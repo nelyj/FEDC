@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, shrink-to-fit=no, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>
+        {% block title %}
+            Simple Sidebar - Start Bootstrap Template
+        {% endblock title %}
+    </title>
+    {% load staticfiles %}
+    {% block constantes %}
+    <script type="text/javascript">
+            var JSON_DATA = "{% static 'DataTables/media/js/Spanish.json' %}"
+    </script>
+    {% endblock constantes %}
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{% static 'css/simple-sidebar.css' %}" rel="stylesheet">
+       <!-- Font Awesome -->
+      <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+      <!-- Ionicons -->
+      <link rel="stylesheet" href="{% static 'css/ionicons.min.css' %}">
+    <!-- jQuery -->
+    {% block extras_css %}
+    {% endblock extras_css %}
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'start/menu_toggle.js' %}"></script>
+    {% block extras_constantes %}
+    {% endblock extras_constantes %}
+    {% block extras_js %}
+    {% endblock extras_js %}
+</head>
+    <body>
+    {% block msjs %}
+    <!-- Agrega elementos al mensaje -->
+        {% include 'utils_mensajes.html' %}
+    {% endblock msjs %}
+        {% block contenido %}
+        {% endblock contenido %}
+    </body>
+    {% block custom_js%}
+
+    {% endblock custom_js%}
+</html>

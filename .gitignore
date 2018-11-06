@@ -1,0 +1,21 @@
+# Add any directories, files, or patterns you don't want to be tracked by version control
+.metadata
+.buildpath
+multi_form_view/__pycache__
+base_django/__pycache__
+users/__pycache__
+utils/__pycache__
+base_django/settings.py
+multi_form_view/migrations
+users/migrations
+utils/migrations
+*.*.backup
+*.*~
+*.swp
+*.tar.gz
+*.pyc
+*.log
+*.pydevproject
+*.project
+*.planner
+*.tmp

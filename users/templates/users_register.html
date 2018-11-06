@@ -1,0 +1,115 @@
+{% extends "utils_start.html" %}
+{% block titulo %}User Register{% endblock titulo %}
+{% block extras_css %}
+{% load staticfiles %}
+<link type="text/css" rel="stylesheet" href="{% static 'jquery-entropizer-master/dist/css/jquery-entropizer.min.css' %}" />
+{% endblock extras_css %}
+{% block extras_js %}
+<script type="text/javascript" src="{% static 'jquery-entropizer-master/lib/entropizer.js' %}"></script>
+<script type="text/javascript" src="{% static 'jquery-entropizer-master/dist/js/jquery-entropizer.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'users/user_register.js' %}"></script>
+{% endblock extras_js %}
+{% block content_center %}
+<div id="page-content-wrapper">
+<div class="container-fluid">
+    <a class="glyphicon glyphicon-list" id="menu-toggle"></a>
+    <div class="col-xs-12">
+        <div class="content">
+          <!-- Inicio Nav tabs -->
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active" id="cuentas">
+              <a href="#cuenta" aria-controls="cuenta" role="tab" data-toggle="tab">Cuenta de Usuario</a>
+            </li>
+            <li role="presentation" id="perfiles">
+              <a href="#perfil" aria-controls="perfil" role="tab" data-toggle="tab">Perfil de Usuario</a>
+            </li>
+          </ul>
+          <!-- Fin Nav tabs -->
+          <!-- Inicio Tab panes -->
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="cuenta">
+              <h3>Registrar la cuenta de usuario</h3>
+              <form id="form_register" method="post">
+                  {% csrf_token %}
+                  <div class="form-group has-feedback">
+                    {{ forms.user.email }}
+                    <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+                  </div>
+                  <div class="form-group has-feedback">
+                    {{ forms.user.username }}
+                    <span class="glyphicon glyphicon-user form-control-feedback"></span>
+                  </div>
+                  <div class="form-group has-feedback">
+                    {{ forms.user.password1 }}
+                    <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+                  </div>
+                  <div class="form-group has-feedback">
+                    {{ forms.user.password2 }}
+                    <span class="glyphicon glyphicon-log-in form-control-feedback"></span>
+                  </div>
+                  <div class="row">
+                  <div id="meter" class="col-md-10 col-md-offset-2">
+                  <p> Fortaleza de la contraseña</p>
+                  </div>
+                  </div>
+                  {% if 'Super Admin' in request.session.grupos %}
+                    <div class="row">
+                      <div class="col-xs-8">
+                      <div class="checkbox icheck">
+                        <label>
+                          {{ forms.user.is_staff}}
+                        </label>
+                          {{ forms.user.is_staff.label}}
+                        </div>
+                      </div>
+                      <div class="col-xs-4">
+                        <div class="checkbox icheck">
+                        <label>
+                          {{ forms.user.is_active}}
+                        </label>
+                          {{ forms.user.is_active.label}}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                      <label>
+                            Grupos de Usuario
+                      </label>
+                      {{ forms.user.groups }}
+                    </div>
+                {% endif %}
+            </div>
+            <div role="tabpanel" class="tab-pane" id="perfil">
+              <h3>Registrar el Perfil del Usuario</h3>
+                <div class="form-group has-feedback">
+                  {{ forms.user.first_name }}
+                  <span class="glyphicon glyphicon-user form-control-feedback"></span>
+                </div>
+                <div class="form-group has-feedback">
+                  {{ forms.user.last_name }}
+                  <span class="glyphicon glyphicon-user form-control-feedback"></span>
+                </div>
+                <div class="form-group has-feedback">
+                  {{ forms.user_perfil.fk_tipo_documento.label }}
+                  {{ forms.user_perfil.fk_tipo_documento }}
+                  <span class="glyphicon glyphicon-list form-control-feedback"></span>
+                </div>
+                <div class="form-group has-feedback">
+                  {{ forms.user_perfil.id_perfil }}
+                  <span class="glyphicon glyphicon-list form-control-feedback"></span>
+                </div>
+              <br>
+              <button id="submit" type="submit" class="btn btn-success btn-block btn-flat">Registrar</button>
+              </div>
+              
+              </form>
+              <br>
+          <!-- Fin Tab panel -->
+        </div>
+    </div>
+    </div>
+</div>
+{% endblock content_center %}
+
+
+

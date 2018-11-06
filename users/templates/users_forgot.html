@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}'=Django-Forgot Password='{% endblock title %}
+{% block extras_constantes %}
+{% endblock extras_constantes %}
+{% block extras_css %}
+<link rel="stylesheet" href="{% static 'css/custom_login.css' %}">
+<link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+<link href="{% static 'css/font_varelaround.css'  %}" rel='stylesheet' type='text/css'>
+{% endblock extras_css %}
+{% block extras_js %}
+<script src="{% static 'js/jquery.validate.min.js' %}"></script>
+<script type="text/javascript">
+</script>
+{% endblock extras_js %}
+{% block contenido %}
+<!-- Where all the magic happens -->
+<!-- FORGOT PASSWORD FORM -->
+<div class="text-center" style="padding:50px 0">
+    <div class="logo">Forgot Password</div>
+    <!-- Main Form -->
+    <div class="login-form-1">
+        <form id="forgot-password-form" class="text-left" method="post">
+            <div class="etc-login-form">
+                <p>When you fill in your registered email address, you will be sent instructions on how to reset your password.</p>
+            </div>
+            <div class="login-form-main-message"></div>
+            <div class="main-login-form">
+                <div class="login-group">
+                    <div class="form-group">
+                        {% csrf_token %}
+                        {{ form.email }}
+                    </div>
+                </div>
+                <button type="submit" class="login-button"><i class="fa fa-chevron-right"></i></button>
+            </div>
+            <div class="etc-login-form">
+                <p>already have an account? <a href="{% url 'users:login'%}">login here</a></p>
+                <p>new user? <a href="#">create new account</a></p>
+            </div>
+        </form>
+    </div>
+    <!-- end:Main Form -->
+</div>
+{% endblock contenido %}
+{% block custom_js%}
+<script src="{% static 'js/custom_login.js' %}"></script>
+{% endblock custom_js%}

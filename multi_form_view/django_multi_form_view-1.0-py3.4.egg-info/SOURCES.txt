@@ -1,0 +1,11 @@
+MANIFEST.in
+README.md
+setup.cfg
+setup.py
+django_multi_form_view.egg-info/PKG-INFO
+django_multi_form_view.egg-info/SOURCES.txt
+django_multi_form_view.egg-info/dependency_links.txt
+django_multi_form_view.egg-info/not-zip-safe
+django_multi_form_view.egg-info/top_level.txt
+multi_form_view/__init__.py
+multi_form_view/base.py

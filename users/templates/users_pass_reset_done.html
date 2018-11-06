@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}'=Django-Recupeara Password='{% endblock title %}
+{% block extras_constantes %}
+{% endblock extras_constantes %}
+{% block extras_css %}
+<link rel="stylesheet" href="{% static 'css/custom_login.css' %}">
+<link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+<link href="{% static 'css/font_varelaround.css'  %}" rel='stylesheet' type='text/css'>
+{% endblock extras_css %}
+{% block extras_js %}
+<script src="{% static 'js/jquery.validate.min.js' %}"></script>
+<script type="text/javascript">
+</script>
+{% endblock extras_js %}
+{% block contenido %}
+<!-- Where all the magic happens -->
+<!-- FORGOT PASSWORD FORM -->
+<div class="text-center" style="padding:50px 0">
+    <div class="logo">Recuperar contraseña</div>
+    <!-- Main Form -->
+    <div class="login-form-1">
+            <div class="etc-login-form">
+                <p align="justify">Hemos enviado las instrucciones de como recuperar la contraseña a la dirección de correo electrónico especificada</p>  
+                <p>Estarás recibiendo el correo pronto.</p>  
+            </div>
+    </div>
+    <!-- end:Main Form -->
+</div>
+{% endblock contenido %}
+{% block custom_js%}
+{% endblock custom_js%}
