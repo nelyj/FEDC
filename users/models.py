@@ -50,3 +50,21 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.fk_user.username
+
+
+class TwoFactToken(models.Model):
+    """!
+    Class for store Two Fact Token from user
+    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @date 16-04-2017
+    @version 1.0.0
+    """
+    # Relation to user model
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    # Field to store Token
+    token = models.CharField(max_length=128)
+
+    # Field to store serial id
+    serial = models.PositiveIntegerField()
+

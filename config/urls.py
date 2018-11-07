@@ -17,25 +17,25 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.views.static import serve
-from django.contrib.auth.views import (
-    password_reset_confirm, password_reset_complete
-    )
 
 from users.forms import SetPasswordForm
+from users.views import ResetPassConfirm, ResetPassSuccess
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(r'^sources/(?P<path>.*)$', serve, {
         'document_root': settings.MEDIA_ROOT,
     }),
-    path('user/password/reset/<uidb64>/<token>/',
-        password_reset_confirm,
-        {'template_name': 'users_confirm_reset.html',
-         'post_reset_redirect': '/user/password/done/',
-         'set_password_form': SetPasswordForm},
-        name='password_reset_confirm'),
-    path('user/password/done/', password_reset_complete,
-        {'template_name': 'users_pass_done.html'}),
+    path(
+        'user/password/reset/<uidb64>/<token>/',
+        ResetPassConfirm.as_view(),
+        name='password_reset_confirm',
+    ),
+    path(
+        'user/password/done/',
+        ResetPassSuccess.as_view(),
+        name='pass_done',
+    ),
     path('', include('utils.urls', namespace="utils")),
     path('', include('users.urls', namespace="users")),
 ]

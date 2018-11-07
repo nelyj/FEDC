@@ -14,6 +14,13 @@ from django.contrib import messages
 from django.contrib.auth import (
     authenticate, logout, login
 )
+from django.contrib.auth.views import (
+    redirect_to_login, PasswordResetView,
+    PasswordResetDoneView, PasswordResetConfirmView,
+    INTERNAL_RESET_URL_TOKEN,
+    INTERNAL_RESET_SESSION_TOKEN,
+    PasswordResetCompleteView
+)
 
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 from django.contrib.auth.models import (
@@ -26,9 +33,16 @@ from django.contrib.auth.mixins import (
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
+from django.http import (
+    JsonResponse, HttpResponseRedirect
+)
 from django.urls import (
     reverse_lazy, reverse
 )
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache
+#from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.debug import sensitive_post_parameters
 
 from django.shortcuts import (
     render, redirect, get_object_or_404
@@ -41,14 +55,15 @@ from django.views.generic.edit import (
 from multi_form_view import MultiModelFormView
 
 from .models import UserProfile
-from .forms import (
-    FormularioLogin, FormularioAdminRegistro, FormularioUpdate,
-    FormularioAdminRegPerfil, FormularioRegistroComun
-)
+from .forms import *
 
 from utils.views import (
-    LoginRequeridoPerAuth
+    LoginRequeridoPerAuth, IpClient
 )
+from utils.logConstant import (
+    ERROR, AUTHENTICATE, VALIDATE,
+    LOGIN, LOGOUT, FORGOT
+    )
 from utils.messages import MENSAJES_LOGIN, MENSAJES_START
 
 class LoginView(FormView):
@@ -339,3 +354,170 @@ class ModalsPerfil(LoginRequeridoPerAuth, MultiModelFormView):
 
 class Error403(LoginRequiredMixin, TemplateView):
     template_name = "403.html"
+
+
+class ResetPassConfirm(PasswordResetConfirmView):
+    """!
+    Class that inherits from the PasswordResetConfirmView which overwrites\
+    the triggers and the form_view to make the respective saved in the log
+
+    @author Ing. Leonel P. Hernandez M. (leonelphm@gmail.com)
+    @date 24-04-2018
+    @version 1.0.0
+    """
+    form_class = SetPasswordForm
+    template_name = 'users_confirm_reset.html'
+    success_url = reverse_lazy('pass_done')
+
+    @method_decorator(sensitive_post_parameters())
+    @method_decorator(never_cache)
+    def dispatch(self, *args, **kwargs):
+        assert 'uidb64' in kwargs and 'token' in kwargs
+
+        self.validlink = False
+        self.user = self.get_user(kwargs['uidb64'])
+        ip_client = IpClient()
+        get_ip = ip_client.get_client_ip(self.request)
+        model_user = ContentType.objects.get_for_model(User).pk
+
+        if self.user is not None:
+            token = kwargs['token']
+            if token == INTERNAL_RESET_URL_TOKEN:
+                session_token = self.request.session.get(INTERNAL_RESET_SESSION_TOKEN)
+                if self.token_generator.check_token(self.user, session_token):
+                    # If the token is valid, display the password reset form.
+                    self.validlink = True
+                    msg = 'The token is valid, you can recover the password'
+                    message = [{'forgot': {'ip_client': get_ip,
+                                                        'message': msg,
+                                                        'validate': self.validlink}}]
+                    LogEntry.objects.log_action(
+                        user_id=self.user .pk,
+                        content_type_id=model_user,
+                        object_id=self.user .pk,
+                        object_repr=str(self.user .username),
+                        action_flag=FORGOT,
+                        change_message=message
+                        )
+                    return super().dispatch(*args, **kwargs)
+            else:
+                if self.token_generator.check_token(self.user, token):
+                    # Store the token in the session and redirect to the
+                    # password reset form at a URL without the token. That
+                    # avoids the possibility of leaking the token in the
+                    # HTTP Referer header.
+                    self.request.session[INTERNAL_RESET_SESSION_TOKEN] = token
+                    redirect_url = self.request.path.replace(token, INTERNAL_RESET_URL_TOKEN)
+                    return HttpResponseRedirect(redirect_url)
+
+        # Display the "Password reset unsuccessful" page.
+        msg = 'The token is invalid, you can not recover the password, verify the mail and try again, but request a new token'
+        message = [{'forgot': {'ip_client': get_ip,
+                                            'message': msg,
+                                            'validate': self.validlink}}]
+        LogEntry.objects.log_action(
+            user_id=self.user .pk,
+            content_type_id=model_user,
+            object_id=self.user .pk,
+            object_repr=str(self.user .username),
+            action_flag=FORGOT,
+            change_message=message
+            )
+        return self.render_to_response(self.get_context_data())
+
+    def form_valid(self, form):
+        ip_client = IpClient()
+        get_ip = ip_client.get_client_ip(self.request)
+        model_user = ContentType.objects.get_for_model(User).pk
+        user = form.save()
+        msg = 'The reset of the password is confirmed, the %s, has a new password' % (user.username)
+        message = [{'forgot': {'ip_client': get_ip,
+                                            'message': msg}}]
+        LogEntry.objects.log_action(
+            user_id=self.user .pk,
+            content_type_id=model_user,
+            object_id=self.user .pk,
+            object_repr=str(self.user .username),
+            action_flag=FORGOT,
+            change_message=message
+        )
+        if self.post_reset_login:
+            login(self.request, user, self.post_reset_login_backend)
+        return super().form_valid(form)
+
+
+class ResetPassSuccess(PasswordResetCompleteView):
+    """!
+    Class that inherits from the PasswordResetCompleteView which overwrites\
+    the initial parameter of the template_name
+
+    @author Ing. Leonel P. Hernandez M. (leonelphm@gmail.com)
+    @date 24-04-2018
+    @version 1.0.0
+    """
+    template_name = 'users_pass_done.html'
+
+
+class ResetPass(PasswordResetView):
+    """!
+    Class that inherits from the PasswordResetView which overwrites\
+    the form to add the log of forgetfulness the password
+
+    @author Ing. Leonel P. Hernandez M. leonelphm@gmail.com
+    @date 24-04-2018
+    @version 1.0.0
+    """
+    template_name = 'users_forgot.html'
+    form_class = PasswordResetForm
+    success_url = reverse_lazy('users:reset_done')
+
+    def form_valid(self, form):
+        """!
+        Form Valid Method
+
+        @param form Recives form object
+        @return send mail and save forgot log
+        """
+        ip_client = IpClient()
+        get_ip = ip_client.get_client_ip(self.request)
+        model_user = ContentType.objects.get_for_model(User).pk
+        opts = {
+            'use_https': self.request.is_secure(),
+            'token_generator': self.token_generator,
+            'from_email': self.from_email,
+            'email_template_name': self.email_template_name,
+            'subject_template_name': self.subject_template_name,
+            'request': self.request,
+            'html_email_template_name': self.html_email_template_name,
+            'extra_email_context': self.extra_email_context,
+        }
+        form.save(**opts)
+        email = form.cleaned_data['email']
+        msg = 'The email was sent successfully to recover the password of the user %s' % (email)
+        message = [{'forgot': {'ip_client': get_ip, 'mail_send': msg}}]
+        user = User.objects.get(email=email)
+        LogEntry.objects.log_action(
+                        user_id=user.pk,
+                        content_type_id=model_user,
+                        object_id=user.pk,
+                        object_repr=str(user.username),
+                        action_flag=FORGOT,
+                        change_message=message
+                        )
+        messages.success(self.request, "Se envio el correo electronico con exito")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return super().form_invalid(form)
+
+
+class ResetPassDone(PasswordResetDoneView):
+    """!
+    Class that inherits from the PasswordResetDoneView which overwrites\
+    the initial parameter of the template_name
+
+    @author Ing. Leonel P. Hernandez M. (leonelphm@gmail.com)
+    @date 24-04-2018
+    @version 1.0.0
+    """
+    template_name = 'users_pass_reset_done.html'

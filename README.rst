@@ -22,11 +22,11 @@ Para instalar la apliacacion en modo desarrollo debera seguir los siguientes pas
 
 3-) Crear un Ambiente Virtual:
 
-    El proyecto está desarrollado con el lenguaje de programación Python, se debe instalar Python v3.4.2. Con los siguientes comandos puede instalar Python y PIP.
+    El proyecto está desarrollado con el lenguaje de programación Python, se debe instalar Python v3.5.x Con los siguientes comandos puede instalar Python y PIP.
 
     Entrar como root para la instalacion 
 
-    # aptitude install python3.4 python3-pip python3.4-dev python3-setuptools
+    # aptitude install python3.5 python3-pip python3.5-dev python3-setuptools
 
     # aptitude install python3-virtualenv virtualenvwrapper
 

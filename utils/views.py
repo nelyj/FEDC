@@ -7,10 +7,12 @@ Vista que construye los controladores para las utilidades de la plataforma
 @version 1.0.0
 """
 import json
+import random
+
+from django.core import signing
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
 from django.shortcuts import render
-from braces.views import GroupRequiredMixin
 from django.views.generic import TemplateView
 from django.contrib import messages
 from django.contrib.auth.mixins import (
@@ -19,6 +21,8 @@ from django.contrib.auth.mixins import (
 from django.shortcuts import (
     redirect
 )
+
+from braces.views import GroupRequiredMixin
 
 from .models import *
 from .messages import MENSAJES_LOGIN
@@ -76,92 +80,93 @@ class StartView(LoginRequeridoPerAuth, TemplateView):
     group_required = [u"Super Admin", u"Admin", u"Invitado"]
 
 
-def obtenerEstados():
-    """
-    Función que permite obtener la lista de estados
+class TokenGenerator():
+    """!
+    Token Generator, based on Django signing
 
-    El método hace una lista consultando el modelo Estado
-
-    @return: Lista de estados
+    @author Rodrigo Boet (rudmanmrrod@gmail.com)
+    @date 16-04-2017
+    @version 1.0.0
     """
-    try:
-        if Estado.DoesNotExist:
-            consulta = Estado.objects.all().values('id', 'nombre')
+
+    def generate_token(self, user):
+        """
+        Generate token for user
+        @param user Recives user objects
+        @return token or False
+        """
+        try:
+            token = signing.dumps(user.id)
+            serial = random.randint(10000,99999)
+            obj, created = TwoFactToken.objects.update_or_create(
+                user=user,
+                defaults={'token': token,'user': user,'serial':serial },
+            )
+            return str(serial)
+        except:
+            return False
+
+    def check_token(self,user_id,token):
+        """
+        Check token for user
+        @param user_id Recives user id
+        @param token Recives token number
+        @return Boolean
+        """
+        twofact = TwoFactToken.objects.filter(user_id=user_id)
+        if(twofact):
+            twofact = twofact.get()
+            if(twofact.serial==int(token)):
+                try:
+                    signing.loads(twofact.token,max_age=350)
+                    return True
+                except:
+                    return False
+            else:
+                return False
         else:
-            consulta = [{'id': '', 'nombre': ''}]
-    except:
-        consulta = [{'id': '', 'nombre': ''}]
+            return False
 
-    return consulta
+    def check_token_form(self, user_id, token):
+        """
+        Check token for user
 
-def obtenerMunicipios(request):
-    """
-    Función que permite obtener la lista de municipios asociados a un estado
-
-    El método hace un llamado al modelo para realizar una consulta
-
-    @param id_estado: Identificador del estado
-    @type id_estado: entero
-
-    @return: Lista de municipios asociados al estado
-    """
-    try:
-        if Municipio.DoesNotExist:
-            id_estado = request.GET.get('id_estado')
-            municipios = Municipio.objects.filter(estado_id=id_estado).values('id', 'nombre')
-            data = json.dumps(list(municipios), cls=DjangoJSONEncoder)
-            print(data)
+        @param user_id Recives user id
+        @param token Recives token number
+        @return Boolean
+        """
+        token_val = TwoFactToken.objects.filter(user_id=user_id)
+        if(token_val):
+            token_val = token_val.get()
+            try:
+                signing.loads(token_val.token)
+                return True
+            except Exception as e:
+                print(e)
+                return False
         else:
-            data = {}
-    except:
-        data = {}
-        pass
-
-    return HttpResponse(data, content_type='application/json')
+            return False
 
 
-def obtenerParroquias(request):
+class IpClient():
+    """!
+    Class to get the customers ip
+
+    @author Ing. Leonel P. Hernandez M. (leonelphm@gmail.com)
+    @date 19-04-2017
+    @version 1.0.0
     """
-    Función que permite obtener la lista de municipios asociados a un estado
 
-    El método hace un llamado al modelo para realizar una consulta
+    def get_client_ip(self, request):
+        """
+        Gets the ip address that makes requestsCheck token for user
 
-    @param id_estado: Identificador del estado
-    @type id_estado: entero
-
-    @return: Lista de municipios asociados al estado
-    """
-    try:
-        if Municipio.DoesNotExist:
-            id_municipio = request.GET.get('id_municipio')
-            municipios = Parroquia.objects.filter(municipio_id=id_municipio).values('id', 'nombre')
-            data = json.dumps(list(municipios), cls=DjangoJSONEncoder)
+        @param request Recives request
+        @return ip
+        """
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
         else:
-            data = {}
-    except:
-        data = {}
-        pass
-
-    return HttpResponse(data, content_type='application/json')
-
-
-def listMunicipios():
-    """
-    Función que permite obtener el municipio asociado a una parroquia
-
-    El método hace un llamado a un servicio REST de la aplicación comun
-
-    @param id_parroquia: Identificador de la parroquia
-    @type id_parroquia: entero
-
-    @return: El municipio asociado a la parroquia
-    """
-    try:
-        if Municipio.DoesNotExist:
-            consulta = Municipio.objects.all().values('id', 'nombre')
-        else:
-            consulta = [{'id': '', 'nombre': ''}]
-    except OperationalError:
-        consulta = [{'id': '', 'nombre': ''}]
-
-    return consulta
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
