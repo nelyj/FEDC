@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 """!
 Modelo que construye los modelos de datos de los usuarios
 

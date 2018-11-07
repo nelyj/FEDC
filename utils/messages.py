@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 MENSAJES_LOGIN = {
     'LOGIN_USUARIO_NO_VALIDO': 'El usuario y/o contraseña no son válidos, verifica y vuele a intentarlo',
     'LOGIN_REQUERIDO': 'Necesita loguearse para acceder al sistema.',

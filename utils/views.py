@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """!
 Vista que construye los controladores para las utilidades de la plataforma
 

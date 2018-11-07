@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 """!
 Vista que controla los procesos de los usuarios
 
