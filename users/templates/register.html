@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
-{% block title %}'=Django-Cambiar Password='{% endblock title %}
+{% block title %}'=Django-Forgot Password='{% endblock title %}
 {% block extras_constantes %}
 {% endblock extras_constantes %}
 {% block extras_css %}
@@ -21,14 +21,12 @@
 <!-- Where all the magic happens -->
 <!-- FORGOT PASSWORD FORM -->
 <div class="text-center" style="padding:50px 0">
-    <div class="logo">Recuperar contraseña</div>
+    <div class="logo">Registrarse</div>
     <!-- Main Form -->
     <div class="login-form-1">
-    {% if validlink %}
-    <form id="forgot-password-form" class="text-left" method="post">
+        <form id="forgot-password-form" class="text-left" method="post">
             <div class="etc-login-form">
-                <p>Por favor ingrese su nueva contraseña dos veces.<br />
-                        Así podremos verificar que es correcta.</p> 
+                <p>Recuerda rellenar todo el formulario</p>
             </div>
             <div class="login-form-main-message"></div>
             <div class="main-login-form">
@@ -40,15 +38,10 @@
                 </div>
                 <button type="submit" class="login-button"><i class="fa fa-chevron-right"></i></button>
             </div>
+            <div class="etc-login-form">
+                <p>already have an account? <a href="{% url 'users:login'%}">login here</a></p>
+            </div>
         </form>
-        {% else %}
-        <div class="etc-login-form">
-            <h1>Se intento recuperar la contraseña, pero fallo.</h1>
-            <p align="center">El vínculo de recuperación de contraseña es inválido, <br />
-            Posiblemente ya ha sido usado <br />
-            Por favor solicite una nueva contraseña.</p>
-        {% endif %}
-        </div>
     </div>
     <!-- end:Main Form -->
 </div>

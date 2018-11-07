@@ -14,7 +14,7 @@
     {% load staticfiles %}
     {% block constantes %}
     <script type="text/javascript">
-            var JSON_DATA = "{% static 'DataTables/media/js/Spanish.json' %}"
+            var JSON_DATA = "{% static 'DataTables/media/js/Spanish.json' %}";
     </script>
     {% endblock constantes %}
     <!-- Bootstrap Core CSS -->
@@ -38,13 +38,13 @@
     {% endblock extras_js %}
 </head>
     <body>
-    {% block msjs %}
-    <!-- Agrega elementos al mensaje -->
-        {% include 'utils_mensajes.html' %}
-    {% endblock msjs %}
         {% block contenido %}
         {% endblock contenido %}
     </body>
+    <script src="{% static 'users/login.js' %}"></script>
+    <script type="text/javascript">
+    $("#wrapper").toggleClass("toggled");
+    </script>
     {% block custom_js%}
 
     {% endblock custom_js%}

@@ -32,7 +32,7 @@ class UserProfile(models.Model):
     """
     fk_user = models.OneToOneField(User, on_delete=models.CASCADE)
     fk_tipo_documento = models.ForeignKey(TipoDocumento, on_delete=models.CASCADE)
-    id_perfil = models.PositiveIntegerField(unique=True, verbose_name='Documento de identidad')
+    id_perfil = models.PositiveIntegerField(verbose_name='Documento de identidad')
 
     class Meta:
         """!
@@ -46,6 +46,7 @@ class UserProfile(models.Model):
         ordering = ('fk_user',)
         verbose_name = 'Perfil de usuario'
         verbose_name_plural = 'Perfiles de usuarios'
+        unique_together = (("fk_tipo_documento", "id_perfil"),)
         db_table = 'users_perfil'
 
     def __str__(self):

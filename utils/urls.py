@@ -1,7 +1,7 @@
-from django.conf.urls import url
+from django.urls import path
 from .views import *
 
 app_name = 'utils'
 urlpatterns = [
-    url(r'^inicio/$', StartView.as_view(), name='inicio'),
+    path('inicio/', StartView.as_view(), name='inicio'),
 ]

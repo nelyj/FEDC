@@ -38,4 +38,5 @@ urlpatterns = [
     ),
     path('', include('utils.urls', namespace="utils")),
     path('', include('users.urls', namespace="users")),
+    path('', include('conectores.urls', namespace="conectores")),
 ]

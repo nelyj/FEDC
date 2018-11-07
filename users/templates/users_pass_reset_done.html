@@ -14,6 +14,10 @@
 </script>
 {% endblock extras_js %}
 {% block contenido %}
+{% block msjs %}
+    <!-- Agrega elementos al mensaje -->
+    {% include 'utils_mensajes.html' %}
+{% endblock msjs %}
 <!-- Where all the magic happens -->
 <!-- FORGOT PASSWORD FORM -->
 <div class="text-center" style="padding:50px 0">

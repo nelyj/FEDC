@@ -285,3 +285,7 @@ label:hover:before {
   color: #aaaaaa;
   font-weight: bold;
 }
+
+.errors{
+    color: red;
+}

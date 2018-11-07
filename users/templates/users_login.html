@@ -2,6 +2,9 @@
 {% load staticfiles %}
 {% block title %}'=Django-Login='{% endblock title %}
 {% block extras_constantes %}
+    <script type="text/javascript">
+        var URL_LOGIN = "{% url 'users:login' %}";
+    </script>
 {% endblock extras_constantes %}
 {% block extras_css %}
 <link rel="stylesheet" href="{% static 'css/custom_login.css' %}">
@@ -11,38 +14,92 @@
 {% block extras_js %}
 <script src="{% static 'js/jquery.validate.min.js' %}"></script>
 {% endblock extras_js %}
+
 {% block contenido %}
+    {% block msjs %}
+        <!-- Agrega elementos al mensaje -->
+        {% include 'utils_mensajes.html' %}
+    {% endblock msjs %}
     <!-- Where all the magic happens -->
     <!-- LOGIN FORM -->
     <div class="text-center" style="padding:50px 0">
         <div class="logo">Login Base Django</div>
-        <!-- Main Form -->
-        <div class="login-form-1">
-            <form id="login-form" class="text-left" method="post">
-            {% csrf_token %}
-                <div class="login-form-main-message"></div>
-                <div class="main-login-form">
-                    <div class="login-group">
-                        <div class="form-group">
-                            {{ form.usuario }}
-                        </div>
-                        <div class="form-group">
-                            {{ form.contrasena }}
-                        </div>
-                        <div class="form-group login-group-checkbox">
-                            {{form.remember_me}}
-                            <label for="id_remember_me">Recordarme</label>
+            <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="false">
+
+                <ol class="carousel-indicators">
+                    <li data-target="#myCarousel" class="active"></li>
+                    <li data-target="#myCarousel" ></li>
+                </ol>
+                <!-- Main Form -->
+                <div class="carousel-inner">
+                    <div class="item active">
+                        <div class="login-form-1">
+                            <form class="text-left" method="post">
+                            {% csrf_token %}
+                                <div class="login-form-main-message"></div>
+                                <div class="main-login-form" id ="first_login">
+                                    <div class="login-group">
+                                        <div class="form-group">
+                                            {{ form.usuario }}
+                                            <span class="errors"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            {{ form.contrasena }}
+                                            <span class="errors"></span>
+                                        </div>
+                                        <div class="form-group login-group-checkbox">
+                                            {{form.remember_me}}
+                                            <label for="id_remember_me">Recordarme</label>
+                                        </div>
+                                    </div>
+                                    <button type="submit" onclick="login(event,this)" class="login-button"><i class="fa fa-chevron-right"></i></button>
+                                </div>
+                            </form>
                         </div>
                     </div>
-                    <button type="submit" class="login-button"><i class="fa fa-chevron-right"></i></button>
+                    <div class="item">
+                        <div class="login-form-1">
+                            <form class="text-left" action="{% url 'users:login_validate'%}" method="post">
+                                {% csrf_token %}
+                            <div class="login-form-main-message"></div>
+                            <div class="main-login-form" id ="second_login">
+                                <div class="login-group">
+                                    <div class="form-group">
+                                        {{form_validationcode.usuario_validate}}
+                                        {{form_validationcode.contrasena_validate}}
+                                        {{form_validationcode.remember_me_validate}}
+                                    </div>
+                                    <div class="form-group">
+                                        Time Left: 
+                                        <span class="span-min"></span>:<span class="span-sec"></span>
+                                    </div><br/>
+                                    <div class="form-group">
+                                            {{form_validationcode.serial_validate}}
+                                            <span class="errors"></span>
+                                    </div>
+                                </div>
+                                    <input type="hidden" name="next" value="{% if request.GET.next %}{{request.GET.next }}{% else %} None {% endif %}"/>
+                                    <button type="submit" class="login-button validate_button" onclick="validate_code(event,this)"><i class="fa fa-chevron-right"></i></button>
+                            </div>
+                            </form>
+                                <div class="login-group">
+                                    <div class="form-group">
+                                        <button class='btn resend_button' id="resend-btn" onclick="resend(event,this);" style="display:none;">
+                                            Resend Code
+                                        </button>
+                                        <button class='btn' id="back-btn" onclick="backlogin(this)">Back</button>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="etc-login-form">
-                    <p>forgot your password? <a href="{% url 'users:forgot' %}">click here</a></p>
-                    <p>new user? <a href="#">create new account</a></p>
+                    <div class="etc-login-form">
+                        <p>forgot your password? <a href="{% url 'users:forgot' %}">click here</a></p>
+                        <p>new user? <a href="{% url 'users:registrar_cuenta' %}">create new account</a></p>
+                    </div>
                 </div>
-            </form>
+                <!-- end:Main Form -->
         </div>
-        <!-- end:Main Form -->
     </div>
 {% endblock contenido %}
 {% block custom_js%}

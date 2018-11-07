@@ -33,6 +33,7 @@ from django.contrib.auth.mixins import (
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
+from django.core.mail import send_mail
 from django.http import (
     JsonResponse, HttpResponseRedirect
 )
@@ -41,7 +42,7 @@ from django.urls import (
 )
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
-#from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.debug import sensitive_post_parameters
 
 from django.shortcuts import (
@@ -54,17 +55,19 @@ from django.views.generic.edit import (
 )
 from multi_form_view import MultiModelFormView
 
-from .models import UserProfile
+from .models import *
 from .forms import *
 
 from utils.views import (
-    LoginRequeridoPerAuth, IpClient
+    LoginRequeridoPerAuth, IpClient,
+    TokenGenerator
 )
 from utils.logConstant import (
     ERROR, AUTHENTICATE, VALIDATE,
     LOGIN, LOGOUT, FORGOT
     )
 from utils.messages import MENSAJES_LOGIN, MENSAJES_START
+
 
 class LoginView(FormView):
     """!
@@ -79,52 +82,339 @@ class LoginView(FormView):
     template_name = 'users_login.html'
     success_url = '/inicio/'
     model = UserProfile
+    form_vali = FormTwoStepLogin
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form_validationcode'] = self.form_vali
+        return context
+
 
     def form_valid(self, form):
         """
-        Valida el formulario de logeo
-        @return: Dirige a la pantalla inicial de la plataforma
+        Validate the logeo form
+        @return: Direct to the initial screen of the platform
         """
         usuario = form.cleaned_data['usuario']
+
         contrasena = form.cleaned_data['contrasena']
-        if '@' in usuario:
+
+        validate = False
+        try:
+            validate_email(usuario)
             try:
                 usuario = User.objects.get(email=usuario).username
             except:
-                messages.error(self.request, MENSAJES_LOGIN['CORREO_INVALIDO'] % (usuario))
+                #messages.error(self.request, MENSAJES_LOGIN['CORREO_INVALIDO'] % (usuario))
+                pass
+        except Exception as e:
+            pass
+        ip_client = IpClient()
+        get_ip = ip_client.get_client_ip(self.request)
+        model_token = ContentType.objects.get_for_model(TwoFactToken).pk
+        model_user = ContentType.objects.get_for_model(User).pk
+        username = usuario
         usuario = authenticate(username=usuario, password=contrasena)
         if usuario is not None:
-            login(self.request, usuario)
-            self.request.session['permisos'] = list(usuario.get_all_permissions())
-            try:
-                grupos = usuario.groups.all()
-                grupo = []
-                if len(grupos) > 1:
-                    for g in grupos:
-                        grupo += str(g),
-                else:
-                    grupo = str(usuario.groups.get())
-            except:
-                grupo = "No pertenece a un grupo"
+            #send mail token validations
+            user = User.objects.get(username=username)
+            token_gen = TokenGenerator()
+            generate_token = token_gen.generate_token(user)
+            obj = TwoFactToken.objects.get(serial=generate_token, user=user)
+            msg = 'Successfully authenticated user'
+            message = [{'athenticate': {'ip_client': get_ip, 'message': msg}}]
+            LogEntry.objects.log_action(
+                        user_id=user.pk,
+                        content_type_id=model_user,
+                        object_id=user.pk,
+                        object_repr=str(user.username),
+                        action_flag=AUTHENTICATE,
+                        change_message=message
+                        )
+            if generate_token:
+                msj_mail = 'This is the security token that you must enter before 5 minutes: %s' % (generate_token)
+                try:
+                    send_mail(
+                                    'Validate Security',
+                                    str(msj_mail),
+                                    'info@user.com',
+                                    [user.email],
+                                    fail_silently=False,
+                                )
+                    validate = True
+                    msg = 'Message sent succesfully'
+                    message = [{'added': {'ip_client': get_ip, 'mail_send': msg}}]
+                    LogEntry.objects.log_action(
+                        user_id=user.pk,
+                        content_type_id=model_token,
+                        object_id=obj.pk,
+                        object_repr=str(obj.serial),
+                        action_flag=ADDITION,
+                        change_message=message
+                        )
+                    # Time left to validation token expires
+                    time = 5*60
+                    return JsonResponse({'msg': msg, 'validate': validate,'time':time})
+                except Exception as e:
+                    validate = validate
+                    msg = 'Error sent mail'
+                    message = [{'error': {'ip_client': get_ip, 'mail_send': msg + str(e)}}]
+                    LogEntry.objects.log_action(
+                        user_id=user.pk,
+                        content_type_id=model_token,
+                        object_id=obj.pk,
+                        object_repr=str(obj.serial),
+                        action_flag=ERROR,
+                        change_message=message
+                        )
+                    return JsonResponse({'msg': msg, 'validate': validate})
 
-            self.request.session['grupos'] = grupo
+            else:
+                validate = validate
+                msg = 'User error does not exist'
+                message = [{'error': {'ip_client': get_ip, 'message': msg}}]
+                LogEntry.objects.log_action(
+                    user_id=user.pk,
+                    content_type_id=model_token,
+                    object_id=user.pk,
+                    object_repr='None',
+                    action_flag=ERROR,
+                    change_message=message
+                    )
+                return JsonResponse({'msg': msg, 'validate': validate})
 
-            if self.request.POST.get('remember_me') is not None:
-                # Session expira a los dos meses si no se deslogea
-                self.request.session.set_expiry(1209600)
-            messages.info(self.request, MENSAJES_START['INICIO_SESION'] % (usuario.first_name, usuario.username))
         else:
             user = User.objects.filter(username=form.cleaned_data['usuario'])
             if user:
                 user = user.get()
                 if not user.is_active:
-                    self.success_url = reverse_lazy('users:login')
-                    messages.error(self.request, MENSAJES_LOGIN['CUENTA_INACTIVA'])
-            else:
-                self.success_url = reverse_lazy('users:login')
-                messages.warning(self.request, MENSAJES_LOGIN['LOGIN_USUARIO_NO_VALIDO'])
+                    #messages.error(self.request, MENSAJES_LOGIN['CUENTA_INACTIVA'])
+                    validate = validate
+                    msg = str(MENSAJES_LOGIN['CUENTA_INACTIVA'])
+                    message = [{'athenticate': {'ip_client': get_ip, 'message': msg}}]
+                    LogEntry.objects.log_action(
+                                user_id=user.pk,
+                                content_type_id=model_user,
+                                object_id=user.pk,
+                                object_repr=str(user.username),
+                                action_flag=AUTHENTICATE,
+                                change_message=message
+                                )
+                    return JsonResponse({'msg': msg, 'validate': validate})
+                elif usuario is None:
+                    validate = validate
+                    msg = str(MENSAJES_LOGIN['LOGIN_USUARIO_NO_VALIDO'])
+                    message = [{'athenticate': {'ip_client': get_ip, 'message': msg}}]
+                    user = User.objects.filter(groups__name="Super Admin").first()
+                    LogEntry.objects.log_action(
+                                user_id=user.pk,
+                                content_type_id=model_user,
+                                object_id=user.pk,
+                                object_repr='None',
+                                action_flag=AUTHENTICATE,
+                                change_message=message
+                                )
+                    return JsonResponse({'msg': msg, 'validate': validate})
 
-        return super(LoginView, self).form_valid(form)
+            else:
+                #messages.warning(self.request, MENSAJES_LOGIN['LOGIN_USUARIO_NO_VALIDO'])
+                validate = validate
+                msg = str(MENSAJES_LOGIN['LOGIN_USUARIO_NO_VALIDO'])
+                message = [{'athenticate': {'ip_client': get_ip, 'message': msg}}]
+                user = User.objects.filter(groups__name="Super Admin").first()
+                LogEntry.objects.log_action(
+                            user_id=user.pk,
+                            content_type_id=model_user,
+                            object_id=user.pk,
+                            object_repr='None',
+                            action_flag=AUTHENTICATE,
+                            change_message=message
+                            )
+                return JsonResponse({'msg': msg, 'validate': validate})
+
+        return super().form_valid(form)
+
+        def form_invalid(self, form):
+            print(form.errors)
+            return super().form_valid(form)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class LoginValidateView(FormView):
+    """!
+    class that validates authentication in two stages
+
+    @author Ing. Leonel P. Hernandez M. (leonelphm@gmail.com)
+    @date 12-04-2018
+    @version 1.0.0
+    """
+    form_class= FormTwoStepLogin
+    template_name = 'users_login.html'
+
+    def form_valid(self, form):
+        valuenext = self.request.POST.get('next')
+        if valuenext.strip() != 'None':
+            redirect_url = valuenext
+        else:
+            redirect_url = '/inicio'
+        usuario = form.cleaned_data['usuario_validate']
+
+        contrasena = form.cleaned_data['contrasena_validate']
+
+        validation_code = form.cleaned_data['serial_validate']
+
+        remember_me = form.cleaned_data['remember_me_validate']
+
+        model_token = ContentType.objects.get_for_model(TwoFactToken).pk
+        model_user = ContentType.objects.get_for_model(User).pk
+
+        token_check = TokenGenerator()
+        ip_client = IpClient()
+        get_ip = ip_client.get_client_ip(self.request)
+        validate = False
+        try:
+            validate_email(usuario)
+            try:
+                usuario = User.objects.get(email=usuario).username
+            except:
+                #messages.error(self.request, MENSAJES_LOGIN['CORREO_INVALIDO'] % (usuario))
+                pass
+        except Exception as e:
+            pass
+        username = usuario
+        try:
+            user = User.objects.get(username=username)
+        except Exception as e:
+            msg = 'User error does not exist'
+            user = User.objects.filter(groups__name="Super Admin").first()
+            message = [{'athenticate': {'ip_client': get_ip, 'message': msg}}]
+            LogEntry.objects.log_action(
+                    user_id=user.pk,
+                    content_type_id=model_user,
+                    object_id=user.pk,
+                    object_repr='None',
+                    action_flag=ERROR,
+                    change_message=message
+                    )
+            return JsonResponse({'msg': msg, 'validate': validate})
+        check_token = token_check.check_token(user.id, validation_code)
+        if check_token:
+            usuario = authenticate(username=usuario, password=contrasena)
+            obj = TwoFactToken.objects.get(serial=validation_code, user=user)
+            if usuario is not None:
+                msg = 'Successfully authenticated user'
+                message = [{'athenticate': {'ip_client': get_ip, 'message': msg}}]
+                LogEntry.objects.log_action(
+                            user_id=user.pk,
+                            content_type_id=model_user,
+                            object_id=user.pk,
+                            object_repr=str(user.username),
+                            action_flag=AUTHENTICATE,
+                            change_message=message
+                            )
+                login(self.request, usuario)
+                messages.info(self.request, MENSAJES_START['INICIO_SESION'] % (usuario.first_name, usuario.username))
+                try:
+                    parameter_location = ConfigParameter.objects.get(active=True)
+                    parameter_location = parameter_location.geolocation
+                except:
+                    parameter_location = True
+                self.request.session['permisos'] = list(usuario.get_all_permissions())
+                self.request.session['location'] = parameter_location
+                try:
+                    grupos = usuario.groups.all()
+                    grupo = []
+                    if len(grupos) > 1:
+                        for g in grupos:
+                            grupo += str(g),
+                    else:
+                        grupo = str(usuario.groups.get())
+                except:
+                    grupo = "Does not belong to a group"
+
+                self.request.session['grupos'] = grupo
+            
+                msg = 'Success when validating the user'
+                validate = True
+                message = [{'validate': {'ip_client': get_ip, 'message': msg}}]
+                LogEntry.objects.log_action(
+                        user_id=user.pk,
+                        content_type_id=model_token,
+                        object_id=obj.pk,
+                        object_repr=str(validation_code),
+                        action_flag=VALIDATE,
+                        change_message=message
+                        )
+                message = [{'login': {'ip_client': get_ip, 'message': msg}}]
+                LogEntry.objects.log_action(
+                        user_id=user.pk,
+                        content_type_id=model_user,
+                        object_id=user.pk,
+                        object_repr=str(user.username),
+                        action_flag=LOGIN,
+                        change_message=message
+                        )
+                return JsonResponse({'msg': msg, 'validate': validate, 'url_redirect': redirect_url})
+            else:
+                user = User.objects.filter(username=form.cleaned_data['usuario_validate'])
+                if user:
+                    user = user.get()
+                    if not user.is_active:
+                        #messages.error(self.request, MENSAJES_LOGIN['CUENTA_INACTIVA'])
+                        validate = validate
+                        msg = MENSAJES_LOGIN['CUENTA_INACTIVA']
+                        message = [{'athenticate': {'ip_client': get_ip, 'message': msg}}]
+                        LogEntry.objects.log_action(
+                                    user_id=user.pk,
+                                    content_type_id=model_user,
+                                    object_id=user.pk,
+                                    object_repr=str(user.username),
+                                    action_flag=AUTHENTICATE,
+                                    change_message=message
+                                    )
+                        return JsonResponse({'msg': msg, 'validate': validate})
+                    elif usuario is None:
+                        validate = validate
+                        msg = str(MENSAJES_LOGIN['LOGIN_USUARIO_NO_VALIDO'])
+                        message = [{'athenticate': {'ip_client': get_ip, 'message': msg}}]
+                        user = User.objects.filter(groups__name="Super Admin").first()
+                        LogEntry.objects.log_action(
+                                    user_id=user.pk,
+                                    content_type_id=model_user,
+                                    object_id=user.pk,
+                                    object_repr='None',
+                                    action_flag=AUTHENTICATE,
+                                    change_message=message
+                                    )
+                        return JsonResponse({'msg': msg, 'validate': validate})
+                else:
+                    #messages.warning(self.request, MENSAJES_LOGIN['LOGIN_USUARIO_NO_VALIDO'])
+                    validate = validate
+                    msg = str(MENSAJES_LOGIN['LOGIN_USUARIO_NO_VALIDO'])
+                    message = [{'athenticate': {'ip_client': get_ip, 'message': msg}}]
+                    user = User.objects.filter(groups__name="Super Admin").first()
+                    LogEntry.objects.log_action(
+                                user_id=user.pk,
+                                content_type_id=model_user,
+                                object_id=user.pk,
+                                object_repr='None',
+                                action_flag=AUTHENTICATE,
+                                change_message=message
+                                )
+                    return JsonResponse({'msg': msg, 'validate': validate})
+        else:
+            msg = 'Token error invalid or expired'
+            message = [{'error': {'ip_client': get_ip, 'message': msg}}]
+            LogEntry.objects.log_action(
+                        user_id=user.pk,
+                        content_type_id=model_token,
+                        object_id='None',
+                        object_repr=str(validation_code),
+                        action_flag=ERROR,
+                        change_message=message
+                        )
+            return JsonResponse({'msg': msg, 'validate': validate})
+
 
 
 class LogOutView(RedirectView):
@@ -443,6 +733,7 @@ class ResetPassConfirm(PasswordResetConfirmView):
         )
         if self.post_reset_login:
             login(self.request, user, self.post_reset_login_backend)
+        messages.success(self.request, msg)
         return super().form_valid(form)
 
 
@@ -521,3 +812,54 @@ class ResetPassDone(PasswordResetDoneView):
     @version 1.0.0
     """
     template_name = 'users_pass_reset_done.html'
+
+
+
+class RegisterAccountView(FormView):
+    """!
+    Register View
+
+    @author Rodrigo Boet (rudmanmrrod@gmail.com)
+    @date 17-04-2018
+    @version 1.0.0
+    """
+    form_class = RegisterUserForm
+    template_name = 'register.html'
+    success_url = '/'
+
+    def form_valid(self,form):
+        """!
+        Form Valid Method
+
+        @param form Recives form object
+        @return validate True
+        """
+        new_user = form.save(commit=False)
+
+        new_user.save()
+        new_user.groups.add(3)
+        ip_client = IpClient()
+        get_ip = ip_client.get_client_ip(self.request)
+        model_user = ContentType.objects.get_for_model(User).pk
+        msg = 'User registered successfully'
+        LogEntry.objects.log_action(
+                        user_id=new_user.pk,
+                        content_type_id=model_user,
+                        object_id=new_user.pk,
+                        object_repr=str(new_user.username),
+                        action_flag=ADDITION,
+                        change_message=[{"added": {'ip_client': get_ip, 'message': msg}}]
+                        )
+        messages.info(self.request, msg)
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        """!
+        Form Invalid Method
+
+        @param form Recives form object
+        @return errors on form
+        """
+        messages.error(self.request, form.errors)
+    
+        return super().form_invalid(form)

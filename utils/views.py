@@ -24,6 +24,8 @@ from django.shortcuts import (
 
 from braces.views import GroupRequiredMixin
 
+from users.models import TwoFactToken 
+
 from .models import *
 from .messages import MENSAJES_LOGIN
 

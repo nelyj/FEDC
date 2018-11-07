@@ -37,7 +37,7 @@ class FormularioLogin(forms.Form):
     remember_me = BooleanField()
 
     class Meta:
-        fields = ('usuario', 'contrasena', 'remember_me' 'captcha')
+        fields = ('usuario', 'contrasena', 'remember_me')
 
     def __init__(self, *args, **kwargs):
         super(FormularioLogin, self).__init__(*args, **kwargs)
@@ -193,7 +193,7 @@ class FormularioRegistroComun(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'password1', 'password2',
-                         'first_name', 'last_name', 'email']
+                  'first_name', 'last_name', 'email']
 
     def __init__(self, arg):
         super(FormularioRegistroComun, self).__init__()
@@ -229,6 +229,88 @@ class FormularioRegistroComun(UserCreationForm):
         if email:
             msg = "Error este email: %s, ya se encuentra asociado a una cuenta\
                   " % (email)
+            try:
+                User.objects.get(email=email)
+                self.add_error('email', msg)
+            except:
+                pass
+
+
+class FormTwoStepLogin(forms.Form):
+    contrasena_validate = CharField()
+    usuario_validate = CharField()
+    serial_validate = forms.IntegerField()
+    remember_me_validate = BooleanField()
+
+    class Meta:
+        fields = ('contrasena_validate', 'usuario_validate',
+                  'serial_validate', 'remember_me_validate')
+
+    def __init__(self, *args, **kwargs):
+        super(FormTwoStepLogin, self).__init__(*args, **kwargs)
+        self.fields['contrasena_validate'].widget = PasswordInput()
+        self.fields['contrasena_validate'].widget.attrs.update({'class': 'form-control',
+        'placeholder': 'Contraseña', 'style':'display:none'})
+        self.fields['usuario_validate'].widget.attrs.update({'class': 'form-control',
+        'placeholder': 'Username o Email', 'style':'display:none'})
+        self.fields['serial_validate'].widget.attrs.update({'class': 'form-control',
+        'placeholder': 'Serial'})
+        self.fields['remember_me_validate'].label = "Recordar"
+        self.fields['remember_me_validate'].widget = CheckboxInput()
+        self.fields['remember_me_validate'].required = False
+        self.fields['remember_me_validate'].widget.attrs.update({'style':'display:none'})
+
+
+class RegisterUserForm(UserCreationForm):
+    """!
+    Class that allows you to create the form to register users
+
+    @author Ing. Leonel P. Hernandez M. (leonelphm@gmail.com)
+    @date 12-04-2018
+    @version 1.0.0
+    """
+
+    class Meta:
+        model = User
+        fields = ['password1', 'password2', 'first_name',
+                  'last_name', 'email', 'username']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['username'].widget.attrs.update({'class': 'form-control',
+                                                     'placeholder':
+                                                     'Username', 'autofocus': False})
+
+        self.fields['password1'].widget.attrs.update({'class': 'form-control',
+                                                      'placeholder': 'Contraseña'})
+        self.fields['password1'].required = True
+        self.fields['password2'].widget.attrs.update({'class': 'form-control',
+                                                      'placeholder': 'Repetir contraseña'})
+        self.fields['password2'].required = True
+        self.fields['email'].widget.attrs.update({'class': 'form-control',
+                                                  'placeholder': 'Email'})
+        self.fields['email'].required = True
+
+        self.fields['first_name'].widget.attrs.update({'class': 'form-control',
+                                                     'placeholder': 'Nombres'})
+        self.fields['first_name'].required = True
+        self.fields['last_name'].widget.attrs.update({'class': 'form-control',
+                                                     'placeholder': 'Apellidos'})
+        self.fields['last_name'].required = True
+
+    def clean(self):
+        cleaned_data = super(RegisterUserForm, self).clean()
+        email = cleaned_data.get("email")
+        password1 = cleaned_data.get("password1")
+        password2 = cleaned_data.get("password2")
+
+        if password1 != password2:
+            msg = "Password not match"
+            self.add_error('password1', msg)
+
+        if email:
+            msg = "Error on mail: %s, has been used" % (email)
             try:
                 User.objects.get(email=email)
                 self.add_error('email', msg)

@@ -7,11 +7,13 @@ from .views import *
 app_name = 'users'
 urlpatterns = [
     path('', LoginView.as_view(), name="login"),
+    path('login_validate/', LoginValidateView.as_view(), name="login_validate"),
     path('logout/', LogOutView.as_view(), name="logout"),
     
     # Reset password all users
     path('accounts/password/reset/', ResetPass.as_view(), name='forgot'),
     path('accounts/password/done/', ResetPassDone.as_view(), name='reset_done'),
+    path('registrar-cuenta', RegisterAccountView.as_view(), name='registrar_cuenta'),
     
     # Urls Access Super Admin
     path('lista-usuarios/', ListUsersView.as_view(), name="lista_users"),
