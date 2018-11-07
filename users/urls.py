@@ -15,7 +15,7 @@ urlpatterns = [
     
     # Urls Access Super Admin
     path('lista-usuarios/', ListUsersView.as_view(), name="lista_users"),
-    path('perfil/<int:pk>)/', ModalsPerfil.as_view(),
+    path('perfil/<int:pk>/', ModalsPerfil.as_view(),
         name="modal_perfil"),
     path('registrar/', RegisterView.as_view(), name="registrar"),
 
