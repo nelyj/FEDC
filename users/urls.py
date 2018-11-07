@@ -31,4 +31,6 @@ urlpatterns = [
     # Ajax list Users, for Super Admin
     url(r'^listar-usuarios/$', ListUsersAjaxView.as_view(),
         name="listar_users"),
+    url(r'^error-403/$', Error403.as_view(),
+        name="403error"),
 ]

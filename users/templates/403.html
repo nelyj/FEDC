@@ -1,0 +1,47 @@
+{% extends "utils_start.html" %}
+{% block titulo %}Error 403{% endblock titulo %}
+{% load staticfiles %}
+{% block content_center %}
+  <div class="container-fluid">
+    <div class="row">
+      <div class="content-wrapper container">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            403 Error
+          </h1>
+        </section>
+        <!-- Main content -->
+        <section class="content">
+          <div class="error-page">
+            <h2 class="headline text-blue"> 403</h2>
+
+            <div class="error-content">
+              <h3><i class="fa fa-warning text-blue"></i> Oops! No tienes permiso de acceso a esta página.</h3>
+
+              <p>
+                No puedes acceder a la página que estás buscando. Usted puede <a href='{% url "utils:inicio" %}'> retornar a inicio</a>  O pregunte al administrador los permisos de acceso.
+              </p>
+
+              <form class="search-form">
+                <div class="input-group">
+                  <input type="text" name="search" class="form-control" placeholder="Search">
+
+                  <div class="input-group-btn">
+                    <button type="submit" name="submit" class="btn btn-info btn-flat"><i class="fa fa-search"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- /.input-group -->
+              </form>
+            </div>
+            <!-- /.error-content -->
+          </div>
+          <!-- /.error-page -->
+        </section>
+        <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+    </div>
+  </div>
+{% endblock content_center %}

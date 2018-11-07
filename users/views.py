@@ -335,3 +335,7 @@ class ModalsPerfil(LoginRequeridoPerAuth, MultiModelFormView):
             messages.success(self.request, "Usuario %s Actualizado con exito\
                                            " % (str(objeto.username)))
         return super(ModalsPerfil, self).forms_valid(forms)
+
+
+class Error403(LoginRequiredMixin, TemplateView):
+    template_name = "403.html"
