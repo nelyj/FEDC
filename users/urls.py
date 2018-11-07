@@ -8,7 +8,7 @@ from .forms import PasswordResetForm
 from .ajaxs import *
 from .views import *
 
-
+app_name = 'users'
 urlpatterns = [
     url(r'^$', LoginView.as_view(), name="login"),
     url(r'^logout/$', LogOutView.as_view(), name="logout"),

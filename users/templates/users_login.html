@@ -10,69 +10,41 @@
 {% endblock extras_css %}
 {% block extras_js %}
 <script src="{% static 'js/jquery.validate.min.js' %}"></script>
-<script type="text/javascript">
-     /**
-     * @brief Función para recargar el captcha vía json
-     * @param element Recibe el botón
-     */
-    function refresh_captcha(element) {
-        $form = $(element).parents('form');
-        var url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/";
-
-        $.getJSON(url, {}, function(json) {
-            $form.find('input[name="captcha_0"]').val(json.key);
-            $form.find('img.captcha').attr('src', json.image_url);
-        });
-
-        return false;
-    } 
-$(document).ready(function() {
-     
-    $('#id_captcha_1').attr('class','form-control');
-    $('#id_captcha_1').attr('placeholder','Ingresa los 4 caracteres');
-});
-</script>
 {% endblock extras_js %}
 {% block contenido %}
-<!-- Where all the magic happens -->
-<!-- LOGIN FORM -->
-<div class="text-center" style="padding:50px 0">
-    <div class="logo">Login Base Django</div>
-    <!-- Main Form -->
-    <div class="login-form-1">
-        <form id="login-form" class="text-left" method="post">
-        {% csrf_token %}
-            <div class="login-form-main-message"></div>
-            <div class="main-login-form">
-                <div class="login-group">
-                    <div class="form-group">
-                        {{ form.usuario }}
+    <!-- Where all the magic happens -->
+    <!-- LOGIN FORM -->
+    <div class="text-center" style="padding:50px 0">
+        <div class="logo">Login Base Django</div>
+        <!-- Main Form -->
+        <div class="login-form-1">
+            <form id="login-form" class="text-left" method="post">
+            {% csrf_token %}
+                <div class="login-form-main-message"></div>
+                <div class="main-login-form">
+                    <div class="login-group">
+                        <div class="form-group">
+                            {{ form.usuario }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.contrasena }}
+                        </div>
+                        <div class="form-group login-group-checkbox">
+                            {{form.remember_me}}
+                            <label for="id_remember_me">Recordarme</label>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        {{ form.contrasena }}
-                    </div>
-                    <div class="form-group login-group-checkbox">
-                        {{form.remember_me}}
-                        <label for="id_remember_me">Recordarme</label>
-                    </div>
-                    <div class="form-group has-feedback {% if form.captcha.errors %}has-error{% endif %}">
-                    <a onclick="refresh_captcha(this);" style="cursor: pointer">
-                      <span class="glyphicon glyphicon-refresh" data-toggle="tooltip" title="Presione para recargar la imagen del captcha"></span>
-                    </a>
-                    {{form.captcha}}
-                  </div>
+                    <button type="submit" class="login-button"><i class="fa fa-chevron-right"></i></button>
                 </div>
-                <button type="submit" class="login-button"><i class="fa fa-chevron-right"></i></button>
-            </div>
-            <div class="etc-login-form">
-                <p>forgot your password? <a href="{% url 'users:forgot' %}">click here</a></p>
-                <p>new user? <a href="#">create new account</a></p>
-            </div>
-        </form>
+                <div class="etc-login-form">
+                    <p>forgot your password? <a href="{% url 'users:forgot' %}">click here</a></p>
+                    <p>new user? <a href="#">create new account</a></p>
+                </div>
+            </form>
+        </div>
+        <!-- end:Main Form -->
     </div>
-    <!-- end:Main Form -->
-</div>
 {% endblock contenido %}
 {% block custom_js%}
-<script src="{% static 'js/custom_login.js' %}"></script>
+    <script src="{% static 'js/custom_login.js' %}"></script>
 {% endblock custom_js%}

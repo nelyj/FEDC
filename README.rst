@@ -69,7 +69,7 @@ Para instalar la apliacacion en modo desarrollo debera seguir los siguientes pas
 
     El manejador de base de datos que usa el proyecto es postgres, es necesario, crear la base de datos desde postgres de la siguiente manera si se usa la consola de postgres:
 
-    postgres=# CREATE DATABASE UserManager OWNER=postgres ENCODING='UTF−8';
+    postgres=# CREATE DATABASE user_manager OWNER=postgres ENCODING='UTF−8';
 
     Para migrar los modelos del proyecto se debe usar el siguiente comando:
 

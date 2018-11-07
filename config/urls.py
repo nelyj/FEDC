@@ -25,7 +25,6 @@ from users.forms import SetPasswordForm
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('captcha/', include('captcha.urls')),
     re_path(r'^sources/(?P<path>.*)$', serve, {
         'document_root': settings.MEDIA_ROOT,
     }),

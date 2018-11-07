@@ -27,7 +27,7 @@ from django.contrib.auth.mixins import (
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import (
+from django.urls import (
     reverse_lazy, reverse
 )
 

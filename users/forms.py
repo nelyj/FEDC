@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """!
 Modulo Forms  que construye los formularios para los templates  de la plataforma
 
@@ -7,7 +6,6 @@ Modulo Forms  que construye los formularios para los templates  de la plataforma
 @date 09-06-2017
 @version 1.0.0
 """
-from captcha.fields import CaptchaField
 from django import forms
 from django.forms import ModelForm
 from django.contrib.auth.models import User
@@ -37,7 +35,6 @@ class FormularioLogin(forms.Form):
     contrasena = CharField()
     usuario = CharField()
     remember_me = BooleanField()
-    captcha = CaptchaField()
 
     class Meta:
         fields = ('usuario', 'contrasena', 'remember_me' 'captcha')
@@ -52,7 +49,6 @@ class FormularioLogin(forms.Form):
         self.fields['remember_me'].label = "Recordar"
         self.fields['remember_me'].widget = CheckboxInput()
         self.fields['remember_me'].required = False
-        self.fields['captcha'].required=True
 
 
 class PasswordResetForm(PasswordResetForm):

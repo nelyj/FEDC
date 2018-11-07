@@ -11,7 +11,6 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
 from django.shortcuts import render
-from dal import autocomplete
 from braces.views import GroupRequiredMixin
 from django.views.generic import TemplateView
 from django.contrib import messages
@@ -61,7 +60,7 @@ class LoginRequeridoPerAuth(LoginRequiredMixin, GroupRequiredMixin):
                 valid_group = True
         if not (valid_group):
             return redirect('users:403error')
-        return super(LoginRequiredMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class StartView(LoginRequeridoPerAuth, TemplateView):
@@ -76,96 +75,6 @@ class StartView(LoginRequeridoPerAuth, TemplateView):
     """
     template_name = "utils_start.html"
     group_required = [u"Super Admin", u"Admin", u"Invitado"]
-
-
-class PaisAutocomplete(autocomplete.Select2QuerySetView):
-    """!
-    Crea el autocomplete para los Paises
-
-    @author Ing. Leonel Paolo Hernandez Macchiarulo  (leonelphm at gmail.com)
-    @copyright <a href='http://www.gnu.org/licenses/gpl-2.0.html'>GNU Public License versión 2 (GPLv2)</a>
-    @date 09-01-2017
-    @version 1.0.0
-    """
-    def get_queryset(self):
-        # No se olvide de filtrar los resultados en función del visitante !
-        if not self.request.user.is_authenticated():
-            return Pais.objects.none()
-
-        qs = Pais.objects.all()
-        if self.q:
-            qs = qs.filter(nombre__istartswith=self.q)
-
-        return qs
-
-
-class EstadoAutocomplete(autocomplete.Select2QuerySetView):
-    """!
-    Crea el autocomplete para los Estados
-
-    @author Ing. Leonel Paolo Hernandez Macchiarulo  (leonelphm at gmail.com)
-    @copyright <a href='http://www.gnu.org/licenses/gpl-2.0.html'>GNU Public License versión 2 (GPLv2)</a>
-    @date 09-01-2017
-    @version 1.0.0
-    """
-
-    def get_queryset(self):
-        # No se olvide de filtrar los resultados en función del visitante !
-        if not self.request.user.is_authenticated():
-            return Estado.objects.none()
-
-        qs = Estado.objects.all()
-
-        if self.q:
-            qs = qs.filter(nombre__istartswith=self.q)
-
-        return qs
-
-
-class MunicipioAutocomplete(autocomplete.Select2QuerySetView):
-    """!
-    Crea el autocomplete para los Municipios
-
-    @author Ing. Leonel Paolo Hernandez Macchiarulo  (leonelphm at gmail.com)
-    @copyright <a href='http://www.gnu.org/licenses/gpl-2.0.html'>GNU Public License versión 2 (GPLv2)</a>
-    @date 09-01-2017
-    @version 1.0.0
-    """
-
-    def get_queryset(self):
-        # No se olvide de filtrar los resultados en función del visitante !
-        if not self.request.user.is_authenticated():
-            return Municipio.objects.none()
-
-        qs = Municipio.objects.all()
-
-        if self.q:
-            qs = qs.filter(nombre__istartswith=self.q)
-
-        return qs
-
-
-class ParroquiaAutocomplete(autocomplete.Select2QuerySetView):
-    """!
-    Crea el autocomplete para las Parroquias
-
-    @author Ing. Leonel Paolo Hernandez Macchiarulo  (leonelphm at gmail.com)
-    @copyright <a href='http://www.gnu.org/licenses/gpl-2.0.html'>GNU Public License versión 2 (GPLv2)</a>
-    @date 09-01-2017
-    @version 1.0.0
-    """
-
-    def get_queryset(self):
-        # No se olvide de filtrar los resultados en función del visitante !
-        if not self.request.user.is_authenticated():
-            return Parroquia.objects.none()
-
-        qs = Parroquia.objects.all()
-
-        if self.q:
-            qs = qs.filter(nombre__istartswith=self.q)
-
-        return qs
 
 
 def obtenerEstados():
