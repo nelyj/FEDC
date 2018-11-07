@@ -23,4 +23,6 @@ class FormConector(ModelForm):
         self.fields['url'].required = True
 
         self.fields['password'].widget = PasswordInput()
+        self.fields['password'].widget.attrs.update({'class': 'form-control', 
+                                                'placeholder': 'Password'})
         self.fields['password'].required = True
