@@ -17,6 +17,7 @@ class FormConector(ModelForm):
 
         self.fields['usuario'].widget.attrs.update({'class': 'form-control'})
         self.fields['usuario'].required = True
+        self.fields['usuario'].empty_label = 'Seleccione Usuario'
 
         self.fields['url'].widget.attrs.update({'class': 'form-control', 
                                                 'placeholder': 'Configurar Url'})

@@ -5,7 +5,7 @@ class Conector(models.Model):
     """
     """
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
-    url = models.CharField(max_length=255)
+    url = models.URLField(max_length=255)
     password = models.CharField(max_length=128)
 
     class Meta:

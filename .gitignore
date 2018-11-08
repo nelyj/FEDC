@@ -9,6 +9,8 @@ base_django/settings.py
 multi_form_view/migrations
 users/migrations
 utils/migrations
+conectores/migrations
+conectores/__pycache__
 *.*.backup
 *.*~
 *.swp
