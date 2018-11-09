@@ -80,11 +80,12 @@ Para instalar la apliacacion en modo desarrollo debera seguir los siguientes pas
 
     Asegurese de que los modelos esten migrados en base de datos y ejecute los siguientes comando para cargar la data inicial del proyecto:
 
+    Esto permitira cargar los datos de los estados, municipios y parroquias:
+    (UserManager)$ python manage.py loaddata fixtures/initial_data_utils.json
+    
     Esto permitira cargar los grupos de usuarios y permisos de los usuarios y el superusuario:
     (UserManager)$  python manage.py loaddata fixtures/initial_data_auth.json
 
-    Esto permitira cargar los datos de los estados, municipios y parroquias:
-    (UserManager)$ python manage.py loaddata fixtures/initial_data_utils.json
 
 
 7-) Correr la aplicacion UserManager
