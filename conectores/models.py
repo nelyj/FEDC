@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 class Conector(models.Model):
     """
     """
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    usuario = models.CharField(max_length=128)
     url = models.URLField(max_length=255)
     password = models.CharField(max_length=128)
 

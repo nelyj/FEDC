@@ -6,7 +6,9 @@ django-datatables-view==1.13.1
 django-extensions==1.7.2
 lxml==3.6.0
 olefile==0.44
-psycopg2==2.7.1
+mysql-connector-python-rf==2.2.2
+psycopg2==2.7.5
+requests==2.20.0
 pydotplus==2.0.2
 pyparsing==2.1.8
 pytz==2017.2
