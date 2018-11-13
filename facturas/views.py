@@ -5,6 +5,7 @@ from django.views.generic.base import TemplateView
 import mysql.connector
 import requests
 from requests import Request, Session
+import dicttoxml
 import json
 
 class ListaFacturasViews(TemplateView):
@@ -76,6 +77,7 @@ class DeatailInvoice(TemplateView):
         url='http://erp.timg.cl/api/resource/Sales%20Invoice/'+str(kwargs['slug'])
         aux=session.get(url)
         aux=json.loads(aux.text)
+        xml = dicttoxml.dicttoxml(aux)
         context['keys'] = list(aux['data'].keys())
         context['values'] = list(aux['data'].values())
         return context
