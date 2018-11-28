@@ -16,8 +16,11 @@ class ConectorViews(FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
-            record = Conector.objects.get(pk=1)
-            form = FormConector(instance=record)
+            record = Conector.objects.filter(pk=1).first()
+            if record:
+                form = FormConector(instance=record)
+            else:
+                form = FormConector()
             context['form']=form
         except Exception as e:
             raise e
