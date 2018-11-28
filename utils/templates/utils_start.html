@@ -26,7 +26,7 @@
             <ul class="sidebar-nav">
                 <li class="sidebar-brand">
                     <a href="#">
-                        Django Base
+                        Timg
                     </a>
                 </li>
                 {% if 'Super Admin' in request.session.grupos %}
@@ -39,16 +39,10 @@
                 </li>
                 {% endif %}
                 <li>
-                    <a href="#">Dashboard</a>
-                </li>
-                <li>
                     <a href="{% url 'facturas:lista_facturas' %}">Facturas</a>
                 </li>
                 <li>
-                    <a href="#">Configuracion de conectores<span class="caret "></span></a>
-                    <ul>
-                        <li><a href="{% url 'conectores:registrar_conector' %}">Registrar Usuario</a></li>
-                  </ul>
+                    <a href="{% url 'conectores:registrar_conector' %}">Configuracion de conectores</a>
                 </li>
                 <li>
                     <a href="{% url 'users:logout' %}">Salir</a>

@@ -22,7 +22,9 @@
                       <h3>Registrar Conector</h3>
                       <form id="form_register" method="post">
                           {% csrf_token %}
-                          {{ form.as_p }}
+                          <div class="col-xs-12" >
+                            {{form.as_p}}
+                          </div>
                          <button id="submit" type="submit" class="btn btn-success btn-block btn-flat">Registrar</button>
                     </div>
                   
