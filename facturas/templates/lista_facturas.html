@@ -28,7 +28,10 @@
             <td> <a href="{% url 'facturas:detail-invoice' lista.data.name %}">{{lista.data.name}}</a></td>
             <td>{{lista.data.title}}</td>
             <td>{{lista.data.status_sii}}</td>
-            <td><input type="submit" name="Estado" value="Enviar a SII"></td>
+            <td>
+                <!-- Trigger the modal with a button -->
+                <button  id="edit_foo" onclick="return validar('{% url 'facturas:send-invoice' lista.data.name%}')" type="button" class="btn btn-info">Enviar SII</button>
+            </td>
         </tr>
         {%endfor%}
     </tbody>
@@ -42,12 +45,28 @@
     </tfoot>
 </table>
 
-<script type="text/javascript">
-    $(document).ready( function () {
-      $('#myTable').DataTable();
-    });
-</script>
-{% endblock content_center %}
+{% include 'modal_XML.html'%}
+
+
+
+    <script type="text/javascript">
+        function validar(url) {
+            console.log(url)
+            $.ajax({
+                type: 'GET',
+                url: url,
+                success: function (data) {
+                    $('#foo_modal').find('.modal-body').html(data);
+                    $('#foo_modal').modal('show');
+                },
+            });
+            return false; 
+        }    
+        $(document).ready( function () {
+          $('#myTable').DataTable();
+      });
+  </script>
+  {% endblock content_center %}
 
 
 

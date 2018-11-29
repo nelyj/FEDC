@@ -7,6 +7,8 @@ import requests
 from requests import Request, Session
 import dicttoxml
 import json
+from django.template.loader import render_to_string
+from django.http import HttpResponse
 
 class ListaFacturasViews(TemplateView):
     template_name = 'lista_facturas.html'
@@ -43,3 +45,10 @@ class DeatailInvoice(TemplateView):
         context['keys'] = list(aux['data'].keys())
         context['values'] = list(aux['data'].values())
         return context
+
+class SendInvoice(TemplateView):
+    template_name = 'modal_XML.html'
+
+    def get(self, request, **kwargs):
+        xml = render_to_string('invoice.xml', {'query_set': kwargs['slug']})
+        return HttpResponse(xml)
