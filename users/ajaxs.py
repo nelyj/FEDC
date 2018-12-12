@@ -3,6 +3,7 @@
 Modulo donde se construyen los ajax´s llamados desde los templates
 
 @author Ing. Leonel Paolo Hernandez Macchiarulo  (leonelphm at gmail.com)
+@author Ing. Luis Barrios (nikeven at gmail.com)
 @copyright <a href='http://www.gnu.org/licenses/gpl-2.0.html'>GNU Public License versión 2 (GPLv2)</a>
 @date 09-01-2017
 @version 1.0.0
@@ -21,6 +22,7 @@ class ListUsersAjaxView(LoginRequeridoPerAuth, BaseDatatableView):
     Prepara la data para mostrar en el datatable
 
     @author Ing. Leonel P. Hernandez M. (leonelphm at gmail.com)
+    @author Ing. Luis Barrios (nikeven at gmail.com)
     @copyright <a href='http://www.gnu.org/licenses/gpl-2.0.html'>GNU Public License versión 2 (GPLv2)</a>
     @date 09-01-2017
     @version 1.0.0

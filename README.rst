@@ -18,7 +18,7 @@ Para instalar la apliacacion en modo desarrollo debera seguir los siguientes pas
 
     > git config --global http.sslCAPath "$HOME/.gitcerts"
 
-    $ git clone https://gitlab.com/leonelphm/UserManger.git
+    $ git clone https://gitlab.com/nikeven/factura_timg.git
 
 3-) Crear un Ambiente Virtual:
 

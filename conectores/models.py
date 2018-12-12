@@ -20,3 +20,24 @@ class Conector(models.Model):
 
     def __str__(self):
         return self.url_erp
+
+class Compania(models.Model):
+    """
+    """
+    rut = models.CharField(max_length=128)
+    razon_social = models.CharField(max_length=128)
+    actividad_principal = models.CharField(max_length=128)
+    giro = models.CharField(max_length=128)
+    direccion = models.CharField(max_length=128)
+    comuna = models.CharField(max_length=128)
+
+    class Meta:
+        """!
+        Clase que construye los meta datos del modelo
+        """
+        ordering = ('rut',)
+        verbose_name = 'Compania'
+        verbose_name_plural = 'Companias'
+
+    def __str__(self):
+        return self.rut

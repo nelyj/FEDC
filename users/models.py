@@ -2,6 +2,7 @@
 Modelo que construye los modelos de datos de los usuarios
 
 @author Ing. Leonel P. Hernandez M. (leonelphm at gmail.com)
+@author Ing. Luis Barrios (nikeven at gmail.com)
 @copyright <a href='http://www.gnu.org/licenses/gpl-2.0.html'>GNU Public License versión 2 (GPLv2)</a>
 @date 18-01-2017
 @version 1.0.0
@@ -26,6 +27,7 @@ class UserProfile(models.Model):
     Clase que construye el modelo de datos para el perfil de usuario
 
     @author Ing. Leonel P. Hernandez M. (leonelphm at gmail.com)
+    @author Ing. Luis Barrios (nikeven at gmail.com)
     @copyright <a href='http://www.gnu.org/licenses/gpl-2.0.html'>GNU Public License versión 2 (GPLv2)</a>
     @date 18-01-2017
     @version 1.0.0
@@ -39,6 +41,7 @@ class UserProfile(models.Model):
         Clase que construye los meta datos del modelo
 
         @author Ing. Leonel P. Hernandez M. (leonelphm at gmail.com)
+        @author Ing. Luis Barrios (nikeven at gmail.com)
         @copyright <a href='http://www.gnu.org/licenses/gpl-2.0.html'>GNU Public License versión 2 (GPLv2)</a>
         @date 18-01-2017
         @version 1.0.0
@@ -57,6 +60,7 @@ class TwoFactToken(models.Model):
     """!
     Class for store Two Fact Token from user
     @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @author Ing. Luis Barrios (nikeven at gmail.com)
     @date 16-04-2017
     @version 1.0.0
     """
