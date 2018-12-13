@@ -20,7 +20,7 @@
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active" id="cuenta">
                       <h3>Registrar Compañia</h3>
-                      <form id="form_register" method="post">
+                      <form id="form_register" method="post" enctype="multipart/form-data">
                           {% csrf_token %}
                           <div class="col-xs-12" >
                             {{form.as_p}}

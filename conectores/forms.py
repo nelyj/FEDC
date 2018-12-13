@@ -43,7 +43,7 @@ class FormCompania(ModelForm):
 
     class Meta:
         model = Compania
-        fields = ['rut','razon_social','actividad_principal', 'giro','direccion','comuna']
+        fields = ['rut','razon_social','actividad_principal', 'giro','direccion','comuna','logo']
 
     def __init__(self, *args, **kwargs):
 
@@ -61,3 +61,4 @@ class FormCompania(ModelForm):
         self.fields['direccion'].required = True
         self.fields['comuna'].widget.attrs.update({'class': 'form-control','placeholder': 'Comuna donde se localiza la Comuna'})
         self.fields['comuna'].required = True
+        self.fields['logo'].widget.attrs.update({'class': 'form-control'})

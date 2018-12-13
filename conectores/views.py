@@ -101,7 +101,8 @@ class CompaniaViews(FormView):
                 'actividad_principal': form['actividad_principal'].value(),
                 'giro': form['giro'].value(),
                 'direccion': form['direccion'].value(),
-                'comuna': form['comuna'].value()
+                'comuna': form['comuna'].value(),
+                'logo': form['logo'].value()
                 })
             msg = "Se configuro la Compañia con éxito"
             messages.info(self.request, msg)

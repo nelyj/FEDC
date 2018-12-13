@@ -28,12 +28,16 @@ class Conector(models.Model):
 class Compania(models.Model):
     """
     """
+    def get_upload_to(self, filename):
+        return "logos/%s/%s" % (self.rut, filename)
+        
     rut = models.CharField(max_length=128)
     razon_social = models.CharField(max_length=128)
     actividad_principal = models.CharField(max_length=128)
     giro = models.CharField(max_length=128)
     direccion = models.CharField(max_length=128)
     comuna = models.CharField(max_length=128)
+    logo = models.FileField(upload_to=get_upload_to)
 
     class Meta:
         """!
