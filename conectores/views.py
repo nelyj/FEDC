@@ -70,12 +70,12 @@ class CompaniaViews(FormView):
     form_class = FormCompania
     template_name = 'registrar_compania.html'
     success_url = '/inicio/'
-    model = Conector
+    model = Compania
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
-            record = Conector.objects.filter(pk=1).first()
+            record = Compania.objects.filter(pk=1).first()
             if record:
                 form = FormCompania(instance=record)
             else:
