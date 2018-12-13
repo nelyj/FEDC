@@ -9,7 +9,8 @@ class FormConector(ModelForm):
 
     class Meta:
         model = Conector
-        fields = ['url_erp','url_sii','usuario', 'password','time_cron']
+        fields = ['url_erp','url_sii','usuario',
+                  'password','time_cron', 'certificado']
 
     def __init__(self, *args, **kwargs):
 
@@ -27,6 +28,16 @@ class FormConector(ModelForm):
         self.fields['password'].required = True
         self.fields['time_cron'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Tiempo para enviar facturas al SII'})
         self.fields['time_cron'].required = True
+        self.fields['certificado'].widget.attrs.update({'class': 'form-control'})
+
+    def clean(self):
+        cleaned_data = super(FormConector, self).clean()
+        password = cleaned_data.get("password")
+        space = password.count(' ')
+        if space > 0:
+            msg = "Error en password: no puede contener espacios en blanco" 
+            self.add_error('password', msg)
+
 
 class FormCompania(ModelForm):
 

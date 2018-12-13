@@ -21,3 +21,5 @@ conectores/__pycache__
 *.project
 *.planner
 *.tmp
+sources/*
+mydatabase

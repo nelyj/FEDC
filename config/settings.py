@@ -86,9 +86,9 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'user_manager',
+        'NAME': 'facturas',
         'USER': 'postgres',
-        'PASSWORD': 'haydelis26',
+        'PASSWORD': '123456',
         'HOST': 'localhost',
         'PORT': '5432',
         'ATOMIC_REQUESTS': True, # Crea transacciones en cada peticion de la vista

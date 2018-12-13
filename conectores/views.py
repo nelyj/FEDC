@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.hashers import PBKDF2PasswordHasher
 from django.views.generic.edit import FormView
 
 from .forms import *
@@ -12,6 +13,7 @@ class ConectorViews(FormView):
     template_name = 'registrar_conector.html'
     success_url = '/inicio/'
     model = Conector
+    hasher = PBKDF2PasswordHasher
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -33,22 +35,23 @@ class ConectorViews(FormView):
         @param form Recives form object
         @return validate True
         """
-        print(form['usuario'].value())
-        try:
-            transaction = Conector.objects.update_or_create(
-                pk=1,
-                defaults={
-                'usuario': form['usuario'].value(),
-                'url_erp': form['url_erp'].value(),
-                'url_sii': form['url_sii'].value(),
-                'password': form['password'].value(),
-                'time_cron': form['time_cron'].value()
-                })
-            msg = "Se configuro el Conector con éxito"
-            messages.info(self.request, msg)
-        except Exception as e:
-            msg = "Ocurrio un problema al guardar la información"
-            messages.error(self.request, msg)
+        print(form['usuario'].value()) 
+        #try:
+        transaction = Conector.objects.update_or_create(
+            pk=1,
+            defaults={
+            'usuario': form['usuario'].value(),
+            'url_erp': form['url_erp'].value(),
+            'url_sii': form['url_sii'].value(),
+            'password': self.hasher().encode(password=form['password'].value(), salt='salt', iterations=50000),
+            'time_cron': form['time_cron'].value(),
+            'certificado': form['certificado'].value()
+            })
+        msg = "Se configuro el Conector con éxito"
+        messages.info(self.request, msg)
+        #except Exception as e:
+        #    msg = "Ocurrio un problema al guardar la información"
+        #    messages.error(self.request, msg)
         return super().form_valid(form)
     def form_invalid(self, form):
         """!

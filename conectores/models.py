@@ -4,10 +4,14 @@ from django.contrib.auth.models import User
 class Conector(models.Model):
     """
     """
+    def get_upload_to(self, filename):
+        return "certificados/%s/%s" % (self.usuario, filename)
+
     usuario = models.CharField(max_length=128)
     url_erp = models.URLField(max_length=255)
     url_sii = models.URLField(max_length=255)
     password = models.CharField(max_length=128)
+    certificado = models.FileField(upload_to=get_upload_to)
     time_cron = models.IntegerField(default=10)
 
     class Meta:
