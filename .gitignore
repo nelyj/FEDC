@@ -23,3 +23,5 @@ conectores/__pycache__
 *.tmp
 sources/*
 mydatabase
+config/settings.py
+config/wsgi.py
