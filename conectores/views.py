@@ -43,7 +43,8 @@ class ConectorViews(FormView):
             'usuario': form['usuario'].value(),
             'url_erp': form['url_erp'].value(),
             'url_sii': form['url_sii'].value(),
-            'password': self.hasher().encode(password=form['password'].value(), salt='salt', iterations=50000),
+            #'password': self.hasher().encode(password=form['password'].value(), salt='salt', iterations=50000),
+            'password': form['password'].value(),
             'time_cron': form['time_cron'].value(),
             'certificado': form['certificado'].value()
             })

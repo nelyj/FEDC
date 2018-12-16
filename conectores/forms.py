@@ -43,7 +43,9 @@ class FormCompania(ModelForm):
 
     class Meta:
         model = Compania
-        fields = ['rut','razon_social','actividad_principal', 'giro','direccion','comuna','logo']
+        fields = ['rut','razon_social','actividad_principal', 'giro',
+                'direccion','comuna','logo','fecha_resolucion','numero_resolucion',
+                'correo_sii','pass_correo_sii','correo_intercambio','pass_correo_intercambio']
 
     def __init__(self, *args, **kwargs):
 
@@ -61,4 +63,21 @@ class FormCompania(ModelForm):
         self.fields['direccion'].required = True
         self.fields['comuna'].widget.attrs.update({'class': 'form-control','placeholder': 'Comuna donde se localiza la Comuna'})
         self.fields['comuna'].required = True
+        self.fields['fecha_resolucion'].widget.attrs.update({'class': 'form-control', 'data-provide': 'datepicker','placeholder':'DD-MM-YYYY'})
+        self.fields['fecha_resolucion'].input_formats = ['%d-%m-%Y']
+        self.fields['fecha_resolucion'].required=True
+        self.fields['numero_resolucion'].widget.attrs.update({'class': 'form-control'})
+        self.fields['numero_resolucion'].required = True
+        self.fields['comuna'].widget.attrs.update({'class': 'form-control','placeholder': 'Comuna donde se localiza la Comuna'})
+        self.fields['comuna'].required = True
+        self.fields['pass_correo_sii'].widget = PasswordInput()
+        self.fields['pass_correo_sii'].widget.attrs.update({'class': 'form-control'})
+        self.fields['pass_correo_sii'].required = True
+        self.fields['correo_sii'].widget.attrs.update({'class': 'form-control'})
+        self.fields['correo_sii'].required = True
+        self.fields['pass_correo_intercambio'].widget = PasswordInput()
+        self.fields['pass_correo_intercambio'].widget.attrs.update({'class': 'form-control'})
+        self.fields['pass_correo_intercambio'].required = True
+        self.fields['correo_intercambio'].widget.attrs.update({'class': 'form-control'})
+        self.fields['correo_intercambio'].required = True
         self.fields['logo'].widget.attrs.update({'class': 'form-control'})

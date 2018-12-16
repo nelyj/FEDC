@@ -38,6 +38,13 @@ class Compania(models.Model):
     direccion = models.CharField(max_length=128)
     comuna = models.CharField(max_length=128)
     logo = models.FileField(upload_to=get_upload_to)
+    fecha_resolucion = models.DateField()
+    numero_resolucion = models.IntegerField()
+    correo_sii = models.EmailField()
+    pass_correo_sii = models.CharField(max_length=128)
+    correo_intercambio = models.EmailField()
+    pass_correo_intercambio = models.CharField(max_length=128)
+
 
     class Meta:
         """!

@@ -9,6 +9,7 @@ import dicttoxml
 import json
 from django.template.loader import render_to_string
 from django.http import HttpResponse
+from conectores.models import *
 
 class ListaFacturasViews(TemplateView):
     template_name = 'lista_facturas.html'
@@ -16,12 +17,17 @@ class ListaFacturasViews(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         session = requests.Session()
-        payload = "{\"usr\":\"luis.be@timg.cl\",\"pwd\":\"Yayu115.\"\n}"
+        try:
+            usuario = Conector.objects.filter(pk=1).first()
+        except Exception as e:
+            print(e)
+        payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
+
         headers = {'content-type': "application/json"}
-        response = session.get('http://erp.timg.cl/api/method/login',data=payload,headers=headers)
-        lista = session.get('http://erp.timg.cl/api/resource/Sales%20Invoice/')
+        response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
+        lista = session.get(usuario.url_erp+'/api/resource/Sales%20Invoice/')
         context['invoices'] = json.loads(lista.text)
-        url='http://erp.timg.cl/api/resource/Sales%20Invoice/'
+        url=usuario.url_erp+'/api/resource/Sales%20Invoice/'
         context['detail']=[]
         for tmp in  context['invoices']['data']:
             aux1=url+str(tmp['name'])
@@ -35,10 +41,14 @@ class DeatailInvoice(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         session = requests.Session()
-        payload = "{\"usr\":\"luis.be@timg.cl\",\"pwd\":\"Yayu115.\"\n}"
+        try:
+            usuario = Conector.objects.filter(pk=1).first()
+        except Exception as e:
+            print(e)
+        payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
         headers = {'content-type': "application/json"}
-        response = session.get('http://erp.timg.cl/api/method/login',data=payload,headers=headers)
-        url='http://erp.timg.cl/api/resource/Sales%20Invoice/'+str(kwargs['slug'])
+        response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
+        url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+str(kwargs['slug'])
         aux=session.get(url)
         aux=json.loads(aux.text)
         xml = dicttoxml.dicttoxml(aux)
