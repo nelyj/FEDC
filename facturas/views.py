@@ -10,6 +10,7 @@ import json
 from django.template.loader import render_to_string
 from django.http import HttpResponse
 from conectores.models import *
+import codecs
 
 class ListaFacturasViews(TemplateView):
     template_name = 'lista_facturas.html'
@@ -57,8 +58,32 @@ class DeatailInvoice(TemplateView):
         return context
 
 class SendInvoice(TemplateView):
-    template_name = 'modal_XML.html'
+    # template_name = 'modal_XML.html'
 
-    def get(self, request, **kwargs):
-        xml = render_to_string('invoice.xml', {'query_set': kwargs['slug']})
-        return HttpResponse(xml)
+    # def get(self, request, **kwargs):
+    #     xml = render_to_string('invoice.xml', {'query_set': kwargs['slug']})
+    #     return HttpResponse(xml)
+    template_name = 'envio_sii.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        session = requests.Session()
+        try:
+            usuario = Conector.objects.filter(pk=1).first()
+        except Exception as e:
+            print(e)
+        payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
+        headers = {'content-type': "application/json"}
+        response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
+        url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+str(kwargs['slug'])
+        aux=session.get(url)
+        aux=json.loads(aux.text)
+        context['factura'] = dict(zip(aux['data'].keys(), aux['data'].values()))
+        print(context['factura'])
+
+        regiones=json.load(codecs.open('fixtures/comunas.json', 'r', 'utf-8-sig'))
+        for comunas in regiones:
+            print(comunas['Nombre'])
+        
+        return context
+

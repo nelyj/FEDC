@@ -4,6 +4,7 @@ from django.views.generic.edit import FormView
 
 from .forms import *
 from .models import *
+from datetime import datetime
 
 
 class ConectorViews(FormView):
@@ -78,6 +79,9 @@ class CompaniaViews(FormView):
         try:
             record = Compania.objects.filter(pk=1).first()
             if record:
+                # datetime.strftime(record.fecha_resolucion,"%d/%m/%Y")
+                # record.fecha_resolucion.strftime("%Y/%m/%d")
+                # datetime.strptime(record.fecha_resolucion, "%d/%m/%Y")
                 form = FormCompania(instance=record)
             else:
                 form = FormCompania()
@@ -103,12 +107,18 @@ class CompaniaViews(FormView):
                 'giro': form['giro'].value(),
                 'direccion': form['direccion'].value(),
                 'comuna': form['comuna'].value(),
+                'fecha_resolucion': datetime.strptime(form['fecha_resolucion'].value(), "%d/%m/%Y"),
+                'numero_resolucion': form['numero_resolucion'].value(),
+                'pass_correo_sii': form['pass_correo_sii'].value(),
+                'correo_sii': form['correo_sii'].value(),
+                'pass_correo_intercambio': form['pass_correo_intercambio'].value(),
+                'correo_intercambio': form['correo_intercambio'].value(),
                 'logo': form['logo'].value()
                 })
             msg = "Se configuro la Compañia con éxito"
             messages.info(self.request, msg)
         except Exception as e:
-            msg = "Ocurrio un problema al guardar la información"
+            msg = "Ocurrio un problema al guardar la información: "+str(e)
             messages.error(self.request, msg)
         return super().form_valid(form)
     def form_invalid(self, form):
@@ -118,6 +128,7 @@ class CompaniaViews(FormView):
         @param form Recives form object
         @return errors on form
         """
+        print(type(form['fecha_resolucion'].value()))
         messages.error(self.request, form.errors)
     
         return super().form_invalid(form)

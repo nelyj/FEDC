@@ -1,0 +1,2078 @@
+﻿[
+    {
+        "Cód.": "15101",
+        "Nombre": "Arica",
+        "Provincia": "Arica",
+        "Región": " Arica y Parinacota"
+    },
+    {
+        "Cód.": "15102",
+        "Nombre": "Camarones",
+        "Provincia": "Arica",
+        "Región": " Arica y Parinacota"
+    },
+    {
+        "Cód.": "15201",
+        "Nombre": "Putre",
+        "Provincia": "Parinacota",
+        "Región": " Arica y Parinacota"
+    },
+    {
+        "Cód.": "15202",
+        "Nombre": "General Lagos",
+        "Provincia": "Parinacota",
+        "Región": " Arica y Parinacota"
+    },
+    {
+        "Cód.": "1101",
+        "Nombre": "Iquique",
+        "Provincia": "Iquique",
+        "Región": " Tarapacá"
+    },
+    {
+        "Cód.": "1107",
+        "Nombre": "Alto Hospicio",
+        "Provincia": "Iquique",
+        "Región": " Tarapacá"
+    },
+    {
+        "Cód.": "1401",
+        "Nombre": "Pozo Almonte",
+        "Provincia": "Tamarugal",
+        "Región": " Tarapacá"
+    },
+    {
+        "Cód.": "1402",
+        "Nombre": "Camiña",
+        "Provincia": "Tamarugal",
+        "Región": " Tarapacá"
+    },
+    {
+        "Cód.": "1403",
+        "Nombre": "Colchane",
+        "Provincia": "Tamarugal",
+        "Región": " Tarapacá"
+    },
+    {
+        "Cód.": "1404",
+        "Nombre": "Huara",
+        "Provincia": "Tamarugal",
+        "Región": " Tarapacá"
+    },
+    {
+        "Cód.": "1405",
+        "Nombre": "Pica",
+        "Provincia": "Tamarugal",
+        "Región": " Tarapacá"
+    },
+    {
+        "Cód.": "2101",
+        "Nombre": "Antofagasta",
+        "Provincia": "Antofagasta",
+        "Región": " Antofagasta"
+    },
+    {
+        "Cód.": "2102",
+        "Nombre": "Mejillones",
+        "Provincia": "Antofagasta",
+        "Región": " Antofagasta"
+    },
+    {
+        "Cód.": "2103",
+        "Nombre": "Sierra Gorda",
+        "Provincia": "Antofagasta",
+        "Región": " Antofagasta"
+    },
+    {
+        "Cód.": "2104",
+        "Nombre": "Taltal",
+        "Provincia": "Antofagasta",
+        "Región": " Antofagasta"
+    },
+    {
+        "Cód.": "2201",
+        "Nombre": "Calama",
+        "Provincia": "El Loa",
+        "Región": " Antofagasta"
+    },
+    {
+        "Cód.": "2202",
+        "Nombre": "Ollagüe",
+        "Provincia": "El Loa",
+        "Región": " Antofagasta"
+    },
+    {
+        "Cód.": "2203",
+        "Nombre": "San Pedro de Atacama",
+        "Provincia": "El Loa",
+        "Región": " Antofagasta"
+    },
+    {
+        "Cód.": "2301",
+        "Nombre": "Tocopilla",
+        "Provincia": "Tocopilla",
+        "Región": " Antofagasta"
+    },
+    {
+        "Cód.": "2302",
+        "Nombre": "María Elena",
+        "Provincia": "Tocopilla",
+        "Región": " Antofagasta"
+    },
+    {
+        "Cód.": "3101",
+        "Nombre": "Copiapó",
+        "Provincia": "Copiapó",
+        "Región": " Atacama"
+    },
+    {
+        "Cód.": "3102",
+        "Nombre": "Caldera",
+        "Provincia": "Copiapó",
+        "Región": " Atacama"
+    },
+    {
+        "Cód.": "3103",
+        "Nombre": "Tierra Amarilla",
+        "Provincia": "Copiapó",
+        "Región": " Atacama"
+    },
+    {
+        "Cód.": "3201",
+        "Nombre": "Chañaral",
+        "Provincia": "Chañaral",
+        "Región": " Atacama"
+    },
+    {
+        "Cód.": "3202",
+        "Nombre": "Diego de Almagro",
+        "Provincia": "Chañaral",
+        "Región": " Atacama"
+    },
+    {
+        "Cód.": "3301",
+        "Nombre": "Vallenar",
+        "Provincia": "Huasco",
+        "Región": " Atacama"
+    },
+    {
+        "Cód.": "3302",
+        "Nombre": "Alto del Carmen",
+        "Provincia": "Huasco",
+        "Región": " Atacama"
+    },
+    {
+        "Cód.": "3303",
+        "Nombre": "Freirina",
+        "Provincia": "Huasco",
+        "Región": " Atacama"
+    },
+    {
+        "Cód.": "3304",
+        "Nombre": "Huasco",
+        "Provincia": "Huasco",
+        "Región": " Atacama"
+    },
+    {
+        "Cód.": "4101",
+        "Nombre": "La Serena",
+        "Provincia": "Elqui",
+        "Región": " Coquimbo"
+    },
+    {
+        "Cód.": "4102",
+        "Nombre": "Coquimbo",
+        "Provincia": "Elqui",
+        "Región": " Coquimbo"
+    },
+    {
+        "Cód.": "4103",
+        "Nombre": "Andacollo",
+        "Provincia": "Elqui",
+        "Región": " Coquimbo"
+    },
+    {
+        "Cód.": "4104",
+        "Nombre": "La Higuera",
+        "Provincia": "Elqui",
+        "Región": " Coquimbo"
+    },
+    {
+        "Cód.": "4105",
+        "Nombre": "Paihuano",
+        "Provincia": "Elqui",
+        "Región": " Coquimbo"
+    },
+    {
+        "Cód.": "4106",
+        "Nombre": "Vicuña",
+        "Provincia": "Elqui",
+        "Región": " Coquimbo"
+    },
+    {
+        "Cód.": "4201",
+        "Nombre": "Illapel",
+        "Provincia": "Choapa",
+        "Región": " Coquimbo"
+    },
+    {
+        "Cód.": "4202",
+        "Nombre": "Canela",
+        "Provincia": "Choapa",
+        "Región": " Coquimbo"
+    },
+    {
+        "Cód.": "4203",
+        "Nombre": "Los Vilos",
+        "Provincia": "Choapa",
+        "Región": " Coquimbo"
+    },
+    {
+        "Cód.": "4204",
+        "Nombre": "Salamanca",
+        "Provincia": "Choapa",
+        "Región": " Coquimbo"
+    },
+    {
+        "Cód.": "4301",
+        "Nombre": "Ovalle",
+        "Provincia": "Limarí",
+        "Región": " Coquimbo"
+    },
+    {
+        "Cód.": "4302",
+        "Nombre": "Combarbalá",
+        "Provincia": "Limarí",
+        "Región": " Coquimbo"
+    },
+    {
+        "Cód.": "4303",
+        "Nombre": "Monte Patria",
+        "Provincia": "Limarí",
+        "Región": " Coquimbo"
+    },
+    {
+        "Cód.": "4304",
+        "Nombre": "Punitaqui",
+        "Provincia": "Limarí",
+        "Región": " Coquimbo"
+    },
+    {
+        "Cód.": "4305",
+        "Nombre": "Río Hurtado",
+        "Provincia": "Limarí",
+        "Región": " Coquimbo"
+    },
+    {
+        "Cód.": "5101",
+        "Nombre": "Valparaíso",
+        "Provincia": "Valparaíso",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5102",
+        "Nombre": "Casablanca",
+        "Provincia": "Valparaíso",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5103",
+        "Nombre": "Concón",
+        "Provincia": "Valparaíso",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5104",
+        "Nombre": "Juan Fernández",
+        "Provincia": "Valparaíso",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5105",
+        "Nombre": "Puchuncaví",
+        "Provincia": "Valparaíso",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5107",
+        "Nombre": "Quintero",
+        "Provincia": "Valparaíso",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5109",
+        "Nombre": "Viña del Mar",
+        "Provincia": "Valparaíso",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5201",
+        "Nombre": "Isla de Pascua",
+        "Provincia": "Isla de Pascua",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5301",
+        "Nombre": "Los Andes",
+        "Provincia": "Los Andes",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5302",
+        "Nombre": "Calle Larga",
+        "Provincia": "Los Andes",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5303",
+        "Nombre": "Rinconada",
+        "Provincia": "Los Andes",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5304",
+        "Nombre": "San Esteban",
+        "Provincia": "Los Andes",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5401",
+        "Nombre": "La Ligua",
+        "Provincia": "Petorca",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5402",
+        "Nombre": "Cabildo",
+        "Provincia": "Petorca",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5403",
+        "Nombre": "Papudo",
+        "Provincia": "Petorca",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5404",
+        "Nombre": "Petorca",
+        "Provincia": "Petorca",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5405",
+        "Nombre": "Zapallar",
+        "Provincia": "Petorca",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5501",
+        "Nombre": "Quillota",
+        "Provincia": "Quillota",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5502",
+        "Nombre": "La Calera",
+        "Provincia": "Quillota",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5503",
+        "Nombre": "Hijuelas",
+        "Provincia": "Quillota",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5504",
+        "Nombre": "La Cruz",
+        "Provincia": "Quillota",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5506",
+        "Nombre": "Nogales",
+        "Provincia": "Quillota",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5601",
+        "Nombre": "San Antonio",
+        "Provincia": "San Antonio",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5602",
+        "Nombre": "Algarrobo",
+        "Provincia": "San Antonio",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5603",
+        "Nombre": "Cartagena",
+        "Provincia": "San Antonio",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5604",
+        "Nombre": "El Quisco",
+        "Provincia": "San Antonio",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5605",
+        "Nombre": "El Tabo",
+        "Provincia": "San Antonio",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5606",
+        "Nombre": "Santo Domingo",
+        "Provincia": "San Antonio",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5701",
+        "Nombre": "San Felipe",
+        "Provincia": "San Felipe de Aconcagua",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5702",
+        "Nombre": "Catemu",
+        "Provincia": "San Felipe de Aconcagua",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5703",
+        "Nombre": "Llaillay",
+        "Provincia": "San Felipe de Aconcagua",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5704",
+        "Nombre": "Panquehue",
+        "Provincia": "San Felipe de Aconcagua",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5705",
+        "Nombre": "Putaendo",
+        "Provincia": "San Felipe de Aconcagua",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5706",
+        "Nombre": "Santa María",
+        "Provincia": "San Felipe de Aconcagua",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5801",
+        "Nombre": "Quilpué",
+        "Provincia": "Marga Marga",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5802",
+        "Nombre": "Limache",
+        "Provincia": "Marga Marga",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5803",
+        "Nombre": "Olmué",
+        "Provincia": "Marga Marga",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "5804",
+        "Nombre": "Villa Alemana",
+        "Provincia": "Marga Marga",
+        "Región": " Valparaíso"
+    },
+    {
+        "Cód.": "6101",
+        "Nombre": "Rancagua",
+        "Provincia": "Cachapoal",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6102",
+        "Nombre": "Codegua",
+        "Provincia": "Cachapoal",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6103",
+        "Nombre": "Coinco",
+        "Provincia": "Cachapoal",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6104",
+        "Nombre": "Coltauco",
+        "Provincia": "Cachapoal",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6105",
+        "Nombre": "Doñihue",
+        "Provincia": "Cachapoal",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6106",
+        "Nombre": "Graneros",
+        "Provincia": "Cachapoal",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6107",
+        "Nombre": "Las Cabras",
+        "Provincia": "Cachapoal",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6108",
+        "Nombre": "Machalí",
+        "Provincia": "Cachapoal",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6109",
+        "Nombre": "Malloa",
+        "Provincia": "Cachapoal",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6110",
+        "Nombre": "Mostazal",
+        "Provincia": "Cachapoal",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6111",
+        "Nombre": "Olivar",
+        "Provincia": "Cachapoal",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6112",
+        "Nombre": "Peumo",
+        "Provincia": "Cachapoal",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6113",
+        "Nombre": "Pichidegua",
+        "Provincia": "Cachapoal",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6114",
+        "Nombre": "Quinta de Tilcoco",
+        "Provincia": "Cachapoal",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6115",
+        "Nombre": "Rengo",
+        "Provincia": "Cachapoal",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6116",
+        "Nombre": "Requínoa",
+        "Provincia": "Cachapoal",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6117",
+        "Nombre": "San Vicente",
+        "Provincia": "Cachapoal",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6201",
+        "Nombre": "Pichilemu",
+        "Provincia": "Cardenal Caro",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6202",
+        "Nombre": "La Estrella",
+        "Provincia": "Cardenal Caro",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6203",
+        "Nombre": "Litueche",
+        "Provincia": "Cardenal Caro",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6204",
+        "Nombre": "Marchihue",
+        "Provincia": "Cardenal Caro",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6205",
+        "Nombre": "Navidad",
+        "Provincia": "Cardenal Caro",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6206",
+        "Nombre": "Paredones",
+        "Provincia": "Cardenal Caro",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6301",
+        "Nombre": "San Fernando",
+        "Provincia": "Colchagua",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6302",
+        "Nombre": "Chépica",
+        "Provincia": "Colchagua",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6303",
+        "Nombre": "Chimbarongo",
+        "Provincia": "Colchagua",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6304",
+        "Nombre": "Lolol",
+        "Provincia": "Colchagua",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6305",
+        "Nombre": "Nancagua",
+        "Provincia": "Colchagua",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6306",
+        "Nombre": "Palmilla",
+        "Provincia": "Colchagua",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6307",
+        "Nombre": "Peralillo",
+        "Provincia": "Colchagua",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6308",
+        "Nombre": "Placilla",
+        "Provincia": "Colchagua",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6309",
+        "Nombre": "Pumanque",
+        "Provincia": "Colchagua",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "6310",
+        "Nombre": "Santa Cruz",
+        "Provincia": "Colchagua",
+        "Región": " Lib. Gral. Bernardo O'Higgins"
+    },
+    {
+        "Cód.": "7101",
+        "Nombre": "Talca",
+        "Provincia": "Talca",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7102",
+        "Nombre": "Constitución",
+        "Provincia": "Talca",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7103",
+        "Nombre": "Curepto",
+        "Provincia": "Talca",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7104",
+        "Nombre": "Empedrado",
+        "Provincia": "Talca",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7105",
+        "Nombre": "Maule",
+        "Provincia": "Talca",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7106",
+        "Nombre": "Pelarco",
+        "Provincia": "Talca",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7107",
+        "Nombre": "Pencahue",
+        "Provincia": "Talca",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7108",
+        "Nombre": "Río Claro",
+        "Provincia": "Talca",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7109",
+        "Nombre": "San Clemente",
+        "Provincia": "Talca",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7110",
+        "Nombre": "San Rafael",
+        "Provincia": "Talca",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7201",
+        "Nombre": "Cauquenes",
+        "Provincia": "Cauquenes",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7202",
+        "Nombre": "Chanco",
+        "Provincia": "Cauquenes",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7203",
+        "Nombre": "Pelluhue",
+        "Provincia": "Cauquenes",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7301",
+        "Nombre": "Curicó",
+        "Provincia": "Curicó",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7302",
+        "Nombre": "Hualañé",
+        "Provincia": "Curicó",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7303",
+        "Nombre": "Licantén",
+        "Provincia": "Curicó",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7304",
+        "Nombre": "Molina",
+        "Provincia": "Curicó",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7305",
+        "Nombre": "Rauco",
+        "Provincia": "Curicó",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7306",
+        "Nombre": "Romeral",
+        "Provincia": "Curicó",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7307",
+        "Nombre": "Sagrada Familia",
+        "Provincia": "Curicó",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7308",
+        "Nombre": "Teno",
+        "Provincia": "Curicó",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7309",
+        "Nombre": "Vichuquén",
+        "Provincia": "Curicó",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7401",
+        "Nombre": "Linares",
+        "Provincia": "Linares",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7402",
+        "Nombre": "Colbún",
+        "Provincia": "Linares",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7403",
+        "Nombre": "Longaví",
+        "Provincia": "Linares",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7404",
+        "Nombre": "Parral",
+        "Provincia": "Linares",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7405",
+        "Nombre": "Retiro",
+        "Provincia": "Linares",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7406",
+        "Nombre": "San Javier",
+        "Provincia": "Linares",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7407",
+        "Nombre": "Villa Alegre",
+        "Provincia": "Linares",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "7408",
+        "Nombre": "Yerbas Buenas",
+        "Provincia": "Linares",
+        "Región": " Maule"
+    },
+    {
+        "Cód.": "08416",
+        "Nombre": "San Carlos",
+        "Provincia": "Punilla",
+        "Región": " Ñuble"
+    },
+    {
+        "Cód.": "08417",
+        "Nombre": "San Fabián",
+        "Provincia": "Punilla",
+        "Región": " Ñuble"
+    },
+    {
+        "Cód.": "08405",
+        "Nombre": "Coihueco",
+        "Provincia": "Punilla",
+        "Región": " Ñuble"
+    },
+    {
+        "Cód.": "08409",
+        "Nombre": "Ñiquén",
+        "Provincia": "Punilla",
+        "Región": " Ñuble"
+    },
+    {
+        "Cód.": "08419",
+        "Nombre": "San Nicolás",
+        "Provincia": "Punilla",
+        "Región": " Ñuble"
+    },
+    {
+        "Cód.": "08402",
+        "Nombre": "Bulnes",
+        "Provincia": "Diguillín",
+        "Región": " Ñuble"
+    },
+    {
+        "Cód.": "08401",
+        "Nombre": "Chillán",
+        "Provincia": "Diguillín",
+        "Región": " Ñuble"
+    },
+    {
+        "Cód.": "08406",
+        "Nombre": "Chillán Viejo",
+        "Provincia": "Diguillín",
+        "Región": " Ñuble"
+    },
+    {
+        "Cód.": "08407",
+        "Nombre": "El Carmen",
+        "Provincia": "Diguillín",
+        "Región": " Ñuble"
+    },
+    {
+        "Cód.": "08410",
+        "Nombre": "Pemuco",
+        "Provincia": "Diguillín",
+        "Región": " Ñuble"
+    },
+    {
+        "Cód.": "08411",
+        "Nombre": "Pinto",
+        "Provincia": "Diguillín",
+        "Región": " Ñuble"
+    },
+    {
+        "Cód.": "08413",
+        "Nombre": "Quillón",
+        "Provincia": "Diguillín",
+        "Región": " Ñuble"
+    },
+    {
+        "Cód.": "08418",
+        "Nombre": "San Ignacio",
+        "Provincia": "Diguillín",
+        "Región": " Ñuble"
+    },
+    {
+        "Cód.": "08421",
+        "Nombre": "Yungay",
+        "Provincia": "Diguillín",
+        "Región": " Ñuble"
+    },
+    {
+        "Cód.": "08414",
+        "Nombre": "Quirihue",
+        "Provincia": "Itata",
+        "Región": " Ñuble"
+    },
+    {
+        "Cód.": "08403",
+        "Nombre": "Cobquecura",
+        "Provincia": "Itata",
+        "Región": " Ñuble"
+    },
+    {
+        "Cód.": "08404",
+        "Nombre": "Coelemu",
+        "Provincia": "Itata",
+        "Región": " Ñuble"
+    },
+    {
+        "Cód.": "08408",
+        "Nombre": "Ninhue",
+        "Provincia": "Itata",
+        "Región": " Ñuble"
+    },
+    {
+        "Cód.": "08412",
+        "Nombre": "Portezuelo",
+        "Provincia": "Itata",
+        "Región": " Ñuble"
+    },
+    {
+        "Cód.": "08415",
+        "Nombre": "Ránquil",
+        "Provincia": "Itata",
+        "Región": " Ñuble"
+    },
+    {
+        "Cód.": "08420",
+        "Nombre": "Treguaco",
+        "Provincia": "Itata",
+        "Región": " Ñuble"
+    },
+    {
+        "Cód.": "8101",
+        "Nombre": "Concepción",
+        "Provincia": "Concepción",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8102",
+        "Nombre": "Coronel",
+        "Provincia": "Concepción",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8103",
+        "Nombre": "Chiguayante",
+        "Provincia": "Concepción",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8104",
+        "Nombre": "Florida",
+        "Provincia": "Concepción",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8105",
+        "Nombre": "Hualqui",
+        "Provincia": "Concepción",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8106",
+        "Nombre": "Lota",
+        "Provincia": "Concepción",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8107",
+        "Nombre": "Penco",
+        "Provincia": "Concepción",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8108",
+        "Nombre": "San Pedro de La Paz",
+        "Provincia": "Concepción",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8109",
+        "Nombre": "Santa Juana",
+        "Provincia": "Concepción",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8110",
+        "Nombre": "Talcahuano",
+        "Provincia": "Concepción",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8111",
+        "Nombre": "Tomé",
+        "Provincia": "Concepción",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8112",
+        "Nombre": "Hualpén",
+        "Provincia": "Concepción",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8201",
+        "Nombre": "Lebu",
+        "Provincia": "Arauco",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8202",
+        "Nombre": "Arauco",
+        "Provincia": "Arauco",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8203",
+        "Nombre": "Cañete",
+        "Provincia": "Arauco",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8204",
+        "Nombre": "Contulmo",
+        "Provincia": "Arauco",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8205",
+        "Nombre": "Curanilahue",
+        "Provincia": "Arauco",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8206",
+        "Nombre": "Los Álamos",
+        "Provincia": "Arauco",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8207",
+        "Nombre": "Tirúa",
+        "Provincia": "Arauco",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8301",
+        "Nombre": "Los Ángeles",
+        "Provincia": "Biobío",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8302",
+        "Nombre": "Antuco",
+        "Provincia": "Biobío",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8303",
+        "Nombre": "Cabrero",
+        "Provincia": "Biobío",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8304",
+        "Nombre": "Laja",
+        "Provincia": "Biobío",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8305",
+        "Nombre": "Mulchén",
+        "Provincia": "Biobío",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8306",
+        "Nombre": "Nacimiento",
+        "Provincia": "Biobío",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8307",
+        "Nombre": "Negrete",
+        "Provincia": "Biobío",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8308",
+        "Nombre": "Quilaco",
+        "Provincia": "Biobío",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8309",
+        "Nombre": "Quilleco",
+        "Provincia": "Biobío",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8310",
+        "Nombre": "San Rosendo",
+        "Provincia": "Biobío",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8311",
+        "Nombre": "Santa Bárbara",
+        "Provincia": "Biobío",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8312",
+        "Nombre": "Tucapel",
+        "Provincia": "Biobío",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8313",
+        "Nombre": "Yumbel",
+        "Provincia": "Biobío",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "8314",
+        "Nombre": "Alto Biobío",
+        "Provincia": "Biobío",
+        "Región": " Biobío"
+    },
+    {
+        "Cód.": "9101",
+        "Nombre": "Temuco",
+        "Provincia": "Cautín",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9102",
+        "Nombre": "Carahue",
+        "Provincia": "Cautín",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9103",
+        "Nombre": "Cunco",
+        "Provincia": "Cautín",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9104",
+        "Nombre": "Curarrehue",
+        "Provincia": "Cautín",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9105",
+        "Nombre": "Freire",
+        "Provincia": "Cautín",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9106",
+        "Nombre": "Galvarino",
+        "Provincia": "Cautín",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9107",
+        "Nombre": "Gorbea",
+        "Provincia": "Cautín",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9108",
+        "Nombre": "Lautaro",
+        "Provincia": "Cautín",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9109",
+        "Nombre": "Loncoche",
+        "Provincia": "Cautín",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9110",
+        "Nombre": "Melipeuco",
+        "Provincia": "Cautín",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9111",
+        "Nombre": "Nueva Imperial",
+        "Provincia": "Cautín",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9112",
+        "Nombre": "Padre Las Casas",
+        "Provincia": "Cautín",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9113",
+        "Nombre": "Perquenco",
+        "Provincia": "Cautín",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9114",
+        "Nombre": "Pitrufquén",
+        "Provincia": "Cautín",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9115",
+        "Nombre": "Pucón",
+        "Provincia": "Cautín",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9116",
+        "Nombre": "Saavedra",
+        "Provincia": "Cautín",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9117",
+        "Nombre": "Teodoro Schmidt",
+        "Provincia": "Cautín",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9118",
+        "Nombre": "Toltén",
+        "Provincia": "Cautín",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9119",
+        "Nombre": "Vilcún",
+        "Provincia": "Cautín",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9120",
+        "Nombre": "Villarrica",
+        "Provincia": "Cautín",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9121",
+        "Nombre": "Cholchol",
+        "Provincia": "Cautín",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9201",
+        "Nombre": "Angol",
+        "Provincia": "Malleco",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9202",
+        "Nombre": "Collipulli",
+        "Provincia": "Malleco",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9203",
+        "Nombre": "Curacautín",
+        "Provincia": "Malleco",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9204",
+        "Nombre": "Ercilla",
+        "Provincia": "Malleco",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9205",
+        "Nombre": "Lonquimay",
+        "Provincia": "Malleco",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9206",
+        "Nombre": "Los Sauces",
+        "Provincia": "Malleco",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9207",
+        "Nombre": "Lumaco",
+        "Provincia": "Malleco",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9208",
+        "Nombre": "Purén",
+        "Provincia": "Malleco",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9209",
+        "Nombre": "Renaico",
+        "Provincia": "Malleco",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9210",
+        "Nombre": "Traiguén",
+        "Provincia": "Malleco",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "9211",
+        "Nombre": "Victoria",
+        "Provincia": "Malleco",
+        "Región": " La Araucanía"
+    },
+    {
+        "Cód.": "14101",
+        "Nombre": "Valdivia",
+        "Provincia": "Valdivia",
+        "Región": " Los Ríos"
+    },
+    {
+        "Cód.": "14102",
+        "Nombre": "Corral",
+        "Provincia": "Valdivia",
+        "Región": " Los Ríos"
+    },
+    {
+        "Cód.": "14103",
+        "Nombre": "Lanco",
+        "Provincia": "Valdivia",
+        "Región": " Los Ríos"
+    },
+    {
+        "Cód.": "14104",
+        "Nombre": "Los Lagos",
+        "Provincia": "Valdivia",
+        "Región": " Los Ríos"
+    },
+    {
+        "Cód.": "14105",
+        "Nombre": "Máfil",
+        "Provincia": "Valdivia",
+        "Región": " Los Ríos"
+    },
+    {
+        "Cód.": "14106",
+        "Nombre": "Mariquina",
+        "Provincia": "Valdivia",
+        "Región": " Los Ríos"
+    },
+    {
+        "Cód.": "14107",
+        "Nombre": "Paillaco",
+        "Provincia": "Valdivia",
+        "Región": " Los Ríos"
+    },
+    {
+        "Cód.": "14108",
+        "Nombre": "Panguipulli",
+        "Provincia": "Valdivia",
+        "Región": " Los Ríos"
+    },
+    {
+        "Cód.": "14201",
+        "Nombre": "La Unión",
+        "Provincia": "Ranco",
+        "Región": " Los Ríos"
+    },
+    {
+        "Cód.": "14202",
+        "Nombre": "Futrono",
+        "Provincia": "Ranco",
+        "Región": " Los Ríos"
+    },
+    {
+        "Cód.": "14203",
+        "Nombre": "Lago Ranco",
+        "Provincia": "Ranco",
+        "Región": " Los Ríos"
+    },
+    {
+        "Cód.": "14204",
+        "Nombre": "Río Bueno",
+        "Provincia": "Ranco",
+        "Región": " Los Ríos"
+    },
+    {
+        "Cód.": "10101",
+        "Nombre": "Puerto Montt",
+        "Provincia": "Llanquihue",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10102",
+        "Nombre": "Calbuco",
+        "Provincia": "Llanquihue",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10103",
+        "Nombre": "Cochamó",
+        "Provincia": "Llanquihue",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10104",
+        "Nombre": "Fresia",
+        "Provincia": "Llanquihue",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10105",
+        "Nombre": "Frutillar",
+        "Provincia": "Llanquihue",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10106",
+        "Nombre": "Los Muermos",
+        "Provincia": "Llanquihue",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10107",
+        "Nombre": "Llanquihue",
+        "Provincia": "Llanquihue",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10108",
+        "Nombre": "Maullín",
+        "Provincia": "Llanquihue",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10109",
+        "Nombre": "Puerto Varas",
+        "Provincia": "Llanquihue",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10201",
+        "Nombre": "Castro",
+        "Provincia": "Chiloé",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10202",
+        "Nombre": "Ancud",
+        "Provincia": "Chiloé",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10203",
+        "Nombre": "Chonchi",
+        "Provincia": "Chiloé",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10204",
+        "Nombre": "Curaco de Vélez",
+        "Provincia": "Chiloé",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10205",
+        "Nombre": "Dalcahue",
+        "Provincia": "Chiloé",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10206",
+        "Nombre": "Puqueldón",
+        "Provincia": "Chiloé",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10207",
+        "Nombre": "Queilén",
+        "Provincia": "Chiloé",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10208",
+        "Nombre": "Quellón",
+        "Provincia": "Chiloé",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10209",
+        "Nombre": "Quemchi",
+        "Provincia": "Chiloé",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10210",
+        "Nombre": "Quinchao",
+        "Provincia": "Chiloé",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10301",
+        "Nombre": "Osorno",
+        "Provincia": "Osorno",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10302",
+        "Nombre": "Puerto Octay",
+        "Provincia": "Osorno",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10303",
+        "Nombre": "Purranque",
+        "Provincia": "Osorno",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10304",
+        "Nombre": "Puyehue",
+        "Provincia": "Osorno",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10305",
+        "Nombre": "Río Negro",
+        "Provincia": "Osorno",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10306",
+        "Nombre": "San Juan de la Costa",
+        "Provincia": "Osorno",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10307",
+        "Nombre": "San Pablo",
+        "Provincia": "Osorno",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10401",
+        "Nombre": "Chaitén",
+        "Provincia": "Palena",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10402",
+        "Nombre": "Futaleufú",
+        "Provincia": "Palena",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10403",
+        "Nombre": "Hualaihué",
+        "Provincia": "Palena",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "10404",
+        "Nombre": "Palena",
+        "Provincia": "Palena",
+        "Región": " Los Lagos"
+    },
+    {
+        "Cód.": "11101",
+        "Nombre": "Coyhaique",
+        "Provincia": "Coyhaique",
+        "Región": " Aysén del Gral. C. Ibáñez del Campo"
+    },
+    {
+        "Cód.": "11102",
+        "Nombre": "Lago Verde",
+        "Provincia": "Coyhaique",
+        "Región": " Aysén del Gral. C. Ibáñez del Campo"
+    },
+    {
+        "Cód.": "11201",
+        "Nombre": "Aysén",
+        "Provincia": "Aysén",
+        "Región": " Aysén del Gral. C. Ibáñez del Campo"
+    },
+    {
+        "Cód.": "11202",
+        "Nombre": "Cisnes",
+        "Provincia": "Aysén",
+        "Región": " Aysén del Gral. C. Ibáñez del Campo"
+    },
+    {
+        "Cód.": "11203",
+        "Nombre": "Guaitecas",
+        "Provincia": "Aysén",
+        "Región": " Aysén del Gral. C. Ibáñez del Campo"
+    },
+    {
+        "Cód.": "11301",
+        "Nombre": "Cochrane",
+        "Provincia": "Capitán Prat",
+        "Región": " Aysén del Gral. C. Ibáñez del Campo"
+    },
+    {
+        "Cód.": "11302",
+        "Nombre": "O'Higgins",
+        "Provincia": "Capitán Prat",
+        "Región": " Aysén del Gral. C. Ibáñez del Campo"
+    },
+    {
+        "Cód.": "11303",
+        "Nombre": "Tortel",
+        "Provincia": "Capitán Prat",
+        "Región": " Aysén del Gral. C. Ibáñez del Campo"
+    },
+    {
+        "Cód.": "11401",
+        "Nombre": "Chile Chico",
+        "Provincia": "General Carrera",
+        "Región": " Aysén del Gral. C. Ibáñez del Campo"
+    },
+    {
+        "Cód.": "11402",
+        "Nombre": "Río Ibáñez",
+        "Provincia": "General Carrera",
+        "Región": " Aysén del Gral. C. Ibáñez del Campo"
+    },
+    {
+        "Cód.": "12101",
+        "Nombre": "Punta Arenas",
+        "Provincia": "Magallanes",
+        "Región": " Magallanes y Antártica Chilena"
+    },
+    {
+        "Cód.": "12102",
+        "Nombre": "Laguna Blanca",
+        "Provincia": "Magallanes",
+        "Región": " Magallanes y Antártica Chilena"
+    },
+    {
+        "Cód.": "12103",
+        "Nombre": "Río Verde",
+        "Provincia": "Magallanes",
+        "Región": " Magallanes y Antártica Chilena"
+    },
+    {
+        "Cód.": "12104",
+        "Nombre": "San Gregorio",
+        "Provincia": "Magallanes",
+        "Región": " Magallanes y Antártica Chilena"
+    },
+    {
+        "Cód.": "12201",
+        "Nombre": "Cabo de Hornos",
+        "Provincia": "Antártica Chilena",
+        "Región": " Magallanes y Antártica Chilena"
+    },
+    {
+        "Cód.": "12202",
+        "Nombre": "Antártica",
+        "Provincia": "Antártica Chilena",
+        "Región": " Magallanes y Antártica Chilena"
+    },
+    {
+        "Cód.": "12301",
+        "Nombre": "Porvenir",
+        "Provincia": "Tierra del Fuego",
+        "Región": " Magallanes y Antártica Chilena"
+    },
+    {
+        "Cód.": "12302",
+        "Nombre": "Primavera",
+        "Provincia": "Tierra del Fuego",
+        "Región": " Magallanes y Antártica Chilena"
+    },
+    {
+        "Cód.": "12303",
+        "Nombre": "Timaukel",
+        "Provincia": "Tierra del Fuego",
+        "Región": " Magallanes y Antártica Chilena"
+    },
+    {
+        "Cód.": "12401",
+        "Nombre": "Natales",
+        "Provincia": "Última Esperanza",
+        "Región": " Magallanes y Antártica Chilena"
+    },
+    {
+        "Cód.": "12402",
+        "Nombre": "Torres del Paine",
+        "Provincia": "Última Esperanza",
+        "Región": " Magallanes y Antártica Chilena"
+    },
+    {
+        "Cód.": "13101",
+        "Nombre": "Santiago",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13102",
+        "Nombre": "Cerrillos",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13103",
+        "Nombre": "Cerro Navia",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13104",
+        "Nombre": "Conchalí",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13105",
+        "Nombre": "El Bosque",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13106",
+        "Nombre": "Estación Central",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13107",
+        "Nombre": "Huechuraba",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13108",
+        "Nombre": "Independencia",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13109",
+        "Nombre": "La Cisterna",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13110",
+        "Nombre": "La Florida",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13111",
+        "Nombre": "La Granja",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13112",
+        "Nombre": "La Pintana",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13113",
+        "Nombre": "La Reina",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13114",
+        "Nombre": "Las Condes",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13115",
+        "Nombre": "Lo Barnechea",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13116",
+        "Nombre": "Lo Espejo",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13117",
+        "Nombre": "Lo Prado",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13118",
+        "Nombre": "Macul",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13119",
+        "Nombre": "Maipú",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13120",
+        "Nombre": "Ñuñoa",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13121",
+        "Nombre": "Pedro Aguirre Cerda",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13122",
+        "Nombre": "Peñalolén",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13123",
+        "Nombre": "Providencia",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13124",
+        "Nombre": "Pudahuel",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13125",
+        "Nombre": "Quilicura",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13126",
+        "Nombre": "Quinta Normal",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13127",
+        "Nombre": "Recoleta",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13128",
+        "Nombre": "Renca",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13129",
+        "Nombre": "San Joaquín",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13130",
+        "Nombre": "San Miguel",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13131",
+        "Nombre": "San Ramón",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13132",
+        "Nombre": "Vitacura",
+        "Provincia": "Santiago",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13201",
+        "Nombre": "Puente Alto",
+        "Provincia": "Cordillera",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13202",
+        "Nombre": "Pirque",
+        "Provincia": "Cordillera",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13203",
+        "Nombre": "San José de Maipo",
+        "Provincia": "Cordillera",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13301",
+        "Nombre": "Colina",
+        "Provincia": "Chacabuco",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13302",
+        "Nombre": "Lampa",
+        "Provincia": "Chacabuco",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13303",
+        "Nombre": "Til Til",
+        "Provincia": "Chacabuco",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13401",
+        "Nombre": "San Bernardo",
+        "Provincia": "Maipo",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13402",
+        "Nombre": "Buin",
+        "Provincia": "Maipo",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13403",
+        "Nombre": "Calera de Tango",
+        "Provincia": "Maipo",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13404",
+        "Nombre": "Paine",
+        "Provincia": "Maipo",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13501",
+        "Nombre": "Melipilla",
+        "Provincia": "Melipilla",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13502",
+        "Nombre": "Alhué",
+        "Provincia": "Melipilla",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13503",
+        "Nombre": "Curacaví",
+        "Provincia": "Melipilla",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13504",
+        "Nombre": "María Pinto",
+        "Provincia": "Melipilla",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13505",
+        "Nombre": "San Pedro",
+        "Provincia": "Melipilla",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13601",
+        "Nombre": "Talagante",
+        "Provincia": "Talagante",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13602",
+        "Nombre": "El Monte",
+        "Provincia": "Talagante",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13603",
+        "Nombre": "Isla de Maipo",
+        "Provincia": "Talagante",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13604",
+        "Nombre": "Padre Hurtado",
+        "Provincia": "Talagante",
+        "Región": " Metropolitana de Santiago"
+    },
+    {
+        "Cód.": "13605",
+        "Nombre": "Peñaflor",
+        "Provincia": "Talagante",
+        "Región": " Metropolitana de Santiago"
+    }
+]

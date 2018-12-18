@@ -63,13 +63,10 @@ class FormCompania(ModelForm):
         self.fields['direccion'].required = True
         self.fields['comuna'].widget.attrs.update({'class': 'form-control','placeholder': 'Comuna donde se localiza la Comuna'})
         self.fields['comuna'].required = True
-        self.fields['fecha_resolucion'].widget.attrs.update({'class': 'form-control', 'data-provide': 'datepicker','placeholder':'DD-MM-YYYY'})
-        self.fields['fecha_resolucion'].input_formats = ['%d-%m-%Y']
+        self.fields['fecha_resolucion'].widget.attrs.update({'class': 'form-control datepicker', 'data-provide': 'datepicker','placeholder':'DD/MM/YYYY'})
         self.fields['fecha_resolucion'].required=True
         self.fields['numero_resolucion'].widget.attrs.update({'class': 'form-control'})
         self.fields['numero_resolucion'].required = True
-        self.fields['comuna'].widget.attrs.update({'class': 'form-control','placeholder': 'Comuna donde se localiza la Comuna'})
-        self.fields['comuna'].required = True
         self.fields['pass_correo_sii'].widget = PasswordInput()
         self.fields['pass_correo_sii'].widget.attrs.update({'class': 'form-control'})
         self.fields['pass_correo_sii'].required = True

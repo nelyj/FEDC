@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from .constantes import (COMUNAS)
 
 class Conector(models.Model):
     """
@@ -36,7 +37,7 @@ class Compania(models.Model):
     actividad_principal = models.CharField(max_length=128)
     giro = models.CharField(max_length=128)
     direccion = models.CharField(max_length=128)
-    comuna = models.CharField(max_length=128)
+    comuna = models.CharField(max_length=128, choices=COMUNAS)
     logo = models.FileField(upload_to=get_upload_to)
     fecha_resolucion = models.DateField()
     numero_resolucion = models.IntegerField()

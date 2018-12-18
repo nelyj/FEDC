@@ -30,7 +30,9 @@
             <td>{{lista.data.status_sii}}</td>
             <td>
                 <!-- Trigger the modal with a button -->
-                <button  id="edit_foo" onclick="return validar('{% url 'facturas:send-invoice' lista.data.name%}')" type="button" class="btn btn-info">Enviar SII</button>
+                {% comment %} <button  id="edit_foo" onclick="return validar('{% url 'facturas:send-invoice' lista.data.name%}')" type="button" class="btn btn-info">Detalle</button> {% endcomment %}
+                <a  id="edit_foo" href='{% url 'facturas:send-invoice' lista.data.name %}' class="btn btn-info">Detalle</a>
+
             </td>
         </tr>
         {%endfor%}
@@ -44,12 +46,13 @@
         </tr>
     </tfoot>
 </table>
-
+{% comment %} 
 {% include 'modal_XML.html'%}
-
+ {% endcomment %}
 
 
     <script type="text/javascript">
+        {% comment %} 
         function validar(url) {
             console.log(url)
             $.ajax({
@@ -61,12 +64,10 @@
                 },
             });
             return false; 
-        }    
+        }     
+        {% endcomment %}
         $(document).ready( function () {
           $('#myTable').DataTable();
       });
   </script>
   {% endblock content_center %}
-
-
-

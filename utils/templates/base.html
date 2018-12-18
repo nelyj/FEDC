@@ -47,6 +47,9 @@
     <script src="{% static 'users/login.js' %}"></script>
     <script type="text/javascript">
     $("#wrapper").toggleClass("toggled");
+    $('.datepicker').datepicker({
+        format: "dd/mm/yyyy"
+    });
     </script>
     {% block custom_js%}
 
