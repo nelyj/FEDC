@@ -20,6 +20,9 @@ class FolioCreateView(CreateView):
 
 	def form_valid(self, form):
 
+		a = form.get_cleaned_data['caf']
+		print(a)
+
 		instance = form.save(commit=False)
 
 		try:
@@ -63,7 +66,7 @@ class FolioCreateView(CreateView):
 
 		messages.error(self.request, 'No se pudo agregar el archivo')
 
-		return self.form_invalid(form)
+		return super().form_invalid(form)
 
 	def get_context_data(self, *args, **kwargs):
 

@@ -25,7 +25,7 @@ class Folio(CreationModificationDateMixin):
 					_('CAF'), 
 					upload_to=upload_file_to, 
 					blank=True, null=True, 
-					validators=[FileExtensionValidator(['xml'])]
+					validators=[FileExtensionValidator(allowed_extensions=['xml'])]
 				)
 	rut = models.CharField(null=False, max_length=255)
 	tipo_de_documento = models.CharField(null=False, max_length=255)
