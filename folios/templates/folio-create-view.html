@@ -1,0 +1,56 @@
+{% extends "utils_start.html" %}
+{% block titulo %}Registrar Folio{% endblock titulo %}
+
+{% block content_center %}
+<div id="page-content-wrapper">
+    <div class="container-fluid">
+        <a class="glyphicon glyphicon-list" id="menu-toggle"></a>
+        <div class="col-xs-12">
+            <div class="content">
+            
+              <!-- Inicio Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="cuenta">
+                      <h3>Registrar Folio</h3>
+                      <form id="form_register" method="post" enctype="multipart/form-data">
+                          {% csrf_token %}
+                          <div class="col-xs-12" >
+                            {{form.as_p}}
+                          </div>
+                         <button id="submit" type="submit" class="btn btn-success btn-block btn-flat">Registrar</button>
+                    </div>
+                  
+                  </form>
+                  <br>
+                </div>
+                <table id="myTable" class="display" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>RUT</th>
+                            <th>Tipo de documento</th>
+                            <th>Fecha de autorización</th>
+                            <th>Desde</th>
+                            <th>Hasta</th>
+                            <th>Timbres disponibles</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for folio in folios_list %}
+                        <tr>
+                            <td>{{ folio.rut }}</td>
+                            <td>{{ folio.get_tipo_de_documento }}</td>
+                            <td>{{ folio.fecha_de_autorizacion|date }}</td>
+                            <td>{{ folio.rango_desde }}</td>
+                            <td>{{ folio.rango_hasta }}</td>
+                            <td>{{ folio.folios_disponibles }}</td>
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+                </table>
+                <!-- Fin Tab panel -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content_center %}
