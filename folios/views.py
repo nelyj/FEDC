@@ -20,9 +20,6 @@ class FolioCreateView(CreateView):
 
 	def form_valid(self, form):
 
-		a = form.get_cleaned_data['caf']
-		print(a)
-
 		instance = form.save(commit=False)
 
 		try:
