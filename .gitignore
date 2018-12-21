@@ -11,6 +11,8 @@ users/migrations
 utils/migrations
 conectores/migrations
 conectores/__pycache__
+folios/migrations
+folios/__pycache__
 *.*.backup
 *.*~
 *.swp
