@@ -19,10 +19,6 @@ class FolioCreateView(CreateView):
 	success_url = reverse_lazy('folios:registrar')
 
 	def form_valid(self, form):
-
-		a = form.get_cleaned_data['caf']
-		print(a)
-
 		instance = form.save(commit=False)
 
 		try:
