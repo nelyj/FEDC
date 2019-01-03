@@ -35,6 +35,8 @@ class Folio(CreationModificationDateMixin):
 	fecha_de_autorizacion = models.DateTimeField(null=False)
 	pk_modulo = models.CharField(null=False, max_length=255)
 	pk_exponente = models.CharField(null=False, max_length=255)
+	pem_public = models.TextField(null=True, default='')
+	pem_private = models.TextField(null=True, default='')
 
 
 	class Meta:
