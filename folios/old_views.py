@@ -6,11 +6,6 @@ from django.urls import reverse_lazy
 
 from lxml import etree
 from bs4 import BeautifulSoup
-from Crypto.PublicKey import RSA
-from Crypto.PublicKey.RSA import construct
-from Crypto.Signature import PKCS1_v1_5
-from Crypto.Hash import SHA
-from base64 import b64decode,b64encode
 
 from .forms import FolioCreateForm
 from conectores.models import Compania
@@ -25,6 +20,7 @@ class FolioCreateView(CreateView):
 	success_url = reverse_lazy('folios:registrar')
 
 	def form_valid(self, form):
+
 		instance = form.save(commit=False)
 
 
@@ -34,7 +30,14 @@ class FolioCreateView(CreateView):
 
 			xml = instance.caf.read()
 
-			soup = BeautifulSoup(xml, 'xml')
+			# soup = BeautifulSoup(xml, 'xml')
+
+			# print(soup.CAF)
+			# print(type(soup.CAF))
+			# print(str(soup.CAF).strip())
+
+
+
 			root = etree.fromstring(xml)
 			rut = root.xpath('//AUTORIZACION/CAF/DA/RE/text()')[0]
 			tipo_de_documento = root.xpath('//AUTORIZACION/CAF/DA/TD/text()')[0]
@@ -44,58 +47,10 @@ class FolioCreateView(CreateView):
 			fecha_de_autorizacion = root.xpath('//AUTORIZACION/CAF/DA/FA/text()')[0]
 			pk_modulo = root.xpath('//AUTORIZACION/CAF/DA/RSAPK/M/text()')[0]
 			pk_exponente = root.xpath('//AUTORIZACION/CAF/DA/RSAPK/E/text()')[0]
-			pem_private = root.xpath('//AUTORIZACION/RSASK/text()')[0]
-			pem_public = root.xpath('//AUTORIZACION/RSAPUBK/text()')[0]
-
-			assert pem_public
-			assert pem_private
 
 		except:
 
 			messages.error(self.request, 'Algo anda mal con el CAF')
-			return super().form_invalid(form)
-
-		try:
-
-			decoded_exponent = int.from_bytes(b64decode(pk_exponente), 'big')
-			decoded_modulus = int.from_bytes(b64decode(pk_modulo), 'big')
-
-			assert decoded_modulus
-			assert decoded_exponent
-
-			sii_pub = construct((decoded_modulus,decoded_exponent))
-
-			sii_final = sii_pub.exportKey('PEM').decode('ascii')
-			sii_final = sii_final.replace('\n','').replace('\t','').replace('\r','')
-			pem_public = pem_public.replace('\n','').replace('\t','').replace('\r','')
-
-			print(sii_final)
-			print(pem_public)
-
-			assert sii_final == pem_public
-
-		except:
-
-			messages.error(self.request, 'La clave publica no fue validada correctamente')
-			return super().form_invalid(form)
-
-		try:
-
-			RSAprivatekey = RSA.importKey(pem_private)
-			private_signer = PKCS1_v1_5.new(RSAprivatekey)
-			digest = SHA.new()
-			digest.update(b'mensaje de prueba')
-			sign = private_signer.sign(digest)
-			sign = b64encode(sign)
-
-			public_signer = PKCS1_v1_5.new(sii_pub)
-			verification = public_signer.verify(digest, b64decode(sign))
-
-			assert verification
-
-		except:
-
-			messages.error(self.request, 'Clave publica y clave privada no coinciden')
 			return super().form_invalid(form)
 
 
