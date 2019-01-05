@@ -158,8 +158,8 @@ EMAIL_USE_TLS = True
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'direccion_email@gmail.com'
-EMAIL_HOST_PASSWORD = 'pass******'
+EMAIL_HOST_USER = 'facturador@timg.cl'
+EMAIL_HOST_PASSWORD = 'FacturaElecTimg*19'
 EMAIL_FROM = EMAIL_HOST_USER
 
 # During production only

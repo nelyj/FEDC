@@ -25,7 +25,6 @@ class FolioCreateView(CreateView):
 	success_url = reverse_lazy('folios:registrar')
 
 	def form_valid(self, form):
-
 		instance = form.save(commit=False)
 
 
