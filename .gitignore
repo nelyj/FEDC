@@ -7,6 +7,8 @@ users/__pycache__
 utils/__pycache__
 base_django/settings.py
 multi_form_view/migrations
+facturas/migrations
+facturas/__pycache__
 users/migrations
 utils/migrations
 conectores/migrations
