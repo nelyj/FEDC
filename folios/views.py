@@ -3,6 +3,8 @@ import datetime
 from django.views.generic import CreateView
 from django.contrib import messages
 from django.urls import reverse_lazy
+from django.db import IntegrityError
+from django.db.transaction import TransactionManagementError
 
 from lxml import etree
 from bs4 import BeautifulSoup
@@ -26,6 +28,7 @@ class FolioCreateView(CreateView):
 
 	def form_valid(self, form):
 		instance = form.save(commit=False)
+		context = super().get_context_data()
 		try:
 			xml = instance.caf.read()
 			soup = BeautifulSoup(xml, 'xml')
@@ -80,19 +83,44 @@ class FolioCreateView(CreateView):
 			messages.error(self.request, 'Clave publica y clave privada no coinciden')
 			return super().form_invalid(form)
 
+		try:
+			compania = Compania.objects.get(razon_social=instance.empresa)
+			if compania and compania.rut.split('-') == rut.split('-'):
+				instance.rut = rut
+			else:
+				raise ValueError
+		except:
+
+			messages.error(self.request, 'El CAF no corresponde con la compania asignada')
+			return super().form_invalid(form)
+
 
 		date_list = fecha_de_autorizacion.split('-')
 		fecha_de_autorizacion = datetime.datetime(int(date_list[0]),int(date_list[1]),int(date_list[2]))
 
-		instance.rut = rut
-		instance.tipo_de_documento = tipo_de_documento
-		instance.rango_desde = rango_desde
-		instance.rango_hasta = rango_hasta
+
+
+		instance.tipo_de_documento = int(tipo_de_documento)
+		instance.rango_desde = int(rango_desde)
+		instance.rango_hasta = int(rango_hasta)
+		instance.folio_actual = rango_desde
 		instance.folios_disponibles = folios_disponibles
 		instance.fecha_de_autorizacion = fecha_de_autorizacion
 		instance.pk_modulo = pk_modulo
 		instance.pk_exponente = pk_exponente
-		instance.save()
+
+
+		try:
+			hash_ = instance.hacer_hash()
+			if Folio.objects.filter(unique_hash=hash_).exists():
+				raise IntegrityError
+			else:
+				instance.unique_hash = hash_
+				instance.save()
+		except:
+			messages.error(self.request, 'El archivo CAF ya existe')
+			return super().form_invalid(form)
+
 		messages.success(self.request, 'Archivo CAF añadido exitosamente')
 
 		return super().form_valid(form)
@@ -105,9 +133,10 @@ class FolioCreateView(CreateView):
 	def get_context_data(self, *args, **kwargs):
 
 		context = super().get_context_data(*args, **kwargs)
-		# Filtrar por usuario o empresa 
 		folios_list = [folio for folio in Folio.objects.all()]
 		context['folios_list'] = folios_list
+		# Filtrar por usuario o empresa 
+
 		return context
 
 

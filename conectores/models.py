@@ -56,4 +56,4 @@ class Compania(models.Model):
         verbose_name_plural = 'Companias'
 
     def __str__(self):
-        return self.rut
+        return self.razon_social
