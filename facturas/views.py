@@ -16,6 +16,7 @@ from conectores.models import *
 from django.http import HttpResponse
 from .forms import *
 from django.urls import reverse_lazy
+from multi_form_view import MultiModelFormView
 
 class ListaFacturasViews(TemplateView):
     template_name = 'lista_facturas.html'
@@ -62,16 +63,61 @@ class DeatailInvoice(TemplateView):
         context['values'] = list(aux['data'].values())
         return context
 
+# class SendInvoice(FormView):
+#     # template_name = 'modal_XML.html'
+
+#     # def get(self, request, **kwargs):
+#     #     xml = render_to_string('invoice.xml', {'query_set': kwargs['slug']})
+#     #     return HttpResponse(xml)
+#     form_class = FormFactura
+#     template_name = 'envio_sii.html'
+#     model = Factura
+
+#     def get_success_url(self):
+#         return reverse_lazy('facturas:send-invoice', kwargs={'slug': self.request.get_full_path().split('/')[2].replace('%C2%BA','º')})
+
+#     def get_context_data(self, **kwargs):
+#         url=self.request.get_full_path().split('/')[2]
+#         context = super().get_context_data(**kwargs)
+#         session = requests.Session()
+#         try:
+#             usuario = Conector.objects.filter(pk=1).first()
+#         except Exception as e:
+#             print(e)
+#         payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
+#         headers = {'content-type': "application/json"}
+#         response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
+#         url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+url
+#         aux=session.get(url)
+#         aux=json.loads(aux.text)
+#         context['factura'] = dict(zip(aux['data'].keys(), aux['data'].values()))
+#         context['factura']['sales_team'] = context['factura']['sales_team'][0]['sales_person']
+#         context['factura']['total_taxes_and_charges'] = round(abs(float(context['factura']['total_taxes_and_charges'])))
+#         # regiones=json.load(codecs.open('static/fixtures/comunas.json', 'r', 'utf-8-sig'))
+#         try:
+#             record = Compania.objects.filter(pk=1).first()
+#             if record:
+#                 # datetime.strftime(record.fecha_resolucion,"%d/%m/%Y")
+#                 # record.fecha_resolucion.strftime("%Y/%m/%d")
+#                 # datetime.strptime(record.fecha_resolucion, "%d/%m/%Y")
+#                 form = FormCompania(instance=record)
+#             else:
+#                 form = FormCompania()
+#             context['compania'] = form
+#         except Exception as e:
+#             raise e        
+#         return context
+
+#     def form_valid(self,form):
+#         print(self.request.POST)
+#         return super().form_valid(form)
+#     def form_invalid(self, form):
+#         return super().form_invalid(form)
+
 class SendInvoice(FormView):
-    # template_name = 'modal_XML.html'
-
-    # def get(self, request, **kwargs):
-    #     xml = render_to_string('invoice.xml', {'query_set': kwargs['slug']})
-    #     return HttpResponse(xml)
-    form_class = FormFactura
     template_name = 'envio_sii.html'
-    model = Factura
-
+    form_class =FormFactura
+    
     def get_success_url(self):
         return reverse_lazy('facturas:send-invoice', kwargs={'slug': self.request.get_full_path().split('/')[2].replace('%C2%BA','º')})
 
@@ -92,13 +138,32 @@ class SendInvoice(FormView):
         context['factura'] = dict(zip(aux['data'].keys(), aux['data'].values()))
         context['factura']['sales_team'] = context['factura']['sales_team'][0]['sales_person']
         context['factura']['total_taxes_and_charges'] = round(abs(float(context['factura']['total_taxes_and_charges'])))
-        # regiones=json.load(codecs.open('static/fixtures/comunas.json', 'r', 'utf-8-sig'))
+        # self.form_class.base_fields['compania'].initial=context['factura']['']
+        self.form_class.base_fields['status'].initial = context['factura']['status_sii']
+        self.form_class.base_fields['numero_factura'].initial=self.kwargs['slug']
+        self.form_class.base_fields['senores'].initial=context['factura']['customer_name']
+        self.form_class.base_fields['direccion'].initial=context['factura']['customer_address']
+        self.form_class.base_fields['transporte'].initial=context['factura']['transporte']
+        self.form_class.base_fields['despachar'].initial=context['factura']['despachar_a']
+        self.form_class.base_fields['observaciones'].initial=context['factura']['observaciones']
+        self.form_class.base_fields['giro'].initial=context['factura']['giro']
+        # self.form_class.base_fields['condicion_venta'].initial=context['factura']['']
+        # self.form_class.base_fields['vencimiento'].initial=context['factura']['']
+        self.form_class.base_fields['vendedor'].initial=context['factura']['sales_team']
+        self.form_class.base_fields['rut'].initial=context['factura']['rut']
+        self.form_class.base_fields['fecha'].initial=context['factura']['posting_date']
+        # self.form_class.base_fields['guia'].initial=context['factura']['']
+        # self.form_class.base_fields['orden_compra'].initial=context['factura']['']
+        self.form_class.base_fields['nota_venta'].initial=context['factura']['orden_de_venta']
+        self.form_class.base_fields['productos'].initial=context['factura']['items']
+        self.form_class.base_fields['monto_palabra'].initial=context['factura']['in_words']
+        self.form_class.base_fields['neto'].initial=context['factura']['net_total']
+        # self.form_class.base_fields['excento'].initial=context['factura']['']
+        self.form_class.base_fields['iva'].initial=context['factura']['total_taxes_and_charges']
+        self.form_class.base_fields['total'].initial=context['factura']['rounded_total']
         try:
             record = Compania.objects.filter(pk=1).first()
             if record:
-                # datetime.strftime(record.fecha_resolucion,"%d/%m/%Y")
-                # record.fecha_resolucion.strftime("%Y/%m/%d")
-                # datetime.strptime(record.fecha_resolucion, "%d/%m/%Y")
                 form = FormCompania(instance=record)
             else:
                 form = FormCompania()
@@ -107,7 +172,18 @@ class SendInvoice(FormView):
             raise e        
         return context
 
-    def form_valid(self,form):
+    def form_valid(self, form, **kwargs):
+        if form.cleaned_data['status'] == 'En proceso':
+            form = form.save(commit=False)
+            form.status = 'Aprobado'
+            form.save()
+            msg = "Se guardo en Base de Datos la factura con éxito"
+        else:
+            msg = "La factura %s ya se encuentra almacenada en la base de datos del Faturador" % (self.kwargs['slug'])
+
+        messages.info(self.request, msg)
         return super().form_valid(form)
+
     def form_invalid(self, form):
+        messages.error(self.request, form.errors)
         return super().form_invalid(form)
