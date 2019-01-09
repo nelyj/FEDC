@@ -32,6 +32,7 @@
                             <th>Desde</th>
                             <th>Hasta</th>
                             <th>Timbres disponibles</th>
+                            <th>Folio actual</th>
 
                         </tr>
                     </thead>
@@ -44,6 +45,7 @@
                             <td>{{ folio.rango_desde }}</td>
                             <td>{{ folio.rango_hasta }}</td>
                             <td>{{ folio.folios_disponibles }}</td>
+                            <td>{{ folio.get_folio_actual }}</td>
                         </tr>
                         {%endfor%}
                     </tbody>
