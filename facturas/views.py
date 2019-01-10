@@ -139,28 +139,76 @@ class SendInvoice(FormView):
         context['factura']['sales_team'] = context['factura']['sales_team'][0]['sales_person']
         context['factura']['total_taxes_and_charges'] = round(abs(float(context['factura']['total_taxes_and_charges'])))
         # self.form_class.base_fields['compania'].initial=context['factura']['']
-        self.form_class.base_fields['status'].initial = context['factura']['status_sii']
+        try:
+            self.form_class.base_fields['status'].initial = context['factura']['status_sii']
+        except Exception as e:
+            self.form_class.base_fields['status'].initial =""
         self.form_class.base_fields['numero_factura'].initial=self.kwargs['slug']
-        self.form_class.base_fields['senores'].initial=context['factura']['customer_name']
-        self.form_class.base_fields['direccion'].initial=context['factura']['customer_address']
-        self.form_class.base_fields['transporte'].initial=context['factura']['transporte']
-        self.form_class.base_fields['despachar'].initial=context['factura']['despachar_a']
-        self.form_class.base_fields['observaciones'].initial=context['factura']['observaciones']
-        self.form_class.base_fields['giro'].initial=context['factura']['giro']
+        try:
+            self.form_class.base_fields['senores'].initial=context['factura']['customer_name']
+        except Exception as e:
+            self.form_class.base_fields['senores'].initial=""
+        try:
+            self.form_class.base_fields['direccion'].initial=context['factura']['customer_address']
+        except Exception as e:
+            self.form_class.base_fields['direccion'].initial=""
+        try:
+            self.form_class.base_fields['transporte'].initial=context['factura']['transporte']
+        except Exception as e:
+            self.form_class.base_fields['transporte'].initial=""
+        try:
+            self.form_class.base_fields['despachar'].initial=context['factura']['despachar_a']
+        except Exception as e:
+            self.form_class.base_fields['despachar'].initial=""
+        try:
+            self.form_class.base_fields['observaciones'].initial=context['factura']['observaciones']
+        except Exception as e:
+            self.form_class.base_fields['observaciones'].initial=""
+        try:
+            self.form_class.base_fields['giro'].initial=context['factura']['giro']
+        except Exception as e:
+            self.form_class.base_fields['giro'].initial=""
         # self.form_class.base_fields['condicion_venta'].initial=context['factura']['']
         # self.form_class.base_fields['vencimiento'].initial=context['factura']['']
-        self.form_class.base_fields['vendedor'].initial=context['factura']['sales_team']
-        self.form_class.base_fields['rut'].initial=context['factura']['rut']
-        self.form_class.base_fields['fecha'].initial=context['factura']['posting_date']
+        try:
+            self.form_class.base_fields['vendedor'].initial=context['factura']['sales_team']
+        except Exception as e:
+            self.form_class.base_fields['vendedor'].initial=""
+        try:
+            self.form_class.base_fields['rut'].initial=context['factura']['rut']
+        except Exception as e:
+            self.form_class.base_fields['rut'].initial=""
+        try:
+            self.form_class.base_fields['fecha'].initial=context['factura']['posting_date']
+        except Exception as e:
+            self.form_class.base_fields['fecha'].initial=""
         # self.form_class.base_fields['guia'].initial=context['factura']['']
         # self.form_class.base_fields['orden_compra'].initial=context['factura']['']
-        self.form_class.base_fields['nota_venta'].initial=context['factura']['orden_de_venta']
-        self.form_class.base_fields['productos'].initial=context['factura']['items']
-        self.form_class.base_fields['monto_palabra'].initial=context['factura']['in_words']
-        self.form_class.base_fields['neto'].initial=context['factura']['net_total']
+        try:
+            self.form_class.base_fields['nota_venta'].initial=context['factura']['orden_de_venta']
+        except Exception as e:
+            self.form_class.base_fields['nota_venta'].initial=""
+        try:
+            self.form_class.base_fields['productos'].initial=context['factura']['items']
+        except Exception as e:
+            self.form_class.base_fields['productos'].initial=""
+        try:
+            self.form_class.base_fields['monto_palabra'].initial=context['factura']['in_words']
+        except Exception as e:
+            self.form_class.base_fields['monto_palabra'].initial=""
+        try:
+            self.form_class.base_fields['neto'].initial=context['factura']['net_total']
+        except Exception as e:
+            self.form_class.base_fields['neto'].initial=""
         # self.form_class.base_fields['excento'].initial=context['factura']['']
-        self.form_class.base_fields['iva'].initial=context['factura']['total_taxes_and_charges']
-        self.form_class.base_fields['total'].initial=context['factura']['rounded_total']
+        try:
+            self.form_class.base_fields['iva'].initial=context['factura']['total_taxes_and_charges']
+        except Exception as e:
+            self.form_class.base_fields['iva'].initial=""
+        try:
+            self.form_class.base_fields['total'].initial=context['factura']['rounded_total']
+        except Exception as e:
+            self.form_class.base_fields['total'].initial=""
         try:
             record = Compania.objects.filter(pk=1).first()
             if record:
@@ -178,6 +226,16 @@ class SendInvoice(FormView):
             form.status = 'Aprobado'
             form.save()
             msg = "Se guardo en Base de Datos la factura con éxito"
+            session = requests.Session()
+            try:
+                usuario = Conector.objects.filter(pk=1).first()
+            except Exception as e:
+                print(e)
+            payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
+            headers = {'content-type': "application/json"}
+            response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
+            url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+self.kwargs['slug']
+            aux=session.put(url,json={'status_sii':'Aprobado'})
         else:
             msg = "La factura %s ya se encuentra almacenada en la base de datos del Faturador" % (self.kwargs['slug'])
 
