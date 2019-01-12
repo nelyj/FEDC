@@ -16,289 +16,298 @@
 <form id="form_register" method="post" enctype="multipart/form-data">
 	{% csrf_token %}
 	<button id="submit" type="submit" class="btn btn-success btn-block btn-flat">Guardar</button>
-		<div class="container-fluid">
-			<!-- Ad basic information -->
+	<div class="container-fluid">
+		<div class="form-group">
 			<div class="col-sm-6">
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								{{compania.rut.label}}
-							</label>
-						</div>
-						<div class="col-sm-6">
-							{{compania.rut}}
-						</div>
+				<label>
+					{{form.status.label}}
+				</label>
+			</div>
+			<div class="col-sm-6">
+				{{form.status}}
+			</div>
+		</div>
+		<!-- Ad basic information -->
+		<div class="col-sm-6">
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							{{compania.rut.label}}
+						</label>
 					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								{{compania.razon_social.label}}
-							</label>
-						</div>
-						<div class="col-sm-6">
-							{{compania.razon_social}}
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								{{compania.actividad_principal.label}}
-							</label>
-						</div>
-						<div class="col-sm-6">
-							{{compania.actividad_principal}}
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								{{compania.giro.label}}
-							</label>
-						</div>
-						<div class="col-sm-6">
-							{{compania.giro}}
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								{{compania.direccion.label}}
-							</label>
-						</div>
-						<div class="col-sm-6">
-							{{compania.direccion}}
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								{{compania.comuna.label}}
-							</label>
-						</div>
-						<div class="col-sm-6">
-							{{compania.comuna}}
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								{{compania.fecha_resolucion.label}}
-							</label>
-						</div>
-						<div class="col-sm-6">
-							{{compania.fecha_resolucion}}
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								{{compania.numero_resolucion.label}}
-							</label>
-						</div>
-						<div class="col-sm-6">
-							{{compania.numero_resolucion}}
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								{{compania.correo_intercambio.label}}
-							</label>
-						</div>
-						<div class="col-sm-6">
-							{{compania.correo_intercambio}}
-						</div>
+					<div class="col-sm-6">
+						{{compania.rut}}
 					</div>
 				</div>
 			</div>
-			<div class="col-sm-6">
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								Senores:
-							</label>
-						</div>
-						<div class="col-sm-6">
-							<input type="text" id="senores" value="{{factura.customer_name}}" class="form-control">
-						</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							{{compania.razon_social.label}}
+						</label>
 					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								Direccion:
-							</label>
-						</div>
-						<div class="col-sm-6">
-							<input type="text" id="direccion" value= {{factura.customer_address}} class="form-control">
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								Transporte:
-							</label>
-						</div>
-						<div class="col-sm-6">
-							<input type="text" id="transporte" value="{{factura.transporte}}" class="form-control">
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								Despachar A:
-							</label>
-						</div>
-						<div class="col-sm-6">
-							<input type="text" id="despachar" value="{{factura.despachar_a}}" class="form-control">
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								Observaciones:
-							</label>
-						</div>
-						<div class="col-sm-6">
-							<input type="text" id="observaciones" value="{{factura.observaciones}}" class="form-control">
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								Giro:
-							</label>
-						</div>
-						<div class="col-sm-6">
-							<input type="text" id="giro" value={{factura.giro}} class="form-control">
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								Cond. de Venta:
-							</label>
-						</div>
-						<div class="col-sm-6">
-							<input type="text" id="condicion_venta" class="form-control">
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								Vencimiento:
-							</label>
-						</div>
-						<div class="col-sm-6">
-							<input type="text" id="vencimiento" class="form-control">
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								Vendedor:
-							</label>
-						</div>
-						<div class="col-sm-6">
-							<input type="text" id="vendedor" value="{{factura.sales_team}}" class="form-control">
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								Rut:
-							</label>
-						</div>
-						<div class="col-sm-6">
-							<input type="text" id="rut" value="{{factura.rut}}" class="form-control">
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								Fecha:
-							</label>
-						</div>
-						<div class="col-sm-6">
-							<input type="text" id="fecha" value="{{factura.posting_date}}" class="form-control">
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								Guia:
-							</label>
-						</div>
-						<div class="col-sm-6">
-							<input type="text" id="guia" class="form-control">
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								O. de Compra:
-							</label>
-						</div>
-						<div class="col-sm-6">
-							<input type="text" id="orden_compra" class="form-control">
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								Nota de Venta:
-							</label>
-						</div>
-						<div class="col-sm-6">
-							<input type="text" id="nota_venta" value="{{factura.orden_de_venta}}" class="form-control">
-						</div>
+					<div class="col-sm-6">
+						{{compania.razon_social}}
 					</div>
 				</div>
 			</div>
-
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							{{compania.actividad_principal.label}}
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{compania.actividad_principal}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							{{compania.giro.label}}
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{compania.giro}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							{{compania.direccion.label}}
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{compania.direccion}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							{{compania.comuna.label}}
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{compania.comuna}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							{{compania.fecha_resolucion.label}}
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{compania.fecha_resolucion}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							{{compania.numero_resolucion.label}}
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{compania.numero_resolucion}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							{{compania.correo_intercambio.label}}
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{compania.correo_intercambio}}
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-6">
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Senores:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.senores}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Direccion:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.direccion}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Transporte:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.transporte}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Despachar A:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.despachar}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Observaciones:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.observaciones}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Giro:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.giro}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Cond. de Venta:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						<input type="text" id="condicion_venta" class="form-control">
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Vencimiento:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						<input type="text" id="vencimiento" class="form-control">
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Vendedor:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.vendedor}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Rut:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.rut}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Fecha:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.fecha}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Guia:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						<input type="text" id="guia" class="form-control">
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							O. de Compra:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						<input type="text" id="orden_compra" class="form-control">
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Nota de Venta:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.nota_venta}}
+					</div>
+				</div>
+			</div>
+		</div>
 		<table id="myTable" class="display" style="width:100%">
 			<thead>
 				<tr>
@@ -312,7 +321,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{% for product in factura.items%}
+				{% for product in factura.items %}
 				<tr>
 					<td>{{product.qty}}</td>
 					<td>Unidad</td>
@@ -325,67 +334,67 @@
 				{%endfor%}
 			</tbody>
 		</table>
-			<div class="col-sm-6">
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-1">
-							<label>
-								Son:
-							</label>
-						</div>
-						<div class="col-sm-11">
-							<input type="text" id="neto" value="{{factura.in_words}}" class="form-control">
-						</div>
+		<div class="col-sm-6">
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-1">
+						<label>
+							Son:
+						</label>
+					</div>
+					<div class="col-sm-11">
+						{{form.monto_palabra}}
 					</div>
 				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								NETO
-							</label>
-						</div>
-						<div class="col-sm-6">
-							<input type="text" id="neto" value="{{factura.net_total}}" class="form-control">
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								Excento
-							</label>
-						</div>
-						<div class="col-sm-6">
-							<input type="text" id="excento" class="form-control">
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								IVA(19%)
-							</label>
-						</div>
-						<div class="col-sm-6">
-							<input type="text" id="iva" value="{{factura.total_taxes_and_charges}}" class="form-control">
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="form-group">
-						<div class="col-sm-6">
-							<label>
-								Total
-							</label>
-						</div>
-						<div class="col-sm-6">
-							<input type="text" id="total" value="{{factura.rounded_total}}" class="form-control">
-						</div>
-					</div>
-				</div>	
 			</div>
-</form>
-{% endblock content_center %}
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							NETO
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.neto}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Excento
+						</label>
+					</div>
+					<div class="col-sm-6">
+						<input type="text" id="excento" class="form-control">
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							IVA(19%)
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.iva}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Total
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.total}}
+					</div>
+				</div>
+			</div>	
+		</div>
+	</form>
+	{% endblock content_center %}

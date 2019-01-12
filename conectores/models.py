@@ -8,12 +8,12 @@ class Conector(models.Model):
     def get_upload_to(self, filename):
         return "certificados/%s/%s" % (self.usuario, filename)
 
-    usuario = models.CharField(max_length=128)
-    url_erp = models.URLField(max_length=255)
-    url_sii = models.URLField(max_length=255)
-    password = models.CharField(max_length=128)
-    certificado = models.FileField(upload_to=get_upload_to)
-    time_cron = models.IntegerField(default=10)
+    usuario = models.CharField(max_length=128, blank=True, null=True)
+    url_erp = models.URLField(max_length=255, blank=True, null=True)
+    url_sii = models.URLField(max_length=255, blank=True, null=True)
+    password = models.CharField(max_length=128, blank=True, null=True)
+    certificado = models.FileField(upload_to=get_upload_to, blank=True, null=True)
+    time_cron = models.IntegerField(default=10, blank=True, null=True)
 
     class Meta:
         """!
@@ -32,19 +32,19 @@ class Compania(models.Model):
     def get_upload_to(self, filename):
         return "logos/%s/%s" % (self.rut, filename)
         
-    rut = models.CharField(max_length=128)
-    razon_social = models.CharField(max_length=128)
-    actividad_principal = models.CharField(max_length=128,choices=ACTIVIDADES)
-    giro = models.CharField(max_length=128,choices=ACTIVIDADES)
-    direccion = models.CharField(max_length=128)
-    comuna = models.CharField(max_length=128, choices=COMUNAS)
-    logo = models.FileField(upload_to=get_upload_to)
-    fecha_resolucion = models.DateField()
-    numero_resolucion = models.IntegerField()
-    correo_sii = models.EmailField()
-    pass_correo_sii = models.CharField(max_length=128)
-    correo_intercambio = models.EmailField()
-    pass_correo_intercambio = models.CharField(max_length=128)
+    rut = models.CharField(max_length=128, blank=True, null=True)
+    razon_social = models.CharField(max_length=128, blank=True, null=True)
+    actividad_principal = models.CharField(max_length=128,choices=ACTIVIDADES, blank=True, null=True)
+    giro = models.CharField(max_length=128,choices=ACTIVIDADES, blank=True, null=True)
+    direccion = models.CharField(max_length=128, blank=True, null=True)
+    comuna = models.CharField(max_length=128, choices=COMUNAS, blank=True, null=True)
+    logo = models.FileField(upload_to=get_upload_to, blank=True, null=True)
+    fecha_resolucion = models.DateField(blank=True, null=True)
+    numero_resolucion = models.IntegerField(blank=True, null=True)
+    correo_sii = models.EmailField(blank=True, null=True)
+    pass_correo_sii = models.CharField(max_length=128, blank=True, null=True)
+    correo_intercambio = models.EmailField(blank=True, null=True)
+    pass_correo_intercambio = models.CharField(max_length=128, blank=True, null=True)
 
 
     class Meta:
