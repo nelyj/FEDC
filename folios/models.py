@@ -9,6 +9,8 @@ from Crypto.Hash import SHA
 # Create your models here.
 from mixins.models import CreationModificationDateMixin
 from conectores.models import Compania
+from .exceptions import ElCafNoTieneMasTimbres, FolioActualNoPuedeSerMayorAlRangoDisponible
+
 
 
 def upload_file_to(instance, filename):
@@ -69,14 +71,24 @@ class Folio(CreationModificationDateMixin):
 	def get_folio_actual(self):
 		"""
 		Retorna el ultimo folio que no ha sido asignado
-		"""
+		""" 
+		if not self.is_active:
+
+			return self.folio_actual
 		
 		return self.folio_actual
 
-	def asignar_folio(self, request):
+	def get_folios_disponibles(self):
+
+		return self.folios_disponibles
+
+	def asignar_folio(self):
 		"""
 		Asigna un nuevo folio, recalcula folios disponibles y el ultimo folio disponible (folio_actual)
 		"""
+		if not self.is_active:
+
+			raise ElCafNoTieneMasTimbres
 
 		if self.folio_actual > self.rango_hasta:
 
@@ -85,10 +97,18 @@ class Folio(CreationModificationDateMixin):
 		else:
 
 			nuevo_folio = self.folio_actual
-			self.folio_actual  += 1
-			self.folios_disponibles -= 1
+			if nuevo_folio == self.rango_hasta:
+				self.is_active = False
+				self.folios_disponibles = self.folios_disponibles - 1
+				self.save()
+			else:
+				self.folio_actual = self.folio_actual + 1
+				self.folios_disponibles = self.folios_disponibles - 1
+				self.save()
+			
 
 		return nuevo_folio
+
  
 
 	def get_tipo_de_documento(self):

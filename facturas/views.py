@@ -17,6 +17,8 @@ from django.http import HttpResponse
 from .forms import *
 from django.urls import reverse_lazy
 from multi_form_view import MultiModelFormView
+from folios.models import Folio
+from folios.exceptions import ElCafNoTieneMasTimbres
 
 class ListaFacturasViews(TemplateView):
     template_name = 'lista_facturas.html'
@@ -221,23 +223,52 @@ class SendInvoice(FormView):
         return context
 
     def form_valid(self, form, **kwargs):
-        if form.cleaned_data['status'] == 'En proceso':
-            form = form.save(commit=False)
-            form.status = 'Aprobado'
-            form.save()
-            msg = "Se guardo en Base de Datos la factura con éxito"
-            session = requests.Session()
-            try:
-                usuario = Conector.objects.filter(pk=1).first()
-            except Exception as e:
-                print(e)
-            payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
-            headers = {'content-type': "application/json"}
-            response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
-            url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+self.kwargs['slug']
-            aux=session.put(url,json={'status_sii':'Aprobado'})
-        else:
-            msg = "La factura %s ya se encuentra almacenada en la base de datos del Faturador" % (self.kwargs['slug'])
+        rut = self.request.POST.get('rut', None)
+        assert rut, "rut no existe"
+        try:
+
+            compania = Compania.objects.get(rut=rut)
+        except Compania.DoesNotExist:
+
+            messages.error(self.request, "No ha seleccionado la compania")
+            return super().form_invalid(form)
+
+        assert compania, "compania no existe"
+
+        # if form.cleaned_data['status'] == 'En proceso':
+        form = form.save(commit=False)
+        try:
+            folio = Folio.objects.get(empresa=compania,is_active=True,tipo_de_documento=33)
+            print(folio)
+
+        except Folio.DoesNotExist:  
+
+            messages.error(self.request, "No posee folios para asignacion de timbre")
+            return super().form_invalid(form)
+
+        form.status = 'Aprobado'
+        try:
+            form.recibir_folio(folio)
+        except (ElCafNoTieneMasTimbres, ValueError):
+
+            messages.error(self.request, "Ya ha consumido todos sus timbres")
+            return super().form_invalid(form)
+
+
+        form.save()
+        msg = "Se guardo en Base de Datos la factura con éxito"
+        session = requests.Session()
+        try:
+            usuario = Conector.objects.filter(pk=1).first()
+        except Exception as e:
+            print(e)
+        payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
+        headers = {'content-type': "application/json"}
+        response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
+        url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+self.kwargs['slug']
+        aux=session.put(url,json={'status_sii':'Aprobado'})
+        # else:
+        #     msg = "La factura %s ya se encuentra almacenada en la base de datos del Faturador" % (self.kwargs['slug'])
 
         messages.info(self.request, msg)
         return super().form_valid(form)

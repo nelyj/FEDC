@@ -37,7 +37,7 @@ class FolioCreateView(CreateView):
 			tipo_de_documento = root.xpath('//AUTORIZACION/CAF/DA/TD/text()')[0]
 			rango_desde = root.xpath('//AUTORIZACION/CAF/DA/RNG/D/text()')[0]
 			rango_hasta = root.xpath('//AUTORIZACION/CAF/DA/RNG/H/text()')[0]
-			folios_disponibles = int(rango_hasta) - int(rango_desde)
+			folios_disponibles = (int(rango_hasta) - int(rango_desde)) + 1
 			fecha_de_autorizacion = root.xpath('//AUTORIZACION/CAF/DA/FA/text()')[0]
 			pk_modulo = root.xpath('//AUTORIZACION/CAF/DA/RSAPK/M/text()')[0]
 			pk_exponente = root.xpath('//AUTORIZACION/CAF/DA/RSAPK/E/text()')[0]
@@ -108,6 +108,8 @@ class FolioCreateView(CreateView):
 		instance.fecha_de_autorizacion = fecha_de_autorizacion
 		instance.pk_modulo = pk_modulo
 		instance.pk_exponente = pk_exponente
+		instance.pem_public = pem_public
+		instance.pem_private = pem_private
 
 
 		try:
