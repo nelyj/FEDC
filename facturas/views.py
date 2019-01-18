@@ -239,12 +239,12 @@ class SendInvoice(FormView):
         form = form.save(commit=False)
         try:
             folio = Folio.objects.get(empresa=compania,is_active=True,tipo_de_documento=33)
-            print(folio)
 
         except Folio.DoesNotExist:  
 
             messages.error(self.request, "No posee folios para asignacion de timbre")
             return super().form_invalid(form)
+
 
         form.status = 'Aprobado'
         try:
@@ -253,6 +253,17 @@ class SendInvoice(FormView):
 
             messages.error(self.request, "Ya ha consumido todos sus timbres")
             return super().form_invalid(form)
+
+
+        # Trae la cantidad de folios disponibles y genera una notificacion cuando quedan menos de 5
+        # Si queda uno, cambia la estructura de la oracion a singular. 
+        disponibles = folio.get_folios_disponibles()
+        if disponibles == 1:
+            messages.info(self.request, f'Queda {disponibles} folio disponible')
+
+        elif disponibles < 5:
+
+            messages.info(self.request, f'Quedan {disponibles} folios disponibles')
 
 
         form.save()
