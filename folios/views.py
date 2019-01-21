@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.db import IntegrityError
 from django.db.transaction import TransactionManagementError
+from django.utils import timezone
 
 from lxml import etree
 from bs4 import BeautifulSoup
@@ -91,13 +92,13 @@ class FolioCreateView(CreateView):
 				raise ValueError
 		except:
 
-			messages.error(self.request, 'El CAF no corresponde con la compania asignada')
+			messages.error(self.request, 'El CAF no corresponde con la compañía asignada')
 			return super().form_invalid(form)
 
 
 		date_list = fecha_de_autorizacion.split('-')
-		fecha_de_autorizacion = datetime.datetime(int(date_list[0]),int(date_list[1]),int(date_list[2]))
-
+		fecha_de_autorizacion = timezone.make_aware(datetime.datetime(int(date_list[0]),int(date_list[1]),int(date_list[2])))
+		# fecha_de_autorizacion = datetime.datetime(int(date_list[0]),int(date_list[1]),int(date_list[2]))
 
 
 		instance.tipo_de_documento = int(tipo_de_documento)
@@ -135,7 +136,7 @@ class FolioCreateView(CreateView):
 	def get_context_data(self, *args, **kwargs):
 
 		context = super().get_context_data(*args, **kwargs)
-		folios_list = [folio for folio in Folio.objects.all()]
+		folios_list = [folio for folio in Folio.objects.all().order_by('fecha_de_autorizacion')]
 		context['folios_list'] = folios_list
 		# Filtrar por usuario o empresa 
 

@@ -25,6 +25,7 @@
                 </div>
                 <table id="myTable" class="display" style="width:100%">
                     <thead>
+
                         <tr>
                             <th>RUT</th>
                             <th>Tipo de documento</th>
@@ -33,6 +34,10 @@
                             <th>Hasta</th>
                             <th>Timbres disponibles</th>
                             <th>Folio actual</th>
+                            <th>Fecha de autorización</th>
+                            <th>Fecha de vencimiento</th>
+                            <th>Días restantes</th>
+                            
 
                         </tr>
                     </thead>
@@ -46,6 +51,9 @@
                             <td>{{ folio.rango_hasta }}</td>
                             <td>{{ folio.get_folios_disponibles }}</td>
                             <td>{{ folio.get_folio_actual }}</td>
+                            <td>{{ folio.fecha_de_autorizacion|date:'d/m/Y' }}</td>
+                            <td>{{ folio.fecha_de_vencimiento|date:'d/m/Y'  }}</td>
+                            <td>{{ folio.calcula_dias_restantes  }}</td>
                         </tr>
                         {%endfor%}
                     </tbody>

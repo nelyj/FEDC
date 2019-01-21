@@ -123,7 +123,7 @@ LANGUAGE_CODE = 'es-ve'
 
 LOCALE_NAME = 'es'
 
-TIME_ZONE = 'America/Caracas'
+TIME_ZONE = 'America/Santiago'
 
 USE_I18N = True
 

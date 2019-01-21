@@ -5,3 +5,7 @@ class ElCafNoTieneMasTimbres(ValueError):
 
 class FolioActualNoPuedeSerMayorAlRangoDisponible(ValueError):
 	pass 
+
+
+class ElCAFSenEncuentraVencido(ValueError):
+	pass 

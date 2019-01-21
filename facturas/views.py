@@ -18,7 +18,7 @@ from .forms import *
 from django.urls import reverse_lazy
 from multi_form_view import MultiModelFormView
 from folios.models import Folio
-from folios.exceptions import ElCafNoTieneMasTimbres
+from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
 
 class ListaFacturasViews(TemplateView):
     template_name = 'lista_facturas.html'
@@ -238,11 +238,19 @@ class SendInvoice(FormView):
         # if form.cleaned_data['status'] == 'En proceso':
         form = form.save(commit=False)
         try:
-            folio = Folio.objects.get(empresa=compania,is_active=True,tipo_de_documento=33)
+            folio = Folio.objects.filter(empresa=compania,is_active=True,vencido=False,tipo_de_documento=33).order_by('fecha_de_autorizacion')[0]
 
+            print(folio.fecha_de_autorizacion)
         except Folio.DoesNotExist:  
 
             messages.error(self.request, "No posee folios para asignacion de timbre")
+            return super().form_invalid(form)
+
+        try:
+            folio.verificar_vencimiento()
+        except ElCAFSenEncuentraVencido:
+
+            messages.error(self.request, "El CAF se encuentra vencido")
             return super().form_invalid(form)
 
 
@@ -255,13 +263,15 @@ class SendInvoice(FormView):
             return super().form_invalid(form)
 
 
+
+
         # Trae la cantidad de folios disponibles y genera una notificacion cuando quedan menos de 5
         # Si queda uno, cambia la estructura de la oracion a singular. 
         disponibles = folio.get_folios_disponibles()
         if disponibles == 1:
             messages.info(self.request, f'Queda {disponibles} folio disponible')
 
-        elif disponibles < 5:
+        elif disponibles < 50:
 
             messages.info(self.request, f'Quedan {disponibles} folios disponibles')
 
