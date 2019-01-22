@@ -5,6 +5,7 @@ from conectores.models import Compania
 
 
 class Factura(models.Model):
+	
 	"""!
 	Modelo Producto
 	"""
@@ -31,7 +32,6 @@ class Factura(models.Model):
 	excento = models.CharField(max_length=128, blank=True, null=True)
 	iva = models.CharField(max_length=128, blank=True, null=True)
 	total = models.CharField(max_length=128, blank=True, null=True)
-
 	class Meta:
 		ordering = ('numero_factura',)
 		verbose_name = 'Factura'
