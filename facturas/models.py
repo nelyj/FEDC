@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from conectores.constantes import (COMUNAS, ACTIVIDADES)
 from conectores.models import Compania
+from folios.models import Folio
+from folios.exceptions import ElCafNoTieneMasTimbres
 
 
 class Factura(models.Model):
@@ -32,6 +34,7 @@ class Factura(models.Model):
 	excento = models.CharField(max_length=128, blank=True, null=True)
 	iva = models.CharField(max_length=128, blank=True, null=True)
 	total = models.CharField(max_length=128, blank=True, null=True)
+	n_folio = models.IntegerField(null=True, default=0)
 	class Meta:
 		ordering = ('numero_factura',)
 		verbose_name = 'Factura'
@@ -39,3 +42,26 @@ class Factura(models.Model):
 
 		def __str__(self):
 			return self.numero_factura
+
+	def recibir_folio(self, folio):
+
+		if isinstance(folio, Folio):
+
+			try:
+				n_folio = folio.asignar_folio()
+			except (ElCafNoTieneMasTimbres, ValueError):
+
+				raise ElCafNoTieneMasTimbres
+			# except ValueError: 
+			assert type(n_folio) == int, "folio no es entero"
+
+			self.n_folio = n_folio 
+
+			print(f'{self.n_folio} asignado con exito')
+
+		else: 
+
+			return 
+
+
+

@@ -1,14 +1,21 @@
 import os
+import datetime
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import FileExtensionValidator
 from django.utils.timezone import now as timezone_now
+from django.db.models.signals import pre_save, post_save
+from django.utils import timezone
 
 from Crypto.Hash import SHA
+from dateutil.relativedelta import relativedelta
 
 # Create your models here.
 from mixins.models import CreationModificationDateMixin
 from conectores.models import Compania
+from .exceptions import ElCafNoTieneMasTimbres, FolioActualNoPuedeSerMayorAlRangoDisponible, ElCAFSenEncuentraVencido
+
 
 
 def upload_file_to(instance, filename):
@@ -37,11 +44,13 @@ class Folio(CreationModificationDateMixin):
 	folio_actual = models.IntegerField(null=False)
 	folios_disponibles = models.IntegerField(null=False)
 	fecha_de_autorizacion = models.DateTimeField(null=False)
+	fecha_de_vencimiento = models.DateTimeField(null=False)
 	pk_modulo = models.CharField(null=False, max_length=255)
 	pk_exponente = models.CharField(null=False, max_length=255)
 	pem_public = models.TextField(null=True, default='')
 	pem_private = models.TextField(null=True, default='')
 	is_active = models.BooleanField(default=True)
+	vencido = models.BooleanField(default=False)
 
 
 	class Meta:
@@ -69,14 +78,24 @@ class Folio(CreationModificationDateMixin):
 	def get_folio_actual(self):
 		"""
 		Retorna el ultimo folio que no ha sido asignado
-		"""
+		""" 
+		if not self.is_active:
+
+			return self.folio_actual
 		
 		return self.folio_actual
 
-	def asignar_folio(self, request):
+	def get_folios_disponibles(self):
+
+		return self.folios_disponibles
+
+	def asignar_folio(self):
 		"""
 		Asigna un nuevo folio, recalcula folios disponibles y el ultimo folio disponible (folio_actual)
 		"""
+		if not self.is_active:
+
+			raise ElCafNoTieneMasTimbres
 
 		if self.folio_actual > self.rango_hasta:
 
@@ -85,10 +104,18 @@ class Folio(CreationModificationDateMixin):
 		else:
 
 			nuevo_folio = self.folio_actual
-			self.folio_actual  += 1
-			self.folios_disponibles -= 1
+			if nuevo_folio == self.rango_hasta:
+				self.is_active = False
+				self.folios_disponibles = self.folios_disponibles - 1
+				self.save()
+			else:
+				self.folio_actual = self.folio_actual + 1
+				self.folios_disponibles = self.folios_disponibles - 1
+				self.save()
+			
 
 		return nuevo_folio
+
  
 
 	def get_tipo_de_documento(self):
@@ -107,3 +134,39 @@ class Folio(CreationModificationDateMixin):
 		else:
 			return "Código desconocido cod({})".format(self.tipo_de_documento)
 
+
+	def verificar_vencimiento(self):
+
+		today = timezone.now()
+		today = today.replace(hour=0,minute=0,second=0, microsecond=0)
+
+		# today_test = timezone.make_aware(datetime.datetime(2019,6,17))
+
+		if self.fecha_de_vencimiento <= today:
+
+			self.vencido = True
+			self.save()
+			raise ElCAFSenEncuentraVencido
+
+	def calcula_dias_restantes(self):
+
+		today = timezone.now()
+		today = today.replace(hour=0,minute=0,second=0, microsecond=0)
+
+		tiempo_restante = self.fecha_de_vencimiento - today
+
+		if tiempo_restante.days >= 0:
+
+			return f'{tiempo_restante.days}'
+		else:
+			return str(0)
+
+
+def folio_pre_save_receiver(sender, instance, *args, **kwargs):
+
+	if not instance.fecha_de_vencimiento:
+		instance.fecha_de_vencimiento = instance.fecha_de_autorizacion + relativedelta(months=+6)
+
+
+
+pre_save.connect(folio_pre_save_receiver, sender=Folio)

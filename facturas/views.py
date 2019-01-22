@@ -19,6 +19,8 @@ from django.urls import reverse_lazy
 from django.http import FileResponse
 import os
 from django.conf import settings
+from folios.models import Folio
+from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
 
 class ListaFacturasViews(TemplateView):
     template_name = 'lista_facturas.html'
@@ -75,9 +77,6 @@ class SendInvoice(FormView):
         initial = super().get_initial()
         session = requests.Session()
         url = self.kwargs['slug']
-        context={}
-
-        initial['observaciones'] = 'prueba'
         try:
             usuario = Conector.objects.filter(pk=1).first()
         except Exception as e:
@@ -93,6 +92,7 @@ class SendInvoice(FormView):
             aux=session.get(url)
             session.close()
             aux=json.loads(aux.text)
+            context={}
             context['factura'] = dict(zip(aux['data'].keys(), aux['data'].values()))
             context['factura']['sales_team'] = context['factura']['sales_team'][0]['sales_person']
             context['factura']['total_taxes_and_charges'] = round(abs(float(context['factura']['total_taxes_and_charges'])))
@@ -207,7 +207,6 @@ class SendInvoice(FormView):
         return context
 
     def form_valid(self, form, **kwargs):
-        print(form.clean())
         if form.cleaned_data['status'] == 'En proceso':
             data = form.clean()
             data['productos']=eval(data['productos'])
@@ -219,8 +218,39 @@ class SendInvoice(FormView):
                 file.write(response)
             except Exception as e:
                 messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
+            rut = self.request.POST.get('rut', None)
+            assert rut, "rut no existe"
+            try:
+                compania = Compania.objects.get(rut=rut)
+            except Compania.DoesNotExist:
+                messages.error(self.request, "No ha seleccionado la compania")
+                return super().form_invalid(form)
+            assert compania, "compania no existe"
             form = form.save(commit=False)
+            try:
+                folio = Folio.objects.filter(empresa=compania,is_active=True,vencido=False,tipo_de_documento=33).order_by('fecha_de_autorizacion')[0]
+                print(folio.fecha_de_autorizacion)
+            except Folio.DoesNotExist:  
+                messages.error(self.request, "No posee folios para asignacion de timbre")
+                return super().form_invalid(form)
+            try:
+                folio.verificar_vencimiento()
+            except ElCAFSenEncuentraVencido:
+                messages.error(self.request, "El CAF se encuentra vencido")
+                return super().form_invalid(form)
             form.status = 'Aprobado'
+            try:
+                form.recibir_folio(folio)
+            except (ElCafNoTieneMasTimbres, ValueError):
+                messages.error(self.request, "Ya ha consumido todos sus timbres")
+                return super().form_invalid(form)
+            # Trae la cantidad de folios disponibles y genera una notificacion cuando quedan menos de 5
+            # Si queda uno, cambia la estructura de la oracion a singular. 
+            disponibles = folio.get_folios_disponibles()
+            if disponibles == 1:
+                messages.info(self.request, f'Queda {disponibles} folio disponible')
+            elif disponibles < 50:
+                messages.info(self.request, f'Quedan {disponibles} folios disponibles')
             form.save()
             msg = "Se guardo en Base de Datos la factura con éxito"
             session = requests.Session()
@@ -236,7 +266,7 @@ class SendInvoice(FormView):
             session.close()
         else:
             msg = "La factura %s ya se encuentra almacenada en la base de datos del Faturador" % (self.kwargs['slug'])
-        messages.info(self.request, msg)
+            messages.info(self.request, msg)
         return super().form_valid(form)
 
     def form_invalid(self, form):

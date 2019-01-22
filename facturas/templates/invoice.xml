@@ -3,7 +3,6 @@
 <SetDTE ID="SetDoc">
 <Caratula version="1.0">
 <RutEmisor>{{compania.rut}}</RutEmisor>
-<RutEmisor>{{compania.rut}}</RutEmisor>
 <RutReceptor>{{form.rut}}</RutReceptor>
 <FchResol>{{compania.fecha_resolucion}}</FchResol>
 <NroResol>{{compania.numero_resolucion}}</NroResol>

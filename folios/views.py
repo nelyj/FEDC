@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.db import IntegrityError
 from django.db.transaction import TransactionManagementError
+from django.utils import timezone
 
 from lxml import etree
 from bs4 import BeautifulSoup
@@ -37,7 +38,7 @@ class FolioCreateView(CreateView):
 			tipo_de_documento = root.xpath('//AUTORIZACION/CAF/DA/TD/text()')[0]
 			rango_desde = root.xpath('//AUTORIZACION/CAF/DA/RNG/D/text()')[0]
 			rango_hasta = root.xpath('//AUTORIZACION/CAF/DA/RNG/H/text()')[0]
-			folios_disponibles = int(rango_hasta) - int(rango_desde)
+			folios_disponibles = (int(rango_hasta) - int(rango_desde)) + 1
 			fecha_de_autorizacion = root.xpath('//AUTORIZACION/CAF/DA/FA/text()')[0]
 			pk_modulo = root.xpath('//AUTORIZACION/CAF/DA/RSAPK/M/text()')[0]
 			pk_exponente = root.xpath('//AUTORIZACION/CAF/DA/RSAPK/E/text()')[0]
@@ -91,13 +92,13 @@ class FolioCreateView(CreateView):
 				raise ValueError
 		except:
 
-			messages.error(self.request, 'El CAF no corresponde con la compania asignada')
+			messages.error(self.request, 'El CAF no corresponde con la compañía asignada')
 			return super().form_invalid(form)
 
 
 		date_list = fecha_de_autorizacion.split('-')
-		fecha_de_autorizacion = datetime.datetime(int(date_list[0]),int(date_list[1]),int(date_list[2]))
-
+		fecha_de_autorizacion = timezone.make_aware(datetime.datetime(int(date_list[0]),int(date_list[1]),int(date_list[2])))
+		# fecha_de_autorizacion = datetime.datetime(int(date_list[0]),int(date_list[1]),int(date_list[2]))
 
 
 		instance.tipo_de_documento = int(tipo_de_documento)
@@ -108,6 +109,8 @@ class FolioCreateView(CreateView):
 		instance.fecha_de_autorizacion = fecha_de_autorizacion
 		instance.pk_modulo = pk_modulo
 		instance.pk_exponente = pk_exponente
+		instance.pem_public = pem_public
+		instance.pem_private = pem_private
 
 
 		try:
@@ -133,7 +136,7 @@ class FolioCreateView(CreateView):
 	def get_context_data(self, *args, **kwargs):
 
 		context = super().get_context_data(*args, **kwargs)
-		folios_list = [folio for folio in Folio.objects.all()]
+		folios_list = [folio for folio in Folio.objects.all().order_by('fecha_de_autorizacion')]
 		context['folios_list'] = folios_list
 		# Filtrar por usuario o empresa 
 
