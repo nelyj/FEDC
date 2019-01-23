@@ -34,7 +34,6 @@ class Factura(models.Model):
 	iva = models.CharField(max_length=128, blank=True, null=True)
 	total = models.CharField(max_length=128, blank=True, null=True)
 	n_folio = models.IntegerField(null=True, default=0)
-
 	class Meta:
 		ordering = ('numero_factura',)
 		verbose_name = 'Factura'

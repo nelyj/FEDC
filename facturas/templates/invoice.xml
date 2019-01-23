@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <EnvioDTE xmlns="http://www.sii.cl/SiiDte" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sii.cl/SiiDte EnvioDTE_v10.xsd" version="1.0">
-{{query_set}}
 <SetDTE ID="SetDoc">
 <Caratula version="1.0">
-<RutEmisor>76263389-2</RutEmisor>
-<RutEnvia>16424036-3</RutEnvia>
-<RutReceptor>76030477-8</RutReceptor>
-<FchResol>2014-08-22</FchResol>
-<NroResol>80</NroResol>
+<RutEmisor>{{compania.rut}}</RutEmisor>
+<RutReceptor>{{form.rut}}</RutReceptor>
+<FchResol>{{compania.fecha_resolucion}}</FchResol>
+<NroResol>{{compania.numero_resolucion}}</NroResol>
 <TmstFirmaEnv>2018-11-21T16:59:45</TmstFirmaEnv>
 <SubTotDTE>
 <TpoDTE>33</TpoDTE>
@@ -15,7 +13,7 @@
 </SubTotDTE>
 </Caratula>
 <DTE version="1.0">
-<Documento ID="FAV_TIMG_maipu_518518">
+<Documento ID={{form.numero_factura}}>
 <Encabezado>
 <IdDoc>
 <TipoDTE>33</TipoDTE>
@@ -24,233 +22,40 @@
 <FmaPago>1</FmaPago>
 </IdDoc>
 <Emisor>
-<RUTEmisor>76263389-2</RUTEmisor>
-<RznSoc>FOTOSTYLE SPA</RznSoc>
-<GiroEmis>COMPRAVTA. COMERC. Y DISTR. O ARR. IMPORT. EXPORT. MAQUIN. INS. Y SUMI</GiroEmis>
-<Acteco>519000</Acteco>
-<DirOrigen>LIBERTAD 176 MAIPU</DirOrigen>
-<CmnaOrigen>094</CmnaOrigen>
-<CiudadOrigen/>
+<RUTEmisor>{{compania.rut}}</RUTEmisor>
+<RznSoc>{{compania.razon_social}}</RznSoc>
+<GiroEmis>{{compania.giro}}</GiroEmis>
+<Acteco>{{compania.actividad_principal}}</Acteco>
+<DirOrigen>{{compania.direccion}}</DirOrigen>
+<CmnaOrigen>{{compania.comuna}}</CmnaOrigen>
 </Emisor>
 <Receptor>
-<RUTRecep>76030477-8</RUTRecep>
-<RznSocRecep> Fotostyle Regalos Especiales Limitada</RznSocRecep>
-<GiroRecep>Venta Insumos Impresion Digital</GiroRecep>
-<DirRecep>Buenos Aires 417</DirRecep>
+<RUTRecep>{{form.rut}}</RUTRecep>
+<RznSocRecep> {{form.senores}}</RznSocRecep>
+<GiroRecep>{{form.giro}}</GiroRecep>
+<DirRecep>{{form.direccion}}</DirRecep>
 <CmnaRecep>RECOLETA</CmnaRecep>
 <CiudadRecep>REGION METROPOLITANA</CiudadRecep>
 </Receptor>
 <Totales>
-<MntNeto>16682000</MntNeto>
+<MntNeto>{{form.neto}}</MntNeto>
 <TasaIVA>19</TasaIVA>
-<IVA>3169580</IVA>
-<MntTotal>19851580</MntTotal>
+<IVA>{{form.iva}}</IVA>
+<MntTotal>{{form.total}}</MntTotal>
 </Totales>
-</Encabezado>
+</Encabezado>{%for prod in form.productos%}
 <Detalle>
-<NroLinDet>1</NroLinDet>
+<NroLinDet>{{forloop.counter}</NroLinDet>
 <CdgItem>
 <TpoCodigo>INT1</TpoCodigo>
-<VlrCodigo>ZZ-PC03</VlrCodigo>
+<VlrCodigo>{{prod.item_code}}</VlrCodigo>
 </CdgItem>
-<NmbItem>PLOTER DE CORTE 3XX ACCESORIOS Y REPUESTOS</NmbItem>
+<NmbItem>{{prod.description}}</NmbItem>
 <DscItem/>
-<QtyItem>3</QtyItem>
-<PrcItem>320000</PrcItem>
-<MontoItem>960000</MontoItem>
-</Detalle>
-<Detalle>
-<NroLinDet>2</NroLinDet>
-<CdgItem>
-<TpoCodigo>INT1</TpoCodigo>
-<VlrCodigo>ZZ-TZ05</VlrCodigo>
-</CdgItem>
-<NmbItem>Pack Tazones Transparentes 200 unidades</NmbItem>
-<DscItem/>
-<QtyItem>2</QtyItem>
-<PrcItem>260000</PrcItem>
-<MontoItem>520000</MontoItem>
-</Detalle>
-<Detalle>
-<NroLinDet>3</NroLinDet>
-<CdgItem>
-<TpoCodigo>INT1</TpoCodigo>
-<VlrCodigo>ZZ-TE05</VlrCodigo>
-</CdgItem>
-<NmbItem>Pack Tintas Ecosolventes Colores Surtidos  50 lts</NmbItem>
-<DscItem/>
-<QtyItem>1</QtyItem>
-<PrcItem>650000</PrcItem>
-<MontoItem>650000</MontoItem>
-</Detalle>
-<Detalle>
-<NroLinDet>4</NroLinDet>
-<CdgItem>
-<TpoCodigo>INT1</TpoCodigo>
-<VlrCodigo>ZZ-PO07</VlrCodigo>
-</CdgItem>
-<NmbItem>Pack Poleras de Algodon 300 unidades</NmbItem>
-<DscItem/>
-<QtyItem>2</QtyItem>
-<PrcItem>310000</PrcItem>
-<MontoItem>620000</MontoItem>
-</Detalle>
-<Detalle>
-<NroLinDet>5</NroLinDet>
-<CdgItem>
-<TpoCodigo>INT1</TpoCodigo>
-<VlrCodigo>ZZ-TZ01</VlrCodigo>
-</CdgItem>
-<NmbItem>Pack Tazones para Sublimacion corrientes 200 unid</NmbItem>
-<DscItem/>
-<QtyItem>3</QtyItem>
-<PrcItem>68000</PrcItem>
-<MontoItem>204000</MontoItem>
-</Detalle>
-<Detalle>
-<NroLinDet>6</NroLinDet>
-<CdgItem>
-<TpoCodigo>INT1</TpoCodigo>
-<VlrCodigo>ZZ-PC06</VlrCodigo>
-</CdgItem>
-<NmbItem>PLOTER DE CORTE 6XX ACCESORIOS Y REPUESTOS</NmbItem>
-<DscItem/>
-<QtyItem>3</QtyItem>
-<PrcItem>480000</PrcItem>
-<MontoItem>1440000</MontoItem>
-</Detalle>
-<Detalle>
-<NroLinDet>7</NroLinDet>
-<CdgItem>
-<TpoCodigo>INT1</TpoCodigo>
-<VlrCodigo>ZZ-CN02</VlrCodigo>
-</CdgItem>
-<NmbItem>CNC LASER Serie 1200 Repuestos y Accesorios</NmbItem>
-<DscItem/>
-<QtyItem>1</QtyItem>
-<PrcItem>2500000</PrcItem>
-<MontoItem>2500000</MontoItem>
-</Detalle>
-<Detalle>
-<NroLinDet>8</NroLinDet>
-<CdgItem>
-<TpoCodigo>INT1</TpoCodigo>
-<VlrCodigo>ZZ-PF12</VlrCodigo>
-</CdgItem>
-<NmbItem>Embalaje Papeles Fotograficos Resmas</NmbItem>
-<DscItem/>
-<QtyItem>2</QtyItem>
-<PrcItem>365000</PrcItem>
-<MontoItem>730000</MontoItem>
-</Detalle>
-<Detalle>
-<NroLinDet>9</NroLinDet>
-<CdgItem>
-<TpoCodigo>INT1</TpoCodigo>
-<VlrCodigo>ZZ-CN07</VlrCodigo>
-</CdgItem>
-<NmbItem>CNC LASER Serie 2100 Repuestos y Accesorios</NmbItem>
-<DscItem/>
-<QtyItem>1</QtyItem>
-<PrcItem>4300000</PrcItem>
-<MontoItem>4300000</MontoItem>
-</Detalle>
-<Detalle>
-<NroLinDet>10</NroLinDet>
-<CdgItem>
-<TpoCodigo>INT1</TpoCodigo>
-<VlrCodigo>ZZ-HS05</VlrCodigo>
-</CdgItem>
-<NmbItem>Horno Sublimacion 3D Repuestos y Accesorios</NmbItem>
-<DscItem/>
-<QtyItem>3</QtyItem>
-<PrcItem>418000</PrcItem>
-<MontoItem>1254000</MontoItem>
-</Detalle>
-<Detalle>
-<NroLinDet>11</NroLinDet>
-<CdgItem>
-<TpoCodigo>INT1</TpoCodigo>
-<VlrCodigo>ZZ-TZ11</VlrCodigo>
-</CdgItem>
-<NmbItem>Pack Tazones Luminosos 200 unidades</NmbItem>
-<DscItem/>
-<QtyItem>3</QtyItem>
-<PrcItem>191000</PrcItem>
-<MontoItem>573000</MontoItem>
-</Detalle>
-<Detalle>
-<NroLinDet>12</NroLinDet>
-<CdgItem>
-<TpoCodigo>INT1</TpoCodigo>
-<VlrCodigo>ZZ-PF27</VlrCodigo>
-</CdgItem>
-<NmbItem>EMBALAJE PAPELES TERMOTRANSFERIBLES</NmbItem>
-<DscItem/>
-<QtyItem>1</QtyItem>
-<PrcItem>1120000</PrcItem>
-<MontoItem>1120000</MontoItem>
-</Detalle>
-<Detalle>
-<NroLinDet>13</NroLinDet>
-<CdgItem>
-<TpoCodigo>INT1</TpoCodigo>
-<VlrCodigo>ZZ-CH03</VlrCodigo>
-</CdgItem>
-<NmbItem>Pack Chapas Surtidas 500 unidades</NmbItem>
-<DscItem/>
-<QtyItem>3</QtyItem>
-<PrcItem>82000</PrcItem>
-<MontoItem>246000</MontoItem>
-</Detalle>
-<Detalle>
-<NroLinDet>14</NroLinDet>
-<CdgItem>
-<TpoCodigo>INT1</TpoCodigo>
-<VlrCodigo>ZZ-PT01</VlrCodigo>
-</CdgItem>
-<NmbItem>Pack Platos para Sublimacion</NmbItem>
-<DscItem/>
-<QtyItem>2</QtyItem>
-<PrcItem>109000</PrcItem>
-<MontoItem>218000</MontoItem>
-</Detalle>
-<Detalle>
-<NroLinDet>15</NroLinDet>
-<CdgItem>
-<TpoCodigo>INT1</TpoCodigo>
-<VlrCodigo>ZZ-EM03</VlrCodigo>
-</CdgItem>
-<NmbItem>Estampadora Multiproposito Repuestos y Accesorios</NmbItem>
-<DscItem/>
-<QtyItem>2</QtyItem>
-<PrcItem>273000</PrcItem>
-<MontoItem>546000</MontoItem>
-</Detalle>
-<Detalle>
-<NroLinDet>16</NroLinDet>
-<CdgItem>
-<TpoCodigo>INT1</TpoCodigo>
-<VlrCodigo>ZZ-TD01</VlrCodigo>
-</CdgItem>
-<NmbItem>Pack Tintas DYE Colores Surtidos</NmbItem>
-<DscItem/>
-<QtyItem>1</QtyItem>
-<PrcItem>213000</PrcItem>
-<MontoItem>213000</MontoItem>
-</Detalle>
-<Detalle>
-<NroLinDet>17</NroLinDet>
-<CdgItem>
-<TpoCodigo>INT1</TpoCodigo>
-<VlrCodigo>ZZ-CN37</VlrCodigo>
-</CdgItem>
-<NmbItem>Pack Ceniceros Surtidos 500 unidades</NmbItem>
-<DscItem/>
-<QtyItem>2</QtyItem>
-<PrcItem>294000</PrcItem>
-<MontoItem>588000</MontoItem>
-</Detalle>
+<QtyItem>{{prod.qty}}</QtyItem>
+<PrcItem>{{prod.base_net_rate}}</PrcItem>
+<MontoItem>{{prod.amount}}</MontoItem>
+</Detalle>{%endfor%}
 <Referencia>
 <NroLinRef>1</NroLinRef>
 <TpoDocRef>801</TpoDocRef>

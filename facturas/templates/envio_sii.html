@@ -17,6 +17,7 @@
 	{% csrf_token %}
 	<button id="submit" type="submit" class="btn btn-success btn-block btn-flat">Guardar</button>
 	<div class="container-fluid">
+
 		<div class="form-group">
 			<div class="col-sm-6">
 				<label>
@@ -397,4 +398,27 @@
 			</div>	
 		</div>
 	</form>
+
+	<script type="text/javascript">
+		var rut = $('#id_rut');
+		rut.prop('disabled', true);
+		var razon_social = $('#id_razon_social');
+		razon_social.prop('disabled', true);
+		var actividad_principal = $('#id_actividad_principal');
+		actividad_principal.prop('disabled', true);
+		var giro = $('#id_giro');
+		giro.prop('disabled', true);
+		var direccion = $('#id_direccion');
+		direccion.prop('disabled', true);
+		var comuna = $('#id_comuna');
+		comuna.prop('disabled', true);
+		var fecha_resolucion = $('#id_fecha_resolucion');
+		fecha_resolucion.prop('disabled', true);
+		var numero_resolucion = $('#id_numero_resolucion');
+		numero_resolucion.prop('disabled', true);
+		var correo_intercambio = $('#id_correo_intercambio');
+		correo_intercambio.prop('disabled', true);
+
+	</script>
+
 	{% endblock content_center %}

@@ -137,7 +137,6 @@ MEDIA_URL = '/sources/'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
-SOURCES_URL = BASE_DIR + 'sources/'
 STATIC_ROOT = BASE_DIR + 'static/'
 STATIC_URL = '/static/'
 
