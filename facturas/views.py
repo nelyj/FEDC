@@ -306,6 +306,7 @@ class SendInvoice(FormView):
             messages.error(self.request, "No posee folios para asignacion de timbre")
             return super().form_invalid(form)
         try:
+            
             folio.verificar_vencimiento()
         except ElCAFSenEncuentraVencido:
             messages.error(self.request, "El CAF se encuentra vencido")
