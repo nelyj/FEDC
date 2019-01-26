@@ -14,6 +14,7 @@
 {% block content_center %}
 
 <div class="empresa-form-wrapper">
+    {% if tiene_empresa %}
     <form method="POST">
         {% csrf_token %}
         <select name="empresa" class=form-control>
@@ -25,6 +26,8 @@
         </select>
         <input type="submit" class="btn btn-primary">
     </form>
+
+    {% endif %}
 </div>
   
 {% endblock content_center %}

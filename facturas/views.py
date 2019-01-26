@@ -30,6 +30,18 @@ class SeleccionarEmpresaView(TemplateView):
         context = super().get_context_data(*args, *kwargs)
         context['empresas'] = Compania.objects.filter(owner=self.request.user)
 
+
+        if Compania.objects.filter(owner=self.request.user).exists():
+            
+            context['tiene_empresa'] = True
+
+        else:
+
+
+            messages.info(self.request, "Registre una empresa para continuar")
+            context['tiene_empresa'] = False
+
+
         return context
 
     def post(self, request):
@@ -53,6 +65,20 @@ class SeleccionarEmpresaView(TemplateView):
 class ListaFacturasViews(TemplateView):
     template_name = 'lista_facturas.html'
 
+    def dispatch(self, *args, **kwargs):
+
+        compania = self.kwargs.get('pk')
+
+        usuario = Conector.objects.filter(t_documento='33',empresa=compania).first()
+
+        if not usuario:
+
+            messages.info(self.request, "No posee conectores asociados a esta empresa")
+            return HttpResponseRedirect(reverse_lazy('facturas:seleccionar-empresa'))
+
+        return super().dispatch(*args, **kwargs)
+            
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         session = requests.Session()
@@ -62,6 +88,7 @@ class ListaFacturasViews(TemplateView):
         try:
             usuario = Conector.objects.filter(t_documento='33',empresa=compania).first()
         except Exception as e:
+
             print(e)
 
         payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)

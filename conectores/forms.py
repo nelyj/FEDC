@@ -32,8 +32,9 @@ class FormConector(ModelForm):
         self.fields['time_cron'].required = True
         self.fields['certificado'].widget.attrs.update({'class': 'form-control'})
         self.fields['t_documento'].widget.attrs.update({'class': 'form-control'})
+        self.fields['empresa'].widget.attrs.update({'class': 'form-control'})
         if self.request:
-            self.fields['empresa'].widget.attrs.update({'class': 'form-control'})
+            
             self.fields['empresa'].queryset = Compania.objects.filter(owner=self.request.user)
 
     def clean(self):
