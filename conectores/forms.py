@@ -10,9 +10,11 @@ class FormConector(ModelForm):
     class Meta:
         model = Conector
         fields = ['url_erp','url_sii','usuario',
-                  'password','time_cron', 'certificado']
+                  'password','time_cron', 'certificado', 'empresa','t_documento']
 
     def __init__(self, *args, **kwargs):
+
+        self.request = kwargs.pop('request', None)
 
         super().__init__(*args, **kwargs)
 
@@ -29,6 +31,10 @@ class FormConector(ModelForm):
         self.fields['time_cron'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Tiempo para enviar facturas al SII'})
         self.fields['time_cron'].required = True
         self.fields['certificado'].widget.attrs.update({'class': 'form-control'})
+        self.fields['t_documento'].widget.attrs.update({'class': 'form-control'})
+        if self.request:
+            self.fields['empresa'].widget.attrs.update({'class': 'form-control'})
+            self.fields['empresa'].queryset = Compania.objects.filter(owner=self.request.user)
 
     def clean(self):
         cleaned_data = super(FormConector, self).clean()

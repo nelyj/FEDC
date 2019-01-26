@@ -66,6 +66,14 @@ class ConectorViews(FormView):
     
         return super().form_invalid(form)
 
+    def get_form_kwargs(self):
+
+        kwargs = super().get_form_kwargs()
+
+        kwargs['request'] = self.request
+
+        return kwargs
+
 class CompaniaViews(FormView):
     """
     """
@@ -101,6 +109,7 @@ class CompaniaViews(FormView):
             transaction = Compania.objects.update_or_create(
                 pk=1,
                 defaults={
+                'owner': self.request.user,
                 'rut': form['rut'].value(),
                 'razon_social': form['razon_social'].value(),
                 'actividad_principal': form['actividad_principal'].value(),
