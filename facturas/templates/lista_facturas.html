@@ -31,7 +31,7 @@
             <td>
                 <!-- Trigger the modal with a button -->
                 {% comment %} <button  id="edit_foo" onclick="return validar('{% url 'facturas:send-invoice' lista.data.name%}')" type="button" class="btn btn-info">Detalle</button> {% endcomment %}
-                <a  id="edit_foo" href='{% url 'facturas:send-invoice' lista.data.name %}' class="btn btn-info">Detalle</a>
+                <a  id="edit_foo" href="{% url 'facturas:send-invoice' pk=id_empresa slug=lista.data.name %}" class="btn btn-info">Detalle</a>
 
             </td>
         </tr>

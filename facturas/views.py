@@ -1,14 +1,14 @@
 from django.contrib import messages
 from django.views.generic.edit import FormView
 from django.shortcuts import render
-from django.views.generic.base import TemplateView
+from django.views.generic.base import TemplateView, View
 import mysql.connector
 import requests
 from requests import Request, Session
 import dicttoxml
 import json
 from django.template.loader import render_to_string
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from conectores.models import *
 import codecs
 from conectores.forms import FormCompania
@@ -22,16 +22,75 @@ from django.conf import settings
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
 
+class SeleccionarEmpresaView(TemplateView):
+    template_name = 'seleccionar_empresa.html'
+
+    def get_context_data(self, *args, **kwargs): 
+
+        context = super().get_context_data(*args, *kwargs)
+        context['empresas'] = Compania.objects.filter(owner=self.request.user)
+
+
+        if Compania.objects.filter(owner=self.request.user).exists():
+            
+            context['tiene_empresa'] = True
+
+        else:
+
+
+            messages.info(self.request, "Registre una empresa para continuar")
+            context['tiene_empresa'] = False
+
+
+        return context
+
+    def post(self, request):
+
+        empresa = int(request.POST.get('empresa'))
+        if not empresa:
+
+            return HttpResponseRedirect('/')
+
+        empresa_obj = Compania.objects.get(pk=empresa)
+
+        if empresa_obj and self.request.user == empresa_obj.owner:
+
+            return HttpResponseRedirect(reverse_lazy('facturas:lista_facturas', kwargs={'pk':empresa}))
+
+        else:
+
+            return HttpResponseRedirect('/')
+
+
 class ListaFacturasViews(TemplateView):
     template_name = 'lista_facturas.html'
+
+    def dispatch(self, *args, **kwargs):
+
+        compania = self.kwargs.get('pk')
+
+        usuario = Conector.objects.filter(t_documento='33',empresa=compania).first()
+
+        if not usuario:
+
+            messages.info(self.request, "No posee conectores asociados a esta empresa")
+            return HttpResponseRedirect(reverse_lazy('facturas:seleccionar-empresa'))
+
+        return super().dispatch(*args, **kwargs)
+            
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         session = requests.Session()
+        compania = self.kwargs.get('pk')
+        context['id_empresa'] = compania
+
         try:
-            usuario = Conector.objects.filter(pk=1).first()
+            usuario = Conector.objects.filter(t_documento='33',empresa=compania).first()
         except Exception as e:
+
             print(e)
+
         payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
 
         headers = {'content-type': "application/json"}
@@ -77,8 +136,10 @@ class SendInvoice(FormView):
         initial = super().get_initial()
         session = requests.Session()
         url = self.kwargs['slug']
+        compania = self.kwargs['pk']
+
         try:
-            usuario = Conector.objects.filter(pk=1).first()
+            usuario = Conector.objects.filter(t_documento='33',empresa=compania).first()
         except Exception as e:
             print(e)
         payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
@@ -171,12 +232,17 @@ class SendInvoice(FormView):
         return initial
     
     def get_success_url(self):
-        return reverse_lazy('facturas:send-invoice', kwargs={'slug': self.request.get_full_path().split('/')[2].replace('%C2%BA','º')})
+
+        id_ = self.kwargs.get('pk')
+
+        return reverse_lazy('facturas:send-invoice', kwargs={'pk':id_,'slug': self.request.get_full_path().split('/')[3].replace('%C2%BA','º')})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         session = requests.Session()
         url = self.kwargs['slug']
+        compania = self.kwargs['pk']
+
         try:
             usuario = Conector.objects.filter(pk=1).first()
         except Exception as e:
@@ -207,66 +273,73 @@ class SendInvoice(FormView):
         return context
 
     def form_valid(self, form, **kwargs):
-        if form.cleaned_data['status'] == 'En proceso':
-            data = form.clean()
-            data['productos']=eval(data['productos'])
-            compania = Compania.objects.filter(pk=1).first()
-            response = render_to_string('invoice.xml', {'form':data,'compania':compania})
-            try:
-                os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug'])
-                file = open(settings.MEDIA_ROOT+'facturas'+'/'+self.kwargs['slug']+'/'+self.kwargs['slug']+'.xml','w')
-                file.write(response)
-            except Exception as e:
-                messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
-            rut = self.request.POST.get('rut', None)
-            assert rut, "rut no existe"
-            try:
-                compania = Compania.objects.get(rut=rut)
-            except Compania.DoesNotExist:
-                messages.error(self.request, "No ha seleccionado la compania")
-                return super().form_invalid(form)
-            assert compania, "compania no existe"
-            form = form.save(commit=False)
-            try:
-                folio = Folio.objects.filter(empresa=compania,is_active=True,vencido=False,tipo_de_documento=33).order_by('fecha_de_autorizacion')[0]
-                print(folio.fecha_de_autorizacion)
-            except Folio.DoesNotExist:  
-                messages.error(self.request, "No posee folios para asignacion de timbre")
-                return super().form_invalid(form)
-            try:
-                folio.verificar_vencimiento()
-            except ElCAFSenEncuentraVencido:
-                messages.error(self.request, "El CAF se encuentra vencido")
-                return super().form_invalid(form)
-            form.status = 'Aprobado'
-            try:
-                form.recibir_folio(folio)
-            except (ElCafNoTieneMasTimbres, ValueError):
-                messages.error(self.request, "Ya ha consumido todos sus timbres")
-                return super().form_invalid(form)
-            # Trae la cantidad de folios disponibles y genera una notificacion cuando quedan menos de 5
-            # Si queda uno, cambia la estructura de la oracion a singular. 
-            disponibles = folio.get_folios_disponibles()
-            if disponibles == 1:
-                messages.info(self.request, f'Queda {disponibles} folio disponible')
-            elif disponibles < 50:
-                messages.info(self.request, f'Quedan {disponibles} folios disponibles')
-            form.save()
-            msg = "Se guardo en Base de Datos la factura con éxito"
-            session = requests.Session()
-            try:
-                usuario = Conector.objects.filter(pk=1).first()
-            except Exception as e:
-                print(e)
-            payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
-            headers = {'content-type': "application/json"}
-            response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
-            url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+self.kwargs['slug']
-            aux=session.put(url,json={'status_sii':'Aprobado'})
-            session.close()
-        else:
-            msg = "La factura %s ya se encuentra almacenada en la base de datos del Faturador" % (self.kwargs['slug'])
-            messages.info(self.request, msg)
+        compania_id = self.kwargs['pk']
+
+        # if form.cleaned_data['status'] == 'En proceso':
+        data = form.clean()
+        
+        try:
+            compania = Compania.objects.get(pk=compania_id)
+        except Compania.DoesNotExist:
+            messages.error(self.request, "No ha seleccionado la compania")
+            return super().form_invalid(form)
+        assert compania, "compania no existe"
+        data['productos']=eval(data['productos'])
+        response = render_to_string('invoice.xml', {'form':data,'compania':compania})
+        try:
+            os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug'])
+            file = open(settings.MEDIA_ROOT+'facturas'+'/'+self.kwargs['slug']+'/'+self.kwargs['slug']+'.xml','w')
+            file.write(response)
+        except Exception as e:
+            messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
+        # rut = self.request.POST.get('rut', None)
+        # assert rut, "rut no existe"
+
+        form = form.save(commit=False)
+        try:
+            folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=33).order_by('fecha_de_autorizacion').first()
+
+            if not folio:
+                raise Folio.DoesNotExist
+
+        except Folio.DoesNotExist:  
+            messages.error(self.request, "No posee folios para asignacion de timbre")
+            return super().form_invalid(form)
+        try:
+            
+            folio.verificar_vencimiento()
+        except ElCAFSenEncuentraVencido:
+            messages.error(self.request, "El CAF se encuentra vencido")
+            return super().form_invalid(form)
+        form.status = 'Aprobado'
+        try:
+            form.recibir_folio(folio)
+        except (ElCafNoTieneMasTimbres, ValueError):
+            messages.error(self.request, "Ya ha consumido todos sus timbres")
+            return super().form_invalid(form)
+        # Trae la cantidad de folios disponibles y genera una notificacion cuando quedan menos de 5
+        # Si queda uno, cambia la estructura de la oracion a singular. 
+        disponibles = folio.get_folios_disponibles()
+        if disponibles == 1:
+            messages.info(self.request, f'Queda {disponibles} folio disponible')
+        elif disponibles < 50:
+            messages.info(self.request, f'Quedan {disponibles} folios disponibles')
+        form.compania = compania
+        form.save()
+        msg = "Se guardo en Base de Datos la factura con éxito"
+        session = requests.Session()
+        try:
+            usuario = Conector.objects.filter(pk=1).first()
+        except Exception as e:
+            print(e)
+        payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
+        headers = {'content-type': "application/json"}
+        response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
+        url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+self.kwargs['slug']
+        aux=session.put(url,json={'status_sii':'Aprobado'})
+        session.close()
+        # else:
+        #     msg = "La factura %s ya se encuentra almacenada en la base de datos del Faturador" % (self.kwargs['slug'])
         return super().form_valid(form)
 
     def form_invalid(self, form):

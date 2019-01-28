@@ -11,8 +11,8 @@ django-datatables-view==1.13.1
 django-extensions==1.7.2
 idna==2.7
 lxml==3.6.0
-olefile==0.44
 mysql-connector-python-rf==2.2.2
+olefile==0.44
 psycopg2==2.7.5
 pycryptodome==3.7.2
 pydotplus==2.0.2

@@ -7,7 +7,6 @@ from folios.exceptions import ElCafNoTieneMasTimbres
 
 
 class Factura(models.Model):
-	
 	"""!
 	Modelo Producto
 	"""
