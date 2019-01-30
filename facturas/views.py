@@ -21,6 +21,7 @@ import os
 from django.conf import settings
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
+from .models import Factura
 
 class SeleccionarEmpresaView(TemplateView):
     template_name = 'seleccionar_empresa.html'
@@ -96,11 +97,42 @@ class ListaFacturasViews(TemplateView):
         headers = {'content-type': "application/json"}
         response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
         lista = session.get(usuario.url_erp+'/api/resource/Sales%20Invoice/')
-        context['invoices'] = json.loads(lista.text)
+        erp_data = json.loads(lista.text)
+
+        # Todas las facturas y boletas sin discriminacion 
+        data = erp_data['data']
+
+        # Consulta en la base de datos todos los numeros de facturas
+        # cargadas por la empresa correspondiente para hacer una comparacion
+        # con el ERP y eliminar las que ya se encuentran cargadas
+        enviadas = [factura.numero_factura for factura in Factura.objects.filter(compania=compania).only('numero_factura')]
+        
+
+        # Elimina todas las boletas de la lista
+        # y crea una nueva lista con todas las facturas 
+        solo_facturas  = []
+        for i , item in enumerate(data):
+
+            if not item['name'].startswith('BOL'):
+
+                solo_facturas.append(item['name'])
+
+        # Verifica si la factura que vienen del ERP 
+        # ya se encuentran cargadas en el sistema
+        # y en ese caso las elimina de la lista
+        for i , item in enumerate(solo_facturas):
+
+            # print(context['invoices']['data'][i])
+
+            if item in enviadas:
+
+                del solo_facturas[i]
+
+
         url=usuario.url_erp+'/api/resource/Sales%20Invoice/'
         context['detail']=[]
-        for tmp in  context['invoices']['data']:
-            aux1=url+str(tmp['name'])
+        for tmp in solo_facturas:
+            aux1=url+str(tmp)
             aux=session.get(aux1)
             context['detail'].append(json.loads(aux.text))
         session.close()
@@ -345,3 +377,9 @@ class SendInvoice(FormView):
     def form_invalid(self, form):
         messages.error(self.request, form.errors)
         return super().form_invalid(form)
+
+# class FacturasCargadasView(ListView):
+#     template_name = 'facturas_enviadas.html'
+
+
+

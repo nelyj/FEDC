@@ -12,7 +12,7 @@ class Factura(models.Model):
 	"""
 	status = models.CharField(max_length=128,blank=True, null=True)
 	compania = models.ForeignKey(Compania, on_delete=models.CASCADE, blank=True, null=True)
-	numero_factura = models.CharField(max_length=128, blank=True, null=True)
+	numero_factura = models.CharField(max_length=128, blank=True, null=True, db_index=True)
 	senores = models.CharField(max_length=128, blank=True, null=True)
 	direccion = models.CharField(max_length=128, blank=True, null=True)
 	transporte = models.CharField(max_length=128, blank=True, null=True)
