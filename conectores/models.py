@@ -61,7 +61,7 @@ class Conector(models.Model):
 
 
     t_documento = models.CharField(max_length=128, choices=[x.value for x in TIPO_DE_CONECTOR],default=TIPO_DE_CONECTOR.get_default(),blank=True, null=True)
-    empresa = models.ForeignKey(Compania, on_delete=models.CASCADE, default=1)   
+    empresa = models.ForeignKey(Compania, on_delete=models.CASCADE)   
     usuario = models.CharField(max_length=128, blank=True, null=True)
     url_erp = models.URLField(max_length=255, blank=True, null=True)
     url_sii = models.URLField(max_length=255, blank=True, null=True)

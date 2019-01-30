@@ -11,29 +11,51 @@
 {% endblock extras_js %}
 {% block content_center %}
 <div id="page-content-wrapper">
-    <div class="container-fluid">
-        <a class="glyphicon glyphicon-list" id="menu-toggle"></a>
-        <div class="col-xs-12">
-            <div class="content">
-            
-              <!-- Inicio Tab panes -->
-                <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active" id="cuenta">
-                      <h3>Registrar Compañia</h3>
-                      <form id="form_register" method="post" enctype="multipart/form-data">
-                          {% csrf_token %}
-                          <div class="col-xs-12" >
-                            {{form.as_p}}
-                          </div>
-                         <button id="submit" type="submit" class="btn btn-success btn-block btn-flat">Registrar</button>
-                    </div>
-                  
-                  </form>
-                  <br>
-                </div>
-                <!-- Fin Tab panel -->
-            </div>
+  <div class="container-fluid">
+    <a class="glyphicon glyphicon-list" id="menu-toggle"></a>
+    <div class="col-xs-12">
+      <div class="content">
+        <!-- Inicio Tab panes -->
+        <div class="tab-content">
+          <div role="tabpanel" class="tab-pane active" id="cuenta">
+            <h3>Registrar Compañia</h3>
+            <form id="form_register" method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="col-xs-12" >
+                {{form.as_p}}
+              </div>
+              <button id="submit" type="submit" class="btn btn-success btn-block btn-flat">Registrar</button>               
+            </form>
+            <br>
+            <table id="myTable" class="display" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>RUT</th>
+                            <th>Razon Social</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for comp in companias %}
+                        <tr>
+                            <td>{{ comp.pk }}</td>
+                            <td>{{ comp.rut }}</td>
+                            <td>{{ comp.razon_social }}</td>
+                            <td>
+                              <a href="{% url 'conectores:update_compania' pk=comp.pk %}"><i class="fa fa-edit"></i></a>
+                              <a href="{% url 'conectores:delete_compania' pk=comp.pk %}"><i class="fa fa-close"></i></a>
+                            </td>
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+                </table>
+            <br>
+          </div>
+          <!-- Fin Tab panel -->
         </div>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock content_center %}
