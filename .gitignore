@@ -25,6 +25,7 @@ folios/__pycache__
 *.project
 *.planner
 *.tmp
+*.orig
 sources/*
 mydatabase
 config/settings.py

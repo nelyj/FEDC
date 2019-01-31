@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.views.generic.edit import FormView
 from django.shortcuts import render
 from django.views.generic.base import TemplateView, View
+from django.views.generic import ListView
 import mysql.connector
 import requests
 from requests import Request, Session
@@ -30,37 +31,36 @@ class SeleccionarEmpresaView(TemplateView):
 
         context = super().get_context_data(*args, *kwargs)
         context['empresas'] = Compania.objects.filter(owner=self.request.user)
-
-
         if Compania.objects.filter(owner=self.request.user).exists():
-            
             context['tiene_empresa'] = True
-
         else:
-
-
             messages.info(self.request, "Registre una empresa para continuar")
             context['tiene_empresa'] = False
-
-
         return context
 
     def post(self, request):
 
+        enviadas = self.request.POST.get('enviadas', None)
+
+        print(enviadas)
+        # enviadas = int(enviadas)
+
         empresa = int(request.POST.get('empresa'))
+
         if not empresa:
-
             return HttpResponseRedirect('/')
-
         empresa_obj = Compania.objects.get(pk=empresa)
-
         if empresa_obj and self.request.user == empresa_obj.owner:
+            if enviadas == "1":
 
-            return HttpResponseRedirect(reverse_lazy('facturas:lista_facturas', kwargs={'pk':empresa}))
+                return HttpResponseRedirect(reverse_lazy('facturas:lista-enviadas', kwargs={'pk':empresa}))
+            else:
 
+                return HttpResponseRedirect(reverse_lazy('facturas:lista_facturas', kwargs={'pk':empresa}))
         else:
-
             return HttpResponseRedirect('/')
+
+
 
 
 class ListaFacturasViews(TemplateView):
@@ -121,8 +121,6 @@ class ListaFacturasViews(TemplateView):
         # ya se encuentran cargadas en el sistema
         # y en ese caso las elimina de la lista
         for i , item in enumerate(solo_facturas):
-
-            # print(context['invoices']['data'][i])
 
             if item in enviadas:
 
@@ -364,11 +362,14 @@ class SendInvoice(FormView):
             usuario = Conector.objects.filter(pk=1).first()
         except Exception as e:
             print(e)
+
         payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
         headers = {'content-type': "application/json"}
         response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
         url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+self.kwargs['slug']
+
         aux=session.put(url,json={'status_sii':'Aprobado'})
+
         session.close()
         # else:
         #     msg = "La factura %s ya se encuentra almacenada en la base de datos del Faturador" % (self.kwargs['slug'])
@@ -378,8 +379,16 @@ class SendInvoice(FormView):
         messages.error(self.request, form.errors)
         return super().form_invalid(form)
 
-# class FacturasCargadasView(ListView):
-#     template_name = 'facturas_enviadas.html'
+class FacturasEnviadasView(ListView):
+    template_name = 'facturas_enviadas.html'
+
+
+    def get_queryset(self):
+
+        compania = self.kwargs.get('pk')
+
+        return Factura.objects.filter(compania=compania).order_by('-created')
+
 
 
 
