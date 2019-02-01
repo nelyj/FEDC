@@ -52,10 +52,8 @@ class SeleccionarEmpresaView(TemplateView):
         empresa_obj = Compania.objects.get(pk=empresa)
         if empresa_obj and self.request.user == empresa_obj.owner:
             if enviadas == "1":
-
                 return HttpResponseRedirect(reverse_lazy('facturas:lista-enviadas', kwargs={'pk':empresa}))
             else:
-
                 return HttpResponseRedirect(reverse_lazy('facturas:lista_facturas', kwargs={'pk':empresa}))
         else:
             return HttpResponseRedirect('/')
@@ -322,6 +320,7 @@ class SendInvoice(FormView):
             file.write(response)
         except Exception as e:
             messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
+            return super().form_invalid(form)
         # rut = self.request.POST.get('rut', None)
         # assert rut, "rut no existe"
 

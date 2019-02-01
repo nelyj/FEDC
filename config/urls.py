@@ -42,6 +42,7 @@ urlpatterns = [
     path('', include('conectores.urls', namespace="conectores")),
     path('', include('facturas.urls', namespace="facturas")),
     path('', include('folios.urls', namespace="folios")),
+    path('', include('boletas.urls',namespace="boletas")),
 ]
 
 if settings.DEBUG:

@@ -2,54 +2,54 @@
 {% block extras_js %}
 {% endblock extras_js %}
 {% block contenido %}
- {% block modals %}
-              <!-- Modal  -->
-              <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                    <div class="modal-dialog" role="document">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                          <h4 class="modal-title" id="myModalLabel">Actualizar Perfil del Usuario</h4>
-                        </div>
-                        <div class="modal-body" id="modal-body">
-                        </div>
-                      </div>
-                    </div>
-              </div>
-            <!-- End Modal -->
-        {% endblock modals %}
+{% block modals %}
+<!-- Modal  -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Actualizar Perfil del Usuario</h4>
+            </div>
+            <div class="modal-body" id="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Modal -->
+{% endblock modals %}
 <div id="wrapper">
 
-        <!-- Sidebar -->
-        {% block sidebar %}
-        <div id="sidebar-wrapper">
-            <ul class="sidebar-nav">
-                <li class="sidebar-brand">
-                    <a href="#">
-                        Timg
-                    </a>
-                </li>
-                {% if 'Super Admin' in request.session.grupos %}
-                <li class="submenu">
-                    <a href="#" > Gestion de usuarios<span class="caret "></span></a>
-                    <ul>
-                        <li><a href="{% url 'users:lista_users' %}">Listar Usuarios</a></li>
-                        <li><a href="{% url 'users:registrar' %}">Registrar Usuario</a></li>
-                  </ul>
-                </li>
-                {% endif %}
-                <li>
-                    <a data-toggle="collapse" href="#facturas-collapse" aria-expanded="false" aria-controls="facturas-collapse">Facturas</a>
-                </li>
-                <div class="collapse" id="facturas-collapse">
-                    <ul class="submenu" id="marketing_services">
-                        <li><a href="{% url 'facturas:seleccionar-empresa' %}">Facturas no enviadas</a></li>
-                        <li><a href="{% url 'facturas:seleccionar-empresa' %}?enviadas=1">Facturas enviadas</a></li>
-                        <li><a href="#">Boletas</a></li>
-                    </ul>
-                </div>
-
-
+    <!-- Sidebar -->
+    {% block sidebar %}
+    <div id="sidebar-wrapper">
+        <ul class="sidebar-nav">
+            <li class="sidebar-brand">
+                <a href="#">
+                    Timg
+                </a>
+            </li>
+            {% if 'Super Admin' in request.session.grupos %}
+            <li class="submenu">
+                <a href="#" > Gestion de usuarios<span class="caret "></span></a>
+                <ul>
+                    <li><a href="{% url 'users:lista_users' %}">Listar Usuarios</a></li>
+                    <li><a href="{% url 'users:registrar' %}">Registrar Usuario</a></li>
+                </ul>
+            </li>
+            {% endif %}
+            <li>
+                <a data-toggle="collapse" href="#facturas-collapse" aria-expanded="false" aria-controls="facturas-collapse">Documentos</a>
+            </li>
+            <div class="collapse" id="facturas-collapse">
+                <ul class="submenu" id="marketing_services">
+                    <li><a href="{% url 'facturas:seleccionar-empresa' %}">Facturas no enviadas</a></li>
+                    <li><a href="{% url 'facturas:seleccionar-empresa' %}?enviadas=1">Facturas enviadas</a></li>
+                    <li><a href="{% url 'boletas:seleccionar-empresa' %}">Boletas no enviadas</a></li>
+                    <li><a href="{% url 'boletas:seleccionar-empresa' %}?enviadas=1">Boletas enviadas</a></li>
+                </ul>
+            </div>
+            <li>
                 <li>
                     <a href="{% url 'conectores:registrar_conector' %}">Configuracion de conectores</a>
                 </li>
@@ -70,10 +70,10 @@
         <!-- Page Content -->
         <div id="page-content-wrapper">
             {% block msjs %}
-                <!-- Agrega elementos al mensaje -->
-                {% include 'utils_mensajes.html' %}
+            <!-- Agrega elementos al mensaje -->
+            {% include 'utils_mensajes.html' %}
             {% endblock msjs %}
-        {% block content_center %}
+            {% block content_center %}
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-12">
@@ -81,9 +81,9 @@
                     </div>
                 </div>
             </div>
-        {% endblock content_center %}
+            {% endblock content_center %}
         </div>
         <!-- /#page-content-wrapper -->
     </div>
     <!-- /#wrapper -->
-{% endblock contenido %}
+    {% endblock contenido %}
