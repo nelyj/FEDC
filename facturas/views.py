@@ -105,6 +105,7 @@ class ListaFacturasViews(TemplateView):
         # con el ERP y eliminar las que ya se encuentran cargadas
         enviadas = [factura.numero_factura for factura in Factura.objects.filter(compania=compania).only('numero_factura')]
         
+        print(enviadas)
 
         # Elimina todas las boletas de la lista
         # y crea una nueva lista con todas las facturas 
@@ -118,16 +119,19 @@ class ListaFacturasViews(TemplateView):
         # Verifica si la factura que vienen del ERP 
         # ya se encuentran cargadas en el sistema
         # y en ese caso las elimina de la lista
+        solo_nuevas = []
         for i , item in enumerate(solo_facturas):
 
-            if item in enviadas:
+            if not item in enviadas:
 
-                del solo_facturas[i]
+                solo_nuevas.append(item)
+
+        print(solo_nuevas)
 
 
         url=usuario.url_erp+'/api/resource/Sales%20Invoice/'
         context['detail']=[]
-        for tmp in solo_facturas:
+        for tmp in solo_nuevas:
             aux1=url+str(tmp)
             aux=session.get(aux1)
             context['detail'].append(json.loads(aux.text))
