@@ -46,21 +46,16 @@ class SeleccionarEmpresaView(TemplateView):
         # enviadas = int(enviadas)
 
         empresa = int(request.POST.get('empresa'))
-
         if not empresa:
             return HttpResponseRedirect('/')
         empresa_obj = Compania.objects.get(pk=empresa)
         if empresa_obj and self.request.user == empresa_obj.owner:
             if enviadas == "1":
-
                 return HttpResponseRedirect(reverse_lazy('facturas:lista-enviadas', kwargs={'pk':empresa}))
             else:
-
                 return HttpResponseRedirect(reverse_lazy('facturas:lista_facturas', kwargs={'pk':empresa}))
         else:
             return HttpResponseRedirect('/')
-
-
 
 
 class ListaFacturasViews(TemplateView):
@@ -322,6 +317,7 @@ class SendInvoice(FormView):
             file.write(response)
         except Exception as e:
             messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
+            return super().form_invalid(form)
         # rut = self.request.POST.get('rut', None)
         # assert rut, "rut no existe"
 
@@ -362,14 +358,11 @@ class SendInvoice(FormView):
             usuario = Conector.objects.filter(pk=1).first()
         except Exception as e:
             print(e)
-
         payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
         headers = {'content-type': "application/json"}
         response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
         url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+self.kwargs['slug']
-
         aux=session.put(url,json={'status_sii':'Aprobado'})
-
         session.close()
         # else:
         #     msg = "La factura %s ya se encuentra almacenada en la base de datos del Faturador" % (self.kwargs['slug'])

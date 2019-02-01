@@ -43,6 +43,9 @@ PROJECT_APPS = [
     'utils',
     'users',
     'conectores',
+    'facturas',
+    'folios',
+    'boletas'
 ]
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS
@@ -121,7 +124,7 @@ LANGUAGE_CODE = 'es-ve'
 
 LOCALE_NAME = 'es'
 
-TIME_ZONE = 'America/Caracas'
+TIME_ZONE = 'America/Santiago'
 
 USE_I18N = True
 
@@ -135,7 +138,6 @@ MEDIA_URL = '/sources/'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
-SOURCES_URL = BASE_DIR + 'sources/'
 STATIC_ROOT = BASE_DIR + 'static/'
 STATIC_URL = '/static/'
 
@@ -156,12 +158,12 @@ EMAIL_USE_TLS = True
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'direccion_email@gmail.com'
-EMAIL_HOST_PASSWORD = 'pass******'
+EMAIL_HOST_USER = 'facturador@timg.cl'
+EMAIL_HOST_PASSWORD = 'FacturaElecTimg*19'
 EMAIL_FROM = EMAIL_HOST_USER
 
 # During production only
-#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # During development only
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
