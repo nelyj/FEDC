@@ -39,8 +39,17 @@
                 </li>
                 {% endif %}
                 <li>
-                    <a href="{% url 'facturas:seleccionar-empresa' %}">Facturas</a>
+                    <a data-toggle="collapse" href="#facturas-collapse" aria-expanded="false" aria-controls="facturas-collapse">Facturas</a>
                 </li>
+                <div class="collapse" id="facturas-collapse">
+                    <ul class="submenu" id="marketing_services">
+                        <li><a href="{% url 'facturas:seleccionar-empresa' %}">Facturas no enviadas</a></li>
+                        <li><a href="{% url 'facturas:seleccionar-empresa' %}?enviadas=1">Facturas enviadas</a></li>
+                        <li><a href="#">Boletas</a></li>
+                    </ul>
+                </div>
+
+
                 <li>
                     <a href="{% url 'conectores:registrar_conector' %}">Configuracion de conectores</a>
                 </li>
