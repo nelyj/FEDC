@@ -311,13 +311,13 @@ class SendInvoice(FormView):
         assert compania, "compania no existe"
         data['productos']=eval(data['productos'])
         response = render_to_string('invoice.xml', {'form':data,'compania':compania})
-        try:
-            os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug'])
-            file = open(settings.MEDIA_ROOT+'facturas'+'/'+self.kwargs['slug']+'/'+self.kwargs['slug']+'.xml','w')
-            file.write(response)
-        except Exception as e:
-            messages.error(self.request, 'XML ya almacenado en el directorio')
-            return super().form_invalid(form)
+        # try:
+        #     os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug'])
+        #     file = open(settings.MEDIA_ROOT+'facturas'+'/'+self.kwargs['slug']+'/'+self.kwargs['slug']+'.xml','w')
+        #     file.write(response)
+        # except Exception as e:
+        #     messages.error(self.request, 'XML ya almacenado en el directorio')
+        #     return super().form_invalid(form)
         # rut = self.request.POST.get('rut', None)
         # assert rut, "rut no existe"
 
