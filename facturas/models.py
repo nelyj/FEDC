@@ -58,7 +58,7 @@ class Factura(CreationModificationDateMixin):
 
 			self.n_folio = n_folio 
 
-			print(f'{self.n_folio} asignado con exito')
+			print(str(self.n_folio)+ str('asignado con exito'))
 
 		else: 
 

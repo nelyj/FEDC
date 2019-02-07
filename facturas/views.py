@@ -316,7 +316,7 @@ class SendInvoice(FormView):
             file = open(settings.MEDIA_ROOT+'facturas'+'/'+self.kwargs['slug']+'/'+self.kwargs['slug']+'.xml','w')
             file.write(response)
         except Exception as e:
-            messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
+            messages.error(self.request, 'XML ya almacenado en el directorio')
             return super().form_invalid(form)
         # rut = self.request.POST.get('rut', None)
         # assert rut, "rut no existe"
