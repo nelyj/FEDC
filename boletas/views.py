@@ -82,8 +82,8 @@ class ListaBoletasViews(TemplateView):
         try:
             usuario = Conector.objects.filter(t_documento='33',empresa=compania).first()
         except Exception as e:
-
-            print(e)
+            messages.info(self.request, "No posee conectores asociados a esta empresa")
+            return HttpResponseRedirect(reverse_lazy('boletas:seleccionar-empresa'))
 
         payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
 
