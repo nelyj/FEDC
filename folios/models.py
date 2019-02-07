@@ -157,7 +157,7 @@ class Folio(CreationModificationDateMixin):
 
 		if tiempo_restante.days >= 0:
 
-			return f'{tiempo_restante.days}'
+			return str(tiempo_restante.days)
 		else:
 			return str(0)
 

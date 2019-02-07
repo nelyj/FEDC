@@ -347,9 +347,9 @@ class SendInvoice(FormView):
         # Si queda uno, cambia la estructura de la oracion a singular. 
         disponibles = folio.get_folios_disponibles()
         if disponibles == 1:
-            messages.info(self.request, f'Queda {disponibles} folio disponible')
+            messages.info(self.request, str('Queda ')+str(disponibles)+str('folio disponible'))
         elif disponibles < 50:
-            messages.info(self.request, f'Quedan {disponibles} folios disponibles')
+            messages.info(self.request, str('Quedan ')+str(disponibles)+str('folios disponibles'))
         form.compania = compania
         form.save()
         msg = "Se guardo en Base de Datos la factura con éxito"
