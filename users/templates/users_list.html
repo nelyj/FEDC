@@ -11,7 +11,7 @@
             var URL = "{% url 'users:listar_users' %}"
             var user = "{{ request.user.pk }}"
             ruta = "{% url 'users:modal_perfil' request.user.pk %}";
-            id_user = {{request.user.pk}};
+            id_user = "{{request.user.pk}}";
         </script>
 {% endblock extras_constantes %}
 {% block extras_js %}

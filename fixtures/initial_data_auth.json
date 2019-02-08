@@ -1,0 +1,66 @@
+[
+  {
+    "model": "auth.group",
+    "pk": 1,
+    "fields": {
+      "name": "Super Admin",
+      "descripcion": "Este grupo de usuario posee el acceso a toda la plataforma",
+      "permissions": [
+        
+      ]
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk": 2,
+    "fields": {
+      "name": "Admin",
+      "descripcion": "Este tipo de usuario pose el control en ciertas areas de la plataforma, no maneja la parti administrativa del sistema",
+      "permissions": [
+        
+      ]
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk": 3,
+    "fields": {
+      "name": "Invitado",
+      "descripcion": "Este tipo de usuario son los que se registran a la plataforma tiene acceso a cierta acciones dentro de la misma",
+      "permissions": [
+        
+      ]
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$30000$XroVOcQb5S8T$FEdBH8V30VSljctFweOjPAsF/4BcwGsNwxRnfCJUoOs=",
+      "last_login": "2017-06-10T12:56:30.502Z",
+      "is_superuser": true,
+      "username": "admin",
+      "first_name": "",
+      "last_name": "",
+      "email": "leonelphm@hotmail.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2017-06-10T11:07:55.317Z",
+      "groups": [
+        1
+      ],
+      "user_permissions": [
+        
+      ]
+    }
+  },
+  {
+    "model": "users.userprofile",
+    "pk": 1,
+    "fields": {
+      "fk_user": 1,
+      "fk_tipo_documento": 1,
+      "id_perfil": 18798029
+    }
+  }
+]
