@@ -1,228 +1,73 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <EnvioDTE xmlns="http://www.sii.cl/SiiDte" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sii.cl/SiiDte EnvioDTE_v10.xsd" version="1.0">
-<SetDTE ID="SetDoc">
-<Caratula version="1.0">
-<RutEmisor>{{compania.rut}}</RutEmisor>
-<RutReceptor>{{form.rut}}</RutReceptor>
-<FchResol>{{compania.fecha_resolucion}}</FchResol>
-<NroResol>{{compania.numero_resolucion}}</NroResol>
-<TmstFirmaEnv>2018-11-21T16:59:45</TmstFirmaEnv>
-<SubTotDTE>
-<TpoDTE>33</TpoDTE>
-<NroDTE>1</NroDTE>
-</SubTotDTE>
-</Caratula>
-<DTE version="1.0">
-<Documento ID="{{form.numero_factura}}">
-<Encabezado>
-<IdDoc>
-<TipoDTE>33</TipoDTE>
-<Folio>518518</Folio>
-<FchEmis>2018-11-21</FchEmis>
-<FmaPago>1</FmaPago>
-</IdDoc>
-<Emisor>
-<RUTEmisor>{{compania.rut}}</RUTEmisor>
-<RznSoc>{{compania.razon_social}}</RznSoc>
-<GiroEmis>{{compania.giro}}</GiroEmis>
-<Acteco>{{compania.actividad_principal}}</Acteco>
-<DirOrigen>{{compania.direccion}}</DirOrigen>
-<CmnaOrigen>{{compania.comuna}}</CmnaOrigen>
-</Emisor>
-<Receptor>
-<RUTRecep>{{form.rut}}</RUTRecep>
-<RznSocRecep> {{form.senores}}</RznSocRecep>
-<GiroRecep>{{form.giro}}</GiroRecep>
-<DirRecep>{{form.direccion}}</DirRecep>
-<CmnaRecep>RECOLETA</CmnaRecep>
-<CiudadRecep>REGION METROPOLITANA</CiudadRecep>
-</Receptor>
-<Totales>
-<MntNeto>{{form.neto}}</MntNeto>
-<TasaIVA>19</TasaIVA>
-<IVA>{{form.iva}}</IVA>
-<MntTotal>{{form.total}}</MntTotal>
-</Totales>
-</Encabezado>{%for prod in form.productos%}
-<Detalle>
-<NroLinDet>{{forloop.counter}</NroLinDet>
-<CdgItem>
-<TpoCodigo>INT1</TpoCodigo>
-<VlrCodigo>{{prod.item_code}}</VlrCodigo>
-</CdgItem>
-<NmbItem>{{prod.description}}</NmbItem>
-<DscItem/>
-<QtyItem>{{prod.qty}}</QtyItem>
-<PrcItem>{{prod.base_net_rate}}</PrcItem>
-<MontoItem>{{prod.amount}}</MontoItem>
-</Detalle>{%endfor%}
-<Referencia>
-<NroLinRef>1</NroLinRef>
-<TpoDocRef>801</TpoDocRef>
-<FolioRef>BXF-7654</FolioRef>
-<FchRef>2018-11-21</FchRef>
-</Referencia>
-<TED version="1.0">
-<DD>
-<RE>76263389-2</RE>
-<TD>33</TD>
-<F>518518</F>
-<FE>2018-11-21</FE>
-<RR>76030477-8</RR>
-<RSR>Fotostyle Regalos Especiales Limitada</RSR>
-<MNT>19851580</MNT>
-<IT1>PLOTER DE CORTE 3XX ACCESORIOS Y </IT1>
-<CAF version="1.0">
-<DA>
-<RE>76263389-2</RE>
-<RS>FOTOSTYLE SPA</RS>
-<TD>33</TD>
-<RNG><D>518301</D><H>530430</H></RNG>
-<FA>2018-11-16</FA>
-<RSAPK><M>oPXOBaDY77Dp37IY6AOwMwmPuSeyDo6hCenVa2bbEsmcdQyWe6kb3F8xSc5TD8YvXVQE2/ja+csd09zAVqMNuw==</M><E>Aw==</E></RSAPK>
-<IDK>300</IDK>
-</DA>
-<FRMA algoritmo="SHA1withRSA">NCXRvMUOQWPHIrVo3DyGm+zMafFomf66IsQiPkvw8jcukgnE6LEx7Ou9cNfO2Wq4JwfcA4IMakYLfMsCziS85Q==</FRMA>
-</CAF>
-<TSTED>2018-11-21T16:59:44</TSTED>
-</DD>
-<FRMT algoritmo="SHA1withRSA">IC5N6cxClFn7HkKrnFpW0XcldExD72EhLX/zoI3Dt4YbpMtvROUuGhVZiqKqY2rteXDtPawZAzmIXDpQeCX4aQ==</FRMT>
-</TED>
-<TmstFirma>2018-11-21T16:59:44</TmstFirma>
-</Documento>
-<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
-<SignedInfo>
-<CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
-<SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
-<Reference URI="#{{form.numero_factura}}">
-<Transforms>
-<Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
-</Transforms>
-<DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
-<DigestValue>z35kgBNHeja/ngcI2W/6sdLrkcU=</DigestValue>
-</Reference>
-</SignedInfo>
-<SignatureValue>Yh5xFkT8d9eEnb7ZssgSgV9VfSkim2/NLVQTep91FECdYmnc25C1L3kuA2VmGdOc
-VWa0LMZvVCZH5l4C0B9eFsSAdfIVJxCwGGcKqblp0Lzqg3/G+wbHWCD1onpsENrZ
-akFauNCwOEUnuN7uWUnvkFG0H4zJvGRdY84R6Eh+YGk=</SignatureValue>
-<KeyInfo>
-<KeyValue>
-<RSAKeyValue>
-<Modulus>
-n0jdpdj7SDma7y1G99MwxUD7y/LVgtagrlVfhuuke8kTR1YUfQ4ERE7l8IVRQcDi
-iiPTz2orUXF1DE+U7h+DMkx/oW0FD1Y9nFZv2kXvx6iCodpG6WJhAQiaKTr1Kc6u
-FkW4UbKSTK7hV4ywIlouYfyaEMynLhT6VSAR+gXXo7M=
-</Modulus>
-<Exponent>
-AQAB
-</Exponent>
-</RSAKeyValue>
-</KeyValue>
-<X509Data>
-
-<X509Certificate>MIIGWjCCBUKgAwIBAgIKe8lrDAAAAAiFwDANBgkqhkiG9w0BAQUFADCB0jELMAkG
-A1UEBhMCQ0wxHTAbBgNVBAgTFFJlZ2lvbiBNZXRyb3BvbGl0YW5hMREwDwYDVQQH
-EwhTYW50aWFnbzEUMBIGA1UEChMLRS1DRVJUQ0hJTEUxIDAeBgNVBAsTF0F1dG9y
-aWRhZCBDZXJ0aWZpY2Fkb3JhMTAwLgYDVQQDEydFLUNFUlRDSElMRSBDQSBGSVJN
-QSBFTEVDVFJPTklDQSBTSU1QTEUxJzAlBgkqhkiG9w0BCQEWGHNjbGllbnRlc0Bl
-LWNlcnRjaGlsZS5jbDAeFw0xNzA3MzExNTI0MTRaFw0yMDA3MzAxNTI0MTRaMIHd
-MQswCQYDVQQGEwJDTDEiMCAGA1UECBMZTUVUUk9QT0xJVEFOQSBERSBTQU5USUFH
-TzERMA8GA1UEBxMIU2FudGlhZ28xFzAVBgNVBAoTDkZvdG9zdHlsZSBMdGRhMTMw
-MQYDVQQLEypWZW50YSBkZSBNYXF1aW5hcmlhIGUgaW5zdW1vcyBkZSBpbXByZXNp
-b24xJzAlBgNVBAMTHkVsaXphYmV0aCBTaWx2aWEgVmlnbmVhdSBSb2phczEgMB4G
-CSqGSIb3DQEJARYRZWxpemFiZXRoQHRpbWcuY2wwgZ8wDQYJKoZIhvcNAQEBBQAD
-gY0AMIGJAoGBAJ9I3aXY+0g5mu8tRvfTMMVA+8vy1YLWoK5VX4brpHvJE0dWFH0O
-BERO5fCFUUHA4ooj089qK1FxdQxPlO4fgzJMf6FtBQ9WPZxWb9pF78eogqHaRuli
-YQEImik69SnOrhZFuFGykkyu4VeMsCJaLmH8mhDMpy4U+lUgEfoF16OzAgMBAAGj
-ggKnMIICozA9BgkrBgEEAYI3FQcEMDAuBiYrBgEEAYI3FQiC3IMvhZOMZoXVnReC
-4twnge/sPGGBy54UhqiCWAIBZAIBBDAdBgNVHQ4EFgQUScNt9KqTexZilWVS95oU
-sEYrJGEwCwYDVR0PBAQDAgTwMB8GA1UdIwQYMBaAFHjhPp/SErN6PI3NMA5Ts0Mp
-B7NVMD4GA1UdHwQ3MDUwM6AxoC+GLWh0dHA6Ly9jcmwuZS1jZXJ0Y2hpbGUuY2wv
-ZWNlcnRjaGlsZWNhRkVTLmNybDA6BggrBgEFBQcBAQQuMCwwKgYIKwYBBQUHMAGG
-Hmh0dHA6Ly9vY3NwLmVjZXJ0Y2hpbGUuY2wvb2NzcDAjBgNVHREEHDAaoBgGCCsG
-AQQBwQEBoAwWCjE2NDI0MDM2LTMwIwYDVR0SBBwwGqAYBggrBgEEAcEBAqAMFgo5
-NjkyODE4MC01MIIBTQYDVR0gBIIBRDCCAUAwggE8BggrBgEEAcNSBTCCAS4wLQYI
-KwYBBQUHAgEWIWh0dHA6Ly93d3cuZS1jZXJ0Y2hpbGUuY2wvQ1BTLmh0bTCB/AYI
-KwYBBQUHAgIwge8egewAQwBlAHIAdABpAGYAaQBjAGEAZABvACAARgBpAHIAbQBh
-ACAAUwBpAG0AcABsAGUALgAgAEgAYQAgAHMAaQBkAG8AIAB2AGEAbABpAGQAYQBk
-AG8AIABlAG4AIABmAG8AcgBtAGEAIABwAHIAZQBzAGUAbgBjAGkAYQBsACwAIABx
-AHUAZQBkAGEAbgBkAG8AIABoAGEAYgBpAGwAaQB0AGEAZABvACAAZQBsACAAQwBl
-AHIAdABpAGYAaQBjAGEAZABvACAAcABhAHIAYQAgAHUAcwBvACAAdAByAGkAYgB1
-AHQAYQByAGkAbzANBgkqhkiG9w0BAQUFAAOCAQEAGVqwfqj5y4qCfY4G3s00zHO0
-e4GJmaC4cJd1iP09mgdEHSrjYyPkpgB7c9Dwu1MSLoBt/89cZG31uY+106nHQB0M
-lH2VP1RpNLoKwq12fI33/Imkha2TI4CJYbtlPyjemiuzcEeqS9ew1ClMp0/579QH
-GPOn/m7X7RV4ooWm4zdU9o+uv+m2UkGDPSSUqaTkUO/kq/wst+Xty11OFdn7CBf6
-MmNC2Alx7O0zw8h1Fdi9LFzgbrF3iQF29+JTsC2Os0Yd/It8atogE02Mf28k/N5D
-2H3vCO7SK5UzFGa9Vt4e0Jpe7vSH2vW2WlbnanV0BwxIk5Hzatgkjuio4Gqtkw==</X509Certificate>
-</X509Data>
-</KeyInfo>
-</Signature>
+	<SetDTE ID="SetDoc">
+	<Caratula version="1.0">
+		<RutEmisor>{{compania.rut}}</RutEmisor>
+		<RutReceptor>{{form.rut}}</RutReceptor>
+		<FchResol>{{compania.fecha_resolucion}}</FchResol>
+		<NroResol>{{compania.numero_resolucion}}</NroResol>
+		<TmstFirmaEnv>2018-11-21T16:59:45</TmstFirmaEnv>
+		<SubTotDTE>
+			<TpoDTE>33</TpoDTE>
+			<NroDTE>1</NroDTE>
+		</SubTotDTE>
+	</Caratula>
+	<DTE version="1.0">
+	<Documento ID="{{form.numero_factura}}">
+		<Encabezado>
+			<IdDoc>
+				<TipoDTE>33</TipoDTE>
+				<Folio>518518</Folio>
+				<FchEmis>2018-11-21</FchEmis>
+				<FmaPago>1</FmaPago>
+			</IdDoc>
+			<Emisor>
+				<RUTEmisor>{{compania.rut}}</RUTEmisor>
+				<RznSoc>{{compania.razon_social}}</RznSoc>
+				<GiroEmis>{{compania.giro}}</GiroEmis>
+				<Acteco>{{compania.actividad_principal}}</Acteco>
+				<DirOrigen>{{compania.direccion}}</DirOrigen>
+				<CmnaOrigen>{{compania.comuna}}</CmnaOrigen>
+			</Emisor>
+			<Receptor>
+				<RUTRecep>{{form.rut}}</RUTRecep>
+				<RznSocRecep> {{form.senores}}</RznSocRecep>
+				<GiroRecep>{{form.giro}}</GiroRecep>
+				<DirRecep>{{form.direccion}}</DirRecep>
+				<CmnaRecep>RECOLETA</CmnaRecep>
+				<CiudadRecep>REGION METROPOLITANA</CiudadRecep>
+			</Receptor>
+			<Totales>
+				<MntNeto>{{form.neto}}</MntNeto>
+				<TasaIVA>19</TasaIVA>
+				<IVA>{{form.iva}}</IVA>
+				<MntTotal>{{form.total}}</MntTotal>
+			</Totales>
+		</Encabezado>{%for prod in form.productos%}
+		<Detalle>
+			<NroLinDet>{{forloop.counter}</NroLinDet>
+			<CdgItem>
+				<TpoCodigo>INT1</TpoCodigo>
+				<VlrCodigo>{{prod.item_code}}</VlrCodigo>
+			</CdgItem>
+			<NmbItem>{{prod.description}}</NmbItem>
+			<DscItem/>
+			<QtyItem>{{prod.qty}}</QtyItem>
+			<PrcItem>{{prod.base_net_rate}}</PrcItem>
+			<MontoItem>{{prod.amount}}</MontoItem>
+		</Detalle>{%endfor%}
+		<Referencia>
+			<NroLinRef>1</NroLinRef>
+			<TpoDocRef>801</TpoDocRef>
+			<FolioRef>BXF-7654</FolioRef>
+			<FchRef>2018-11-21</FchRef>
+		</Referencia>
+		<TED version="1.0">
+			{{ DD }}
+		</TED>
+		<TmstFirma>2018-11-21T16:59:44</TmstFirma>
+	</Documento>
+	{{ signature_Documento }}
 </DTE></SetDTE>
-<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
-<SignedInfo>
-<CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
-<SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
-<Reference URI="#SetDoc">
-<Transforms>
-<Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
-</Transforms>
-<DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
-<DigestValue>jR3Hj/J8EkJAIiD3nffgGIKiD6Q=</DigestValue>
-</Reference>
-</SignedInfo>
-<SignatureValue>O68pfSiiXYGCKP8b09wYczbsU8xIMDgd2uiUa/GNhqoTQNqjCiDVwPtDtvJ5Qdfc
-UFO6Bz/WJyoweCFoy1ZDoQoFrPceGjTxL/sS+WA4RhEujYVbLAWnWAmI2HLw5rCg
-zv5qH6xRVwPOEcaXMwW97L8BMQlNiwVClbl21iW2F54=</SignatureValue>
-<KeyInfo>
-<KeyValue>
-<RSAKeyValue>
-<Modulus>
-n0jdpdj7SDma7y1G99MwxUD7y/LVgtagrlVfhuuke8kTR1YUfQ4ERE7l8IVRQcDi
-iiPTz2orUXF1DE+U7h+DMkx/oW0FD1Y9nFZv2kXvx6iCodpG6WJhAQiaKTr1Kc6u
-FkW4UbKSTK7hV4ywIlouYfyaEMynLhT6VSAR+gXXo7M=
-</Modulus>
-<Exponent>
-AQAB
-</Exponent>
-</RSAKeyValue>
-</KeyValue>
-<X509Data>
-
-<X509Certificate>MIIGWjCCBUKgAwIBAgIKe8lrDAAAAAiFwDANBgkqhkiG9w0BAQUFADCB0jELMAkG
-A1UEBhMCQ0wxHTAbBgNVBAgTFFJlZ2lvbiBNZXRyb3BvbGl0YW5hMREwDwYDVQQH
-EwhTYW50aWFnbzEUMBIGA1UEChMLRS1DRVJUQ0hJTEUxIDAeBgNVBAsTF0F1dG9y
-aWRhZCBDZXJ0aWZpY2Fkb3JhMTAwLgYDVQQDEydFLUNFUlRDSElMRSBDQSBGSVJN
-QSBFTEVDVFJPTklDQSBTSU1QTEUxJzAlBgkqhkiG9w0BCQEWGHNjbGllbnRlc0Bl
-LWNlcnRjaGlsZS5jbDAeFw0xNzA3MzExNTI0MTRaFw0yMDA3MzAxNTI0MTRaMIHd
-MQswCQYDVQQGEwJDTDEiMCAGA1UECBMZTUVUUk9QT0xJVEFOQSBERSBTQU5USUFH
-TzERMA8GA1UEBxMIU2FudGlhZ28xFzAVBgNVBAoTDkZvdG9zdHlsZSBMdGRhMTMw
-MQYDVQQLEypWZW50YSBkZSBNYXF1aW5hcmlhIGUgaW5zdW1vcyBkZSBpbXByZXNp
-b24xJzAlBgNVBAMTHkVsaXphYmV0aCBTaWx2aWEgVmlnbmVhdSBSb2phczEgMB4G
-CSqGSIb3DQEJARYRZWxpemFiZXRoQHRpbWcuY2wwgZ8wDQYJKoZIhvcNAQEBBQAD
-gY0AMIGJAoGBAJ9I3aXY+0g5mu8tRvfTMMVA+8vy1YLWoK5VX4brpHvJE0dWFH0O
-BERO5fCFUUHA4ooj089qK1FxdQxPlO4fgzJMf6FtBQ9WPZxWb9pF78eogqHaRuli
-YQEImik69SnOrhZFuFGykkyu4VeMsCJaLmH8mhDMpy4U+lUgEfoF16OzAgMBAAGj
-ggKnMIICozA9BgkrBgEEAYI3FQcEMDAuBiYrBgEEAYI3FQiC3IMvhZOMZoXVnReC
-4twnge/sPGGBy54UhqiCWAIBZAIBBDAdBgNVHQ4EFgQUScNt9KqTexZilWVS95oU
-sEYrJGEwCwYDVR0PBAQDAgTwMB8GA1UdIwQYMBaAFHjhPp/SErN6PI3NMA5Ts0Mp
-B7NVMD4GA1UdHwQ3MDUwM6AxoC+GLWh0dHA6Ly9jcmwuZS1jZXJ0Y2hpbGUuY2wv
-ZWNlcnRjaGlsZWNhRkVTLmNybDA6BggrBgEFBQcBAQQuMCwwKgYIKwYBBQUHMAGG
-Hmh0dHA6Ly9vY3NwLmVjZXJ0Y2hpbGUuY2wvb2NzcDAjBgNVHREEHDAaoBgGCCsG
-AQQBwQEBoAwWCjE2NDI0MDM2LTMwIwYDVR0SBBwwGqAYBggrBgEEAcEBAqAMFgo5
-NjkyODE4MC01MIIBTQYDVR0gBIIBRDCCAUAwggE8BggrBgEEAcNSBTCCAS4wLQYI
-KwYBBQUHAgEWIWh0dHA6Ly93d3cuZS1jZXJ0Y2hpbGUuY2wvQ1BTLmh0bTCB/AYI
-KwYBBQUHAgIwge8egewAQwBlAHIAdABpAGYAaQBjAGEAZABvACAARgBpAHIAbQBh
-ACAAUwBpAG0AcABsAGUALgAgAEgAYQAgAHMAaQBkAG8AIAB2AGEAbABpAGQAYQBk
-AG8AIABlAG4AIABmAG8AcgBtAGEAIABwAHIAZQBzAGUAbgBjAGkAYQBsACwAIABx
-AHUAZQBkAGEAbgBkAG8AIABoAGEAYgBpAGwAaQB0AGEAZABvACAAZQBsACAAQwBl
-AHIAdABpAGYAaQBjAGEAZABvACAAcABhAHIAYQAgAHUAcwBvACAAdAByAGkAYgB1
-AHQAYQByAGkAbzANBgkqhkiG9w0BAQUFAAOCAQEAGVqwfqj5y4qCfY4G3s00zHO0
-e4GJmaC4cJd1iP09mgdEHSrjYyPkpgB7c9Dwu1MSLoBt/89cZG31uY+106nHQB0M
-lH2VP1RpNLoKwq12fI33/Imkha2TI4CJYbtlPyjemiuzcEeqS9ew1ClMp0/579QH
-GPOn/m7X7RV4ooWm4zdU9o+uv+m2UkGDPSSUqaTkUO/kq/wst+Xty11OFdn7CBf6
-MmNC2Alx7O0zw8h1Fdi9LFzgbrF3iQF29+JTsC2Os0Yd/It8atogE02Mf28k/N5D
-2H3vCO7SK5UzFGa9Vt4e0Jpe7vSH2vW2WlbnanV0BwxIk5Hzatgkjuio4Gqtkw==</X509Certificate>
-</X509Data>
-</KeyInfo>
-	</Signature>
+	{{ signature_SetDTE }}
 </EnvioDTE>

@@ -28,6 +28,7 @@ class Certificado(CreationModificationDateMixin):
 					blank=True, null=True, 
 					validators=[FileExtensionValidator(allowed_extensions=['xml'])]
 				)
+	
 
 
 

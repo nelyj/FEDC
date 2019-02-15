@@ -318,6 +318,8 @@ class SendInvoice(FormView):
         assert compania, "compania no existe"
         data['productos']=eval(data['productos'])
         response = render_to_string('invoice.xml', {'form':data,'compania':compania})
+
+        
         try:
             os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug'])
             file = open(settings.MEDIA_ROOT+'facturas'+'/'+self.kwargs['slug']+'/'+self.kwargs['slug']+'.xml','w')
@@ -327,7 +329,6 @@ class SendInvoice(FormView):
             return super().form_invalid(form)
         # rut = self.request.POST.get('rut', None)
         # assert rut, "rut no existe"
-
         form = form.save(commit=False)
         try:
             folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=33).order_by('fecha_de_autorizacion').first()
@@ -359,6 +360,13 @@ class SendInvoice(FormView):
             messages.info(self.request, f'Quedan {disponibles} folios disponibles')
         form.compania = compania
         form.save()
+
+        # response_dd = render_to_string('snippets/DD_tag.xml', {'data':data,'folio':folio, 'instance':form})
+        response_dd = Factura._firmar_dd(data, folio, form)
+
+        # print(response_dd)
+
+
         msg = "Se guardo en Base de Datos la factura con éxito"
         session = requests.Session()
         try:

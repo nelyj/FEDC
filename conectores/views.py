@@ -97,7 +97,15 @@ class CompaniaViews(FormView):
         @return validate True
         """
         try:
-            form.save(commit=False)
+            instance = form.save(commit=False)
+
+            certificado = instance.certificado.read().decode('ascii')
+
+            certificado = certificado.replace('-----BEGIN CERTIFICATE-----\n','').replace('\n-----END CERTIFICATE-----\n','')
+
+            instance.cert_decoded = certificado
+
+            print(instance.cert_decoded)
             form.save()
             msg = "Se configuro la Compañia con éxito"
             messages.info(self.request, msg)

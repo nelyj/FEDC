@@ -2,6 +2,7 @@ from enum import Enum
 from django.db import models
 from django.contrib.auth.models import User
 from .constantes import (COMUNAS, ACTIVIDADES)
+from django.core.validators import FileExtensionValidator
 
 
 class Compania(models.Model):
@@ -9,6 +10,9 @@ class Compania(models.Model):
     """
     def get_upload_to(self, filename):
         return "logos/%s/%s" % (self.rut, filename)
+
+    def get_cert_upload_to(self, filename):
+        return "certificados/%s/%s" % (self.rut, filename)
     
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE, default=1)     
@@ -25,6 +29,8 @@ class Compania(models.Model):
     pass_correo_sii = models.CharField(max_length=128, blank=True, null=True)
     correo_intercambio = models.EmailField(blank=True, null=True)
     pass_correo_intercambio = models.CharField(max_length=128, blank=True, null=True)
+    certificado = models.FileField('Certificado', upload_to=get_cert_upload_to,validators=[FileExtensionValidator(allowed_extensions=['pem'])], blank=False, null=True)
+    cert_decoded = models.TextField(null=True,blank=True)
 
 
     class Meta:

@@ -1,10 +1,20 @@
+import datetime
+from base64 import b64decode,b64encode
+
 from django.db import models
 from django.contrib.auth.models import User
+from django.template.loader import render_to_string
+
 from conectores.constantes import (COMUNAS, ACTIVIDADES)
 from conectores.models import Compania
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres
 from mixins.models import CreationModificationDateMixin
+
+from bs4 import BeautifulSoup
+from Crypto.PublicKey import RSA
+from Crypto.Hash import SHA
+from Crypto.Signature import PKCS1_v1_5
 
 
 class Factura(CreationModificationDateMixin):
@@ -64,5 +74,60 @@ class Factura(CreationModificationDateMixin):
 		else: 
 
 			return 
+
+
+	def _firmar_dd(data, folio, instance): 
+
+		now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S").split()
+
+		timestamp = f"{now[0]}T{now[1]}"
+
+		print(timestamp)
+
+		sin_aplanar = render_to_string('snippets/DD_tag.xml', {'data':data,'folio':folio, 'instance':instance, 'timestamp':timestamp})
+		digest_string = sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
+
+		RSAprivatekey = RSA.importKey(folio.pem_private)
+		private_signer = PKCS1_v1_5.new(RSAprivatekey)
+
+
+		digest = SHA.new()
+		digest.update(digest_string.encode('iso8859-1'))
+		sign = private_signer.sign(digest)
+
+		firma = f'<FRMT algoritmo="SHA1withRSA">{b64encode(sign).decode()}</FRMT>'
+
+		# print(firma)
+
+		sin_aplanar += firma
+
+		print(sin_aplanar)
+
+		return sin_aplanar
+
+	def firmar_documento(etiqueta_DD, datos, folio):
+
+		return 
+
+		
+
+
+# 		"""
+# <FRMT algoritmo="SHA1withRSA">IC5N6cxClFn7HkKrnFpW0XcldExD72EhLX/zoI3Dt4YbpMtvROUuGhVZiqKqY2rteXDtPawZAzmIXDpQeCX4aQ==</FRMT>"""
+
+# 		return 
+
+	# # @class_method
+	# def firmar_factura(dte_string):
+
+	# 	soup = BeautifulSoup(dte_string, 'xml')
+
+	# 	documento = soup.EnvioDTE.Documento.text
+
+	# 	SetDTE =  soup.EnvioDTE.SetDTE.text
+
+
+	# 	return 
+
 
 
