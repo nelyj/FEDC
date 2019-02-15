@@ -26,7 +26,7 @@ class SeleccionarEmpresaView(TemplateView):
 
     def get_context_data(self, *args, **kwargs): 
 
-        context = super().get_context_data(*args, *kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context['empresas'] = Compania.objects.filter(owner=self.request.user)
         if Compania.objects.filter(owner=self.request.user).exists():
             context['tiene_empresa'] = True
@@ -48,7 +48,7 @@ class SeleccionarEmpresaView(TemplateView):
         empresa_obj = Compania.objects.get(pk=empresa)
         if empresa_obj and self.request.user == empresa_obj.owner:
             if enviadas == "1":
-                return HttpResponseRedirect(reverse_lazy('boletas:lista-enviadas', kwargs={'pk':empresa}))
+                return HttpResponseRedirect(reverse_lazy('boletas:lista-boletas-enviadas', kwargs={'pk':empresa}))
             else:
                 return HttpResponseRedirect(reverse_lazy('boletas:lista_boletas', kwargs={'pk':empresa}))
         else:
@@ -82,8 +82,8 @@ class ListaBoletasViews(TemplateView):
         try:
             usuario = Conector.objects.filter(t_documento='33',empresa=compania).first()
         except Exception as e:
-
-            print(e)
+            messages.info(self.request, "No posee conectores asociados a esta empresa")
+            return HttpResponseRedirect(reverse_lazy('boletas:seleccionar-empresa'))
 
         payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
 

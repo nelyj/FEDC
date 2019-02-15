@@ -25,7 +25,7 @@
     <tbody>
         {%for lista in detail%}
         <tr>
-            <td> <a href="{% url 'facturas:detail-invoice' lista.data.name %}">{{lista.data.name}}</a></td>
+            <td> <a href="{% url 'boletas:detail-boleta' lista.data.name %}">{{lista.data.name}}</a></td>
             <td>{{lista.data.title}}</td>
             <td>{{lista.data.status_sii}}</td>
             <td>

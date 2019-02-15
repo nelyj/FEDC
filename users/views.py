@@ -571,6 +571,9 @@ class RegisterView(LoginRequeridoPerAuth, MultiModelFormView):
                                        " % (str(usuario)))
         return super(RegisterView, self).forms_valid(forms)
 
+    def forms_invalid(self, forms, **kwargs):
+        return super(RegisterView, self).forms_invalid(forms)
+
         
 class ModalsPerfil(LoginRequeridoPerAuth, MultiModelFormView):
     """!

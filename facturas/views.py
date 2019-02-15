@@ -29,7 +29,7 @@ class SeleccionarEmpresaView(TemplateView):
 
     def get_context_data(self, *args, **kwargs): 
 
-        context = super().get_context_data(*args, *kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context['empresas'] = Compania.objects.filter(owner=self.request.user)
         if Compania.objects.filter(owner=self.request.user).exists():
             context['tiene_empresa'] = True
@@ -267,7 +267,7 @@ class SendInvoice(FormView):
 
         id_ = self.kwargs.get('pk')
 
-        return reverse_lazy('facturas:send-invoice', kwargs={'pk':id_,'slug': self.request.get_full_path().split('/')[3].replace('%C2%BA','º')})
+        return reverse_lazy('facturas:send-invoice', kwargs={'pk':id_,'slug':self.kwargs['slug']})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -355,9 +355,9 @@ class SendInvoice(FormView):
         # Si queda uno, cambia la estructura de la oracion a singular. 
         disponibles = folio.get_folios_disponibles()
         if disponibles == 1:
-            messages.info(self.request, f'Queda {disponibles} folio disponible')
+            messages.info(self.request, str('Queda ')+str(disponibles)+str('folio disponible'))
         elif disponibles < 50:
-            messages.info(self.request, f'Quedan {disponibles} folios disponibles')
+            messages.info(self.request, str('Quedan ')+str(disponibles)+str('folios disponibles'))
         form.compania = compania
         form.save()
 
