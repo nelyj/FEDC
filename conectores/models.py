@@ -3,6 +3,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from .constantes import (COMUNAS, ACTIVIDADES)
 from django.core.validators import FileExtensionValidator
+from .exceptions import ContrasenaDeCertificadoIncorrecta
+
+import OpenSSL.crypto
 
 
 class Compania(models.Model):
@@ -29,8 +32,9 @@ class Compania(models.Model):
     pass_correo_sii = models.CharField(max_length=128, blank=True, null=True)
     correo_intercambio = models.EmailField(blank=True, null=True)
     pass_correo_intercambio = models.CharField(max_length=128, blank=True, null=True)
-    certificado = models.FileField('Certificado', upload_to=get_cert_upload_to,validators=[FileExtensionValidator(allowed_extensions=['pem'])], blank=False, null=True)
-    cert_decoded = models.TextField(null=True,blank=True)
+    certificado = models.FileField('Certificado', upload_to=get_cert_upload_to,validators=[FileExtensionValidator(allowed_extensions=['pfx'])], blank=False, null=True)
+    pass_certificado = models.CharField(max_length=128, blank=True, null=True)
+
 
 
     class Meta:
@@ -43,6 +47,29 @@ class Compania(models.Model):
 
     def __str__(self):
         return self.razon_social
+
+    def validar_certificado(string_archivo_pfx, password):
+
+        try:
+
+            p12 = OpenSSL.crypto.load_pkcs12(string_archivo_pfx, password)
+
+        except OpenSSL.crypto.Error:
+
+            raise ContrasenaDeCertificadoIncorrecta
+
+        private = OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_PEM, p12.get_privatekey()).decode()
+        certificate = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, p12.get_certificate()).decode()
+        public_key = OpenSSL.crypto.dump_publickey(OpenSSL.crypto.FILETYPE_PEM,p12.get_certificate().get_pubkey()).decode()
+
+        return (private, certificate, public_key)
+
+
+
+
+
+
+
 
 
 class Conector(models.Model):

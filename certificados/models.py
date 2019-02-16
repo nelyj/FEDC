@@ -20,17 +20,12 @@ def upload_certificate_to(instance, filename):
 
 class Certificado(CreationModificationDateMixin):
 
-	empresa = models.ForeignKey(Compania, on_delete=models.CASCADE, blank=True, null=True)
+	empresa = models.ForeignKey(Compania, on_delete=models.CASCADE, blank=True, null=True, related_name='cert')
 	owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
-	certificado = models.FileField(
-					_('Certificado digital'), 
-					upload_to=upload_certificate_to, 
-					blank=True, null=True, 
-					validators=[FileExtensionValidator(allowed_extensions=['xml'])]
-				)
+	private_key = models.TextField(null=False, blank=False, default='')
+	public_key = models.TextField(null=False, blank=False, default='')
+	certificado = models.TextField(null=False, blank=False, default='')
 	
-
-
 
 	class Meta:
 

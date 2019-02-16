@@ -50,9 +50,23 @@ class FormCompania(ModelForm):
 
     class Meta:
         model = Compania
-        fields = ['rut','razon_social','actividad_principal', 'giro',
-                'direccion','comuna','logo','fecha_resolucion','numero_resolucion',
-                'correo_sii','pass_correo_sii','correo_intercambio','pass_correo_intercambio','certificado']
+        fields = [
+            'rut',
+            'razon_social',
+            'actividad_principal', 
+            'giro',
+            'direccion',
+            'comuna',
+            'logo',
+            'fecha_resolucion',
+            'numero_resolucion',
+            'correo_sii',
+            'pass_correo_sii',
+            'correo_intercambio',
+            'pass_correo_intercambio',
+            'certificado',
+            'pass_certificado'
+        ]
 
     def __init__(self, *args, **kwargs):
 
@@ -86,3 +100,6 @@ class FormCompania(ModelForm):
         self.fields['correo_intercambio'].required = True
         self.fields['logo'].widget.attrs.update({'class': 'form-control'})
         self.fields['certificado'].widget.attrs.update({'class': 'form-control'})
+        self.fields['pass_certificado'].widget = PasswordInput()
+        self.fields['pass_certificado'].widget.attrs.update({'class': 'form-control'})
+        self.fields['pass_certificado'].required = True
