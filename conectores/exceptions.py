@@ -1,0 +1,4 @@
+
+
+class ContrasenaDeCertificadoIncorrecta(ValueError):
+	pass 

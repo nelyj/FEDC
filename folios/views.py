@@ -35,6 +35,9 @@ class FolioCreateView(CreateView):
 			soup = BeautifulSoup(xml, 'xml')
 			root = etree.fromstring(xml)
 			rut = root.xpath('//AUTORIZACION/CAF/DA/RE/text()')[0]
+			razon_social_caf = root.xpath('//AUTORIZACION/CAF/DA/RS/text()')[0]
+			idk = root.xpath('//AUTORIZACION/CAF/DA/IDK/text()')[0]
+			firma_da = root.xpath('//AUTORIZACION/CAF/FRMA/text()')[0]
 			tipo_de_documento = root.xpath('//AUTORIZACION/CAF/DA/TD/text()')[0]
 			rango_desde = root.xpath('//AUTORIZACION/CAF/DA/RNG/D/text()')[0]
 			rango_hasta = root.xpath('//AUTORIZACION/CAF/DA/RNG/H/text()')[0]
@@ -111,6 +114,9 @@ class FolioCreateView(CreateView):
 		instance.pk_exponente = pk_exponente
 		instance.pem_public = pem_public
 		instance.pem_private = pem_private
+		instance.razon_social = razon_social_caf
+		instance.idk = idk
+		instance.firma = firma_da
 
 
 		try:

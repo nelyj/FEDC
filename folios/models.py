@@ -38,19 +38,25 @@ class Folio(CreationModificationDateMixin):
 					validators=[FileExtensionValidator(allowed_extensions=['xml'])]
 				)
 	rut = models.CharField(null=False, max_length=255)
+	razon_social = models.CharField(null=False, max_length=255, default="N/A")
 	tipo_de_documento = models.IntegerField(null=False)
 	rango_desde = models.IntegerField(null=False)
 	rango_hasta = models.IntegerField(null=False)
-	folio_actual = models.IntegerField(null=False)
-	folios_disponibles = models.IntegerField(null=False)
 	fecha_de_autorizacion = models.DateTimeField(null=False)
-	fecha_de_vencimiento = models.DateTimeField(null=False)
 	pk_modulo = models.CharField(null=False, max_length=255)
 	pk_exponente = models.CharField(null=False, max_length=255)
-	pem_public = models.TextField(null=True, default='')
+	idk = models.CharField(null=False, max_length=255, default="N/A")
+	firma = models.CharField(null=False, max_length=255, default="N/A")
+	idk = models.CharField(null=False, max_length=255, default="N/A")
 	pem_private = models.TextField(null=True, default='')
-	is_active = models.BooleanField(default=True)
-	vencido = models.BooleanField(default=False)
+	pem_public = models.TextField(null=True, default='')
+
+
+	fecha_de_vencimiento = models.DateTimeField(null=False, editable=False)
+	folios_disponibles = models.IntegerField(null=False, editable=False)
+	is_active = models.BooleanField(default=True, editable=False)
+	vencido = models.BooleanField(default=False, editable=False)
+	folio_actual = models.IntegerField(null=False, editable=False)
 
 
 	class Meta:

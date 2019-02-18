@@ -8,6 +8,9 @@ from .models import *
 from datetime import datetime
 from django.views.generic.edit import DeleteView
 
+from certificados.models import Certificado
+from .exceptions import ContrasenaDeCertificadoIncorrecta
+
 class ConectorViews(FormView):
     """
     """
@@ -97,8 +100,29 @@ class CompaniaViews(FormView):
         @return validate True
         """
         try:
-            form.save(commit=False)
-            form.save()
+
+            instance = form.save(commit=False)
+            pfx = instance.certificado.read()
+            clave_privada, clave_publica, certificado = \
+            Compania.validar_certificado(pfx, instance.pass_certificado)
+            print(pfx)
+
+        except ContrasenaDeCertificadoIncorrecta:
+
+            messages.error(self.request, "Contraseña del certificado incorrecta")
+            return super().form_invalid(form)
+
+
+
+        try:
+            saved_instance = form.save()
+            Certificado.objects.create(
+                    empresa=saved_instance,
+                    owner=self.request.user,
+                    private_key=clave_privada,
+                    public_key=clave_publica,
+                    certificado=certificado
+                )
             msg = "Se configuro la Compañia con éxito"
             messages.info(self.request, msg)
         except Exception as e:
