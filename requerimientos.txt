@@ -16,6 +16,7 @@ olefile==0.44
 psycopg2==2.7.5
 pycryptodome==3.7.2
 pydotplus==2.0.2
+pyOpenSSL
 pyparsing==2.1.8
 python-dateutil==2.7.5
 pytz==2017.2
