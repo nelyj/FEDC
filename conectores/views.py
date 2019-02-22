@@ -99,13 +99,13 @@ class CompaniaViews(FormView):
         @param form Recives form object
         @return validate True
         """
+
         try:
 
             instance = form.save(commit=False)
             pfx = instance.certificado.read()
-            clave_privada, clave_publica, certificado = \
-            Compania.validar_certificado(pfx, instance.pass_certificado)
-            print(pfx)
+            clave_privada, certificado, clave_publica  = \
+            Compania.validar_certificado(pfx, form.cleaned_data['pass_certificado'])
 
         except ContrasenaDeCertificadoIncorrecta:
 

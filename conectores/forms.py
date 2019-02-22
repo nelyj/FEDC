@@ -48,6 +48,8 @@ class FormConector(ModelForm):
 
 class FormCompania(ModelForm):
 
+    pass_certificado = forms.CharField(label='Contraseña del certificado')
+
     class Meta:
         model = Compania
         fields = [

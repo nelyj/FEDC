@@ -1,0 +1,15 @@
+	<SetDTE ID="SetDoc">
+	<Caratula version="1.0">
+		<RutEmisor>{{compania.rut}}</RutEmisor>
+		<RutReceptor>{{form.rut}}</RutReceptor>
+		<FchResol>{{compania.fecha_resolucion}}</FchResol>
+		<NroResol>{{compania.numero_resolucion}}</NroResol>
+		<TmstFirmaEnv>{{ timestamp_firma }}</TmstFirmaEnv>
+		<SubTotDTE>
+			<TpoDTE>{{ folio.tipo_de_documento }}</TpoDTE>
+			<NroDTE>1</NroDTE> <!-- No configurado en Conector -->
+		</SubTotDTE>
+	</Caratula>
+	<DTE version="1.0">{% autoescape off %}
+	{{ documento }}{% endautoescape %}
+</DTE></SetDTE>

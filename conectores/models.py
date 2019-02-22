@@ -1,3 +1,4 @@
+import os
 from enum import Enum
 from django.db import models
 from django.contrib.auth.models import User
@@ -6,6 +7,9 @@ from django.core.validators import FileExtensionValidator
 from .exceptions import ContrasenaDeCertificadoIncorrecta
 
 import OpenSSL.crypto
+from Crypto.Hash import MD5
+
+from base64 import b64decode,b64encode
 
 
 class Compania(models.Model):
@@ -15,7 +19,15 @@ class Compania(models.Model):
         return "logos/%s/%s" % (self.rut, filename)
 
     def get_cert_upload_to(self, filename):
-        return "certificados/%s/%s" % (self.rut, filename)
+
+        filename_base, filename_ext = os.path.splitext(filename)
+
+        # assert type(filename) == str(), "filename no string"
+
+        hash = MD5.new()
+        hash.update(filename_base.encode())
+
+        return "certificados/%s%s" % (hash.hexdigest(),filename_ext.lower())
     
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE, default=1)     
@@ -33,7 +45,7 @@ class Compania(models.Model):
     correo_intercambio = models.EmailField(blank=True, null=True)
     pass_correo_intercambio = models.CharField(max_length=128, blank=True, null=True)
     certificado = models.FileField('Certificado', upload_to=get_cert_upload_to,validators=[FileExtensionValidator(allowed_extensions=['pfx'])], blank=False, null=True)
-    pass_certificado = models.CharField(max_length=128, blank=True, null=True)
+    
 
 
 
@@ -59,15 +71,11 @@ class Compania(models.Model):
             raise ContrasenaDeCertificadoIncorrecta
 
         private = OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_PEM, p12.get_privatekey()).decode()
-        certificate = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, p12.get_certificate()).decode()
+        certificate = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, p12.get_certificate()).decode().replace('\n-----END CERTIFICATE-----\n', '').replace('-----BEGIN CERTIFICATE-----\n', '')
         public_key = OpenSSL.crypto.dump_publickey(OpenSSL.crypto.FILETYPE_PEM,p12.get_certificate().get_pubkey()).decode()
 
+
         return (private, certificate, public_key)
-
-
-
-
-
 
 
 

@@ -42,7 +42,7 @@ class SeleccionarEmpresaView(TemplateView):
 
         enviadas = self.request.POST.get('enviadas', None)
 
-        print(enviadas)
+        # print(enviadas)
         # enviadas = int(enviadas)
 
         empresa = int(request.POST.get('empresa'))
@@ -105,7 +105,7 @@ class ListaFacturasViews(TemplateView):
         # con el ERP y eliminar las que ya se encuentran cargadas
         enviadas = [factura.numero_factura for factura in Factura.objects.filter(compania=compania).only('numero_factura')]
         
-        print(enviadas)
+        # print(enviadas)
 
         # Elimina todas las boletas de la lista
         # y crea una nueva lista con todas las facturas 
@@ -126,7 +126,7 @@ class ListaFacturasViews(TemplateView):
 
                 solo_nuevas.append(item)
 
-        print(solo_nuevas)
+        # print(solo_nuevas)
 
 
         url=usuario.url_erp+'/api/resource/Sales%20Invoice/'
@@ -317,16 +317,7 @@ class SendInvoice(FormView):
             return super().form_invalid(form)
         assert compania, "compania no existe"
         data['productos']=eval(data['productos'])
-        response = render_to_string('invoice.xml', {'form':data,'compania':compania})
 
-        
-        try:
-            os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug'])
-            file = open(settings.MEDIA_ROOT+'facturas'+'/'+self.kwargs['slug']+'/'+self.kwargs['slug']+'.xml','w')
-            file.write(response)
-        except Exception as e:
-            messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
-            return super().form_invalid(form)
         # rut = self.request.POST.get('rut', None)
         # assert rut, "rut no existe"
         form = form.save(commit=False)
@@ -363,6 +354,18 @@ class SendInvoice(FormView):
 
         # response_dd = render_to_string('snippets/DD_tag.xml', {'data':data,'folio':folio, 'instance':form})
         response_dd = Factura._firmar_dd(data, folio, form)
+        documento_firmado = Factura.firmar_documento(response_dd,data,folio, compania)
+        documento_final_firmado = Factura.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
+        caratula_firmada = Factura.generar_documento_final(documento_final_firmado)
+
+        try:
+            os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug'])
+            file = open(settings.MEDIA_ROOT+'facturas'+'/'+self.kwargs['slug']+'/'+self.kwargs['slug']+'.xml','w')
+            file.write(caratula_firmada)
+        except Exception as e:
+            messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
+            return super().form_invalid(form)
+
 
         # print(response_dd)
 

@@ -10,6 +10,8 @@ from conectores.models import Compania
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres
 from mixins.models import CreationModificationDateMixin
+from certificados.models import Certificado
+from .utils import extraer_modulo_y_exponente, generar_firma_con_certificado
 
 from bs4 import BeautifulSoup
 from Crypto.PublicKey import RSA
@@ -69,7 +71,7 @@ class Factura(CreationModificationDateMixin):
 
 			self.n_folio = n_folio 
 
-			print(str(self.n_folio)+ str('asignado con exito'))
+			# print(str(self.n_folio)+ str('asignado con exito'))
 
 		else: 
 
@@ -78,11 +80,19 @@ class Factura(CreationModificationDateMixin):
 
 	def _firmar_dd(data, folio, instance): 
 
+		"""
+		Llena los campos de que se encuentran dentro de la etiqueta
+		<DD> del DTE y anade la firma correspondiente en la etiqueta
+		<FMRT>. Retorna la etiqueta <DD> con su contenido, firmada y
+		sin aplanar.
+
+		"""
+
 		now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S").split()
 
-		timestamp = f"{now[0]}T{now[1]}"
+		timestamp = "{}T{}".format(now[0],now[1])
 
-		print(timestamp)
+		# print(timestamp)
 
 		sin_aplanar = render_to_string('snippets/DD_tag.xml', {'data':data,'folio':folio, 'instance':instance, 'timestamp':timestamp})
 		digest_string = sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
@@ -101,33 +111,88 @@ class Factura(CreationModificationDateMixin):
 
 		sin_aplanar += firma
 
-		print(sin_aplanar)
+		# print(sin_aplanar)
 
 		return sin_aplanar
 
-	def firmar_documento(etiqueta_DD, datos, folio):
 
-		return 
+	def firmar_documento(etiqueta_DD, datos, folio, compania):
 
-		
+		"""
+		Llena los campos de la etiqueta <Documento>, y la firma usando la 
+		plantilla signature.xml. Retorna la etiquta <Documento> con sus datos y 
+		la correspondiente firma con la clave privada cargada por el usuario en
+		el certificado.
+		"""
+
+		now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S").split()
+
+		timestamp = "{}T{}".format(now[0],now[1])
+
+		documento_sin_aplanar = render_to_string(
+			'snippets/Documento_tag.xml', {
+				'datos':datos,
+				'folio':folio, 
+				'compania':compania, 
+				'timestamp':timestamp,
+				'DD':etiqueta_DD 
+			})
+
+		digest_string = documento_sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
 
 
-# 		"""
-# <FRMT algoritmo="SHA1withRSA">IC5N6cxClFn7HkKrnFpW0XcldExD72EhLX/zoI3Dt4YbpMtvROUuGhVZiqKqY2rteXDtPawZAzmIXDpQeCX4aQ==</FRMT>"""
+		firma_electronica = generar_firma_con_certificado(compania, digest_string)
 
-# 		return 
+		signature_tag = render_to_string('snippets/signature.xml', {'signature':firma_electronica})
 
-	# # @class_method
-	# def firmar_factura(dte_string):
+		documento_sin_aplanar += "\n{}".format(signature_tag)
 
-	# 	soup = BeautifulSoup(dte_string, 'xml')
-
-	# 	documento = soup.EnvioDTE.Documento.text
-
-	# 	SetDTE =  soup.EnvioDTE.SetDTE.text
+	
+		return documento_sin_aplanar
 
 
-	# 	return 
+	def firmar_etiqueta_set_dte(compania, folio, etiqueta_Documento):
+
+
+		now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S").split()
+
+		timestamp_firma = "{}T{}".format(now[0],now[1])
+
+		set_dte_sin_aplanar = render_to_string(
+			'snippets/set_DTE_tag.xml', {
+				'compania':compania, 
+				'folio':folio, 
+				'timestamp_firma':timestamp_firma,
+				'documento': etiqueta_Documento
+			}
+		)
+
+		digest_string = set_dte_sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
+
+		firma_electronica = generar_firma_con_certificado(compania, digest_string)
+
+		signature_tag = render_to_string('snippets/signature.xml', {'signature':firma_electronica})
+
+
+		set_dte_sin_aplanar += "\n{}".format(signature_tag)
+
+		# print(set_dte_sin_aplanar)
+
+
+		return set_dte_sin_aplanar
+
+
+	def generar_documento_final(etiqueta_SetDte):
+
+		documento_final = render_to_string('invoice.xml', {'set_DTE':etiqueta_SetDte})
+
+		documento_final_sin_tabs = documento_final.replace('\t','').replace('\r','')
+
+		print(documento_final_sin_tabs)
+
+		return documento_final_sin_tabs
 
 
 
+
+	

@@ -4,9 +4,9 @@
 	<F>{{ instance.n_folio }}</F>
 	<FE>{{ instance.created }}</FE>
 	<RR>{{ data.rut }}</RR>
-	<RSR>*** Fotostyle Regalos Especiales Limitada ***</RSR>
-	<MNT>19851580</MNT>
-	<IT1>PLOTER DE CORTE 3XX ACCESORIOS Y </IT1>
+	<RSR>*** Fotostyle Regalos Especiales Limitada ***</RSR> <!-- No configuardo en conector -->
+	<MNT>19851580</MNT> <!-- No configurado en conector -->
+	<IT1>PLOTER DE CORTE 3XX ACCESORIOS Y </IT1> <!-- No configurado en conector -->
 	<CAF version="1.0">
 		<DA>
 			<RE>{{ folio.rut }}</RE>
