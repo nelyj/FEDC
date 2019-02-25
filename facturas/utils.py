@@ -23,8 +23,6 @@ def extraer_modulo_y_exponente(public_key):
 	compacted_modulus = modulus.to_bytes(ceil(modulus.bit_length()/8),'big')
 	compacted_exponent = exponent.to_bytes(ceil(exponent.bit_length()/8),'big')
 
-	# print(compacted_modulus)
-
 	b64_modulus = b64encode(compacted_modulus)
 	b64_exponent = b64encode(compacted_exponent)
 
@@ -33,17 +31,27 @@ def extraer_modulo_y_exponente(public_key):
 
 def generar_firma_con_certificado(compania, digest_string):
 
+	"""
+	Genera una firma y extrae los datos necesarios para ser incorporados
+	en la plantilla signature.xml
+	"""
+
+	# Obtiene el certificado de la empresa
 	certificado = Certificado.objects.get(empresa=compania)
 
+	# Importa la clave privada del certificado
 	RSAprivatekey = RSA.importKey(certificado.private_key)
 	private_signer = PKCS1_v1_5.new(RSAprivatekey)
 
+	# Crea un digest con la informacion suministrada
 	digest = SHA.new()
 	digest.update(digest_string.encode('iso8859-1'))
 	sign = private_signer.sign(digest)
 
+	# Extrae modulo y exponente de la clave publica
 	modulo, exponente = extraer_modulo_y_exponente(certificado.public_key)
 
+	# Diccionario con todos los datos necesarios para la firma 
 	firma_electronica = {
 
 		'firma': b64encode(sign).decode(),

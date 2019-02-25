@@ -20,9 +20,12 @@ class Compania(models.Model):
 
     def get_cert_upload_to(self, filename):
 
-        filename_base, filename_ext = os.path.splitext(filename)
+        """ 
+        Crea un hash del nombre del certificado, antes de almacenarlo en 
+        el servidor
+        """
 
-        # assert type(filename) == str(), "filename no string"
+        filename_base, filename_ext = os.path.splitext(filename)
 
         hash = MD5.new()
         hash.update(filename_base.encode())
@@ -61,17 +64,26 @@ class Compania(models.Model):
         return self.razon_social
 
     def validar_certificado(string_archivo_pfx, password):
+        """
+        Recibe un archivo de certificado .pfx y su correspondiente contrasena
+        y retorna una tupla con la clave privada, la clave publica y el certificado extraido del mismo
+        """
 
         try:
-
+            # Carga el archivo .pfx y muestra un error si la contrasena
+            # es incorrecta
             p12 = OpenSSL.crypto.load_pkcs12(string_archivo_pfx, password)
 
         except OpenSSL.crypto.Error:
 
             raise ContrasenaDeCertificadoIncorrecta
 
+        # Extraccion de clave privada
         private = OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_PEM, p12.get_privatekey()).decode()
+
+        # Extraccion de certificado
         certificate = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, p12.get_certificate()).decode().replace('\n-----END CERTIFICATE-----\n', '').replace('-----BEGIN CERTIFICATE-----\n', '')
+        # Extraccion de clave publica
         public_key = OpenSSL.crypto.dump_publickey(OpenSSL.crypto.FILETYPE_PEM,p12.get_certificate().get_pubkey()).decode()
 
 

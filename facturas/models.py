@@ -59,6 +59,11 @@ class Factura(CreationModificationDateMixin):
 
 	def recibir_folio(self, folio):
 
+		"""
+		Recibe un objeto de tipo Folio y genera uno nuevo de acuerdo
+		a la disponibilidad. 
+		"""
+
 		if isinstance(folio, Folio):
 
 			try:
@@ -66,12 +71,8 @@ class Factura(CreationModificationDateMixin):
 			except (ElCafNoTieneMasTimbres, ValueError):
 
 				raise ElCafNoTieneMasTimbres
-			# except ValueError: 
-			assert type(n_folio) == int, "folio no es entero"
 
 			self.n_folio = n_folio 
-
-			# print(str(self.n_folio)+ str('asignado con exito'))
 
 		else: 
 
@@ -90,28 +91,33 @@ class Factura(CreationModificationDateMixin):
 
 		now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S").split()
 
+		# Crea el timestamp con el formato adecuado
 		timestamp = "{}T{}".format(now[0],now[1])
 
-		# print(timestamp)
-
+		# Llena los campos de la plantilla DD_tag.xml con la informacion del diccionario
 		sin_aplanar = render_to_string('snippets/DD_tag.xml', {'data':data,'folio':folio, 'instance':instance, 'timestamp':timestamp})
+
+		# Elimina tabulaciones y espacios antes de procesar con la funcion de hash
 		digest_string = sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
 
+		# Importa la clave privada que se encuentra en el CAF que esta siendo utilizado
 		RSAprivatekey = RSA.importKey(folio.pem_private)
+
+		# Crea el objeto encargado de la firma del documento 
 		private_signer = PKCS1_v1_5.new(RSAprivatekey)
 
-
+		# Crea el digest 
 		digest = SHA.new()
 		digest.update(digest_string.encode('iso8859-1'))
+		# Firma el digest
 		sign = private_signer.sign(digest)
 
+		# Crea la etiqueta FRMT para la firma 
 		firma = f'<FRMT algoritmo="SHA1withRSA">{b64encode(sign).decode()}</FRMT>'
 
-		# print(firma)
-
+		# Incorpora la firma al final de la plantilla DD_tag.xml
 		sin_aplanar += firma
 
-		# print(sin_aplanar)
 
 		return sin_aplanar
 
@@ -127,8 +133,10 @@ class Factura(CreationModificationDateMixin):
 
 		now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S").split()
 
+		# Crea timestamp en formato correspondiente
 		timestamp = "{}T{}".format(now[0],now[1])
 
+		# Llena los datos de la plantilla Documento_tag.xml con la informacion pertinente
 		documento_sin_aplanar = render_to_string(
 			'snippets/Documento_tag.xml', {
 				'datos':datos,
@@ -138,13 +146,17 @@ class Factura(CreationModificationDateMixin):
 				'DD':etiqueta_DD 
 			})
 
+
+		# Elimina tabulaciones y espacios para la generacion del digest
 		digest_string = documento_sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
 
-
+		# Crea firma electronica compuesta utilizando la plantillka signature.xml
 		firma_electronica = generar_firma_con_certificado(compania, digest_string)
 
+		# Llena la plantilla signature.xml con los datos de la firma electronica 
 		signature_tag = render_to_string('snippets/signature.xml', {'signature':firma_electronica})
 
+		# Agrega la plantilla signature.xml al final del documento
 		documento_sin_aplanar += "\n{}".format(signature_tag)
 
 	
@@ -155,9 +167,10 @@ class Factura(CreationModificationDateMixin):
 
 
 		now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S").split()
-
+		# Genera timestamp en formato correspondiente
 		timestamp_firma = "{}T{}".format(now[0],now[1])
 
+		# LLena la plantilla set_DTE_tag.xml con los datos correspondientes
 		set_dte_sin_aplanar = render_to_string(
 			'snippets/set_DTE_tag.xml', {
 				'compania':compania, 
@@ -167,23 +180,28 @@ class Factura(CreationModificationDateMixin):
 			}
 		)
 
+		# Crea el digest eliminando espacios y tabulaciones
 		digest_string = set_dte_sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
 
+		# Firma el digest y retorna diccionario con datos de la firma
 		firma_electronica = generar_firma_con_certificado(compania, digest_string)
 
+		# Llena los datos de la plantilla signature.xml con los datos de la firma
 		signature_tag = render_to_string('snippets/signature.xml', {'signature':firma_electronica})
 
-
+		# Agrega la firma al final del documento 
 		set_dte_sin_aplanar += "\n{}".format(signature_tag)
-
-		# print(set_dte_sin_aplanar)
-
 
 		return set_dte_sin_aplanar
 
 
 	def generar_documento_final(etiqueta_SetDte):
 
+		"""
+		Incorpora todo el documento firmado al la presentacion final y elimina 
+		las tabulaciones.
+
+		"""
 		documento_final = render_to_string('invoice.xml', {'set_DTE':etiqueta_SetDte})
 
 		documento_final_sin_tabs = documento_final.replace('\t','').replace('\r','')
