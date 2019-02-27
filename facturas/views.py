@@ -1,27 +1,24 @@
+import codecs, dicttoxml, json, os, requests
+import mysql.connector
+from requests import Request, Session
+from django.conf import settings
 from django.contrib import messages
+from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
+from django.urls import reverse_lazy
+from django.http import FileResponse
 from django.views.generic.edit import FormView
 from django.shortcuts import render
 from django.views.generic.base import TemplateView, View
 from django.views.generic import ListView
-import mysql.connector
-import requests
-from requests import Request, Session
-import dicttoxml
-import json
 from django.template.loader import render_to_string
-from django.http import HttpResponse, HttpResponseRedirect
 from conectores.models import *
-import codecs
 from conectores.forms import FormCompania
 from conectores.models import *
-from django.http import HttpResponse
-from .forms import *
-from django.urls import reverse_lazy
-from django.http import FileResponse
-import os
-from django.conf import settings
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
+from utils.SIISdk import SII_SDK
+from .forms import *
 from .models import Factura
 
 class SeleccionarEmpresaView(TemplateView):
@@ -360,6 +357,10 @@ class SendInvoice(FormView):
         response_dd = Factura._firmar_dd(data, folio, form)
 
         # print(response_dd)
+        send_sii = self.send_invoice_sii()
+        if(not send_sii):
+            messages.error(self.request, "Ocurrió un error al comunicarse con el sii")
+            return super().form_invalid(form)
 
 
         msg = "Se guardo en Base de Datos la factura con éxito"
@@ -381,6 +382,16 @@ class SendInvoice(FormView):
     def form_invalid(self, form):
         messages.error(self.request, form.errors)
         return super().form_invalid(form)
+
+    def send_invoice_sii(self):
+        try:
+            sii_sdk = SII_SDK()
+            seed = sii_sdk.getSeed()
+            print(seed)
+            return True
+        except Exception as e:
+            print(e)
+            return False
 
 class FacturasEnviadasView(ListView):
     template_name = 'facturas_enviadas.html'

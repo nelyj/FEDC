@@ -76,6 +76,18 @@ Para instalar la apliacacion en modo desarrollo debera seguir los siguientes pas
     (UserManager)$ python manage.py makemigrations
     (UserManager)$ python manage.py migrate
 
+    5.1-) Migraciones individuales
+
+        (UserManager)$ python manage.py makemigrations boletas
+        (UserManager)$ python manage.py makemigrations certificados
+        (UserManager)$ python manage.py makemigrations conectores
+        (UserManager)$ python manage.py makemigrations facturas
+        (UserManager)$ python manage.py makemigrations folios
+        (UserManager)$ python manage.py makemigrations users
+        (UserManager)$ python manage.py makemigrations utils
+
+        (UserManager)$ python manage.py migrate
+
 6-) Cargar data inicial del proyecto 
 
     Asegurese de que los modelos esten migrados en base de datos y ejecute los siguientes comando para cargar la data inicial del proyecto:
@@ -95,5 +107,7 @@ Para instalar la apliacacion en modo desarrollo debera seguir los siguientes pas
     (UserManager)$ python manage.py runserver
 
 Ingresar a la plataforma con la siguientes credenciales:
+
 Username: admin
+
 password: 1234567890admin
