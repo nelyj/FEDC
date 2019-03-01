@@ -1,5 +1,4 @@
 import codecs, dicttoxml, json, os, requests
-import mysql.connector
 from requests import Request, Session
 from django.conf import settings
 from django.contrib import messages
