@@ -354,7 +354,7 @@ class SendInvoice(FormView):
 
         # response_dd = render_to_string('snippets/DD_tag.xml', {'data':data,'folio':folio, 'instance':form})
         response_dd = Factura._firmar_dd(data, folio, form)
-        documento_firmado = Factura.firmar_documento(response_dd,data,folio, compania)
+        documento_firmado = Factura.firmar_documento(response_dd,data,folio, compania, form)
         documento_final_firmado = Factura.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
         caratula_firmada = Factura.generar_documento_final(documento_final_firmado)
 

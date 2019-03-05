@@ -54,8 +54,8 @@ class Factura(CreationModificationDateMixin):
 		verbose_name = 'Factura'
 		verbose_name_plural = 'Facturas'
 
-		def __str__(self):
-			return self.numero_factura
+	def __str__(self):
+		return "{}".format(self.numero_factura)
 
 	def recibir_folio(self, folio):
 
@@ -122,7 +122,7 @@ class Factura(CreationModificationDateMixin):
 		return sin_aplanar
 
 
-	def firmar_documento(etiqueta_DD, datos, folio, compania):
+	def firmar_documento(etiqueta_DD, datos, folio, compania, instance):
 
 		"""
 		Llena los campos de la etiqueta <Documento>, y la firma usando la 
@@ -143,7 +143,8 @@ class Factura(CreationModificationDateMixin):
 				'folio':folio, 
 				'compania':compania, 
 				'timestamp':timestamp,
-				'DD':etiqueta_DD 
+				'DD':etiqueta_DD,
+				'instance':instance
 			})
 
 

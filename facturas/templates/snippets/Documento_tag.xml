@@ -2,21 +2,21 @@
 	<Encabezado>
 		<IdDoc>
 			<TipoDTE>{{ folio.tipo_de_documento }}</TipoDTE>
-			<Folio>11111</Folio> <!-- No configurado en vistas -->
+			<Folio>{{ instance.n_folio }}</Folio>
 			<FchEmis>2018-11-21</FchEmis> <!-- No configurado en conector -->
 			<FmaPago>1</FmaPago> <!-- No configurado en conector -->
 		</IdDoc>
 		<Emisor>
 			<RUTEmisor>{{compania.rut}}</RUTEmisor>
 			<RznSoc>{{compania.razon_social}}</RznSoc>
-			<GiroEmis>{{compania.giro}}</GiroEmis>
-			<Acteco>{{compania.actividad_principal}}</Acteco>
+			<GiroEmis>{{compania.giro}}</GiroEmis> <!-- Eliminar espacios al principio y al final -->
+			<Acteco>{{compania.actividad_principal}}</Acteco><!-- Eliminar espacios al principio y al final -->
 			<DirOrigen>{{compania.direccion}}</DirOrigen>
 			<CmnaOrigen>{{compania.comuna}}</CmnaOrigen>
 		</Emisor>
 		<Receptor>
 			<RUTRecep>{{datos.rut}}</RUTRecep>
-			<RznSocRecep> {{datos.senores}}</RznSocRecep>
+			<RznSocRecep>{{datos.senores}}</RznSocRecep>
 			<GiroRecep>{{datos.giro}}</GiroRecep>
 			<DirRecep>{{datos.direccion}}</DirRecep>
 			<CmnaRecep>RECOLETA</CmnaRecep> <!-- No configurado en conector -->
@@ -24,7 +24,7 @@
 		</Receptor>
 		<Totales>
 			<MntNeto>{{datos.neto}}</MntNeto>
-			<TasaIVA>19</TasaIVA> <!-- No configurado en conector -->
+			<TasaIVA>{{compania.tasa_de_iva}}</TasaIVA> 
 			<IVA>{{datos.iva}}</IVA>
 			<MntTotal>{{datos.total}}</MntTotal>
 		</Totales>

@@ -46,10 +46,12 @@
                     <li><a href="{% url 'facturas:seleccionar-empresa' %}">Facturas no enviadas</a></li>
                     <li><a href="{% url 'facturas:seleccionar-empresa' %}?enviadas=1">Facturas enviadas</a></li>
                     <li><a href="{% url 'boletas:seleccionar-empresa' %}">Boletas no enviadas</a></li>
-                    <!-- <li><a href="{% url 'boletas:seleccionar-empresa' %}?enviadas=1">Boletas enviadas</a> --></li>
+                    <!-- <li><a href="{% url 'boletas:seleccionar-empresa' %}?enviadas=1">Boletas enviadas</a> </li>-->
                 </ul>
             </div>
             <li>
+                <a href="{% url 'reportes:crear' %}">Reportes</a>
+            </li>
                 <li>
                     <a href="{% url 'conectores:registrar_conector' %}">Configuracion de conectores</a>
                 </li>

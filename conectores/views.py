@@ -89,8 +89,9 @@ class CompaniaViews(FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form']=self.form_class
-        context['companias']=Compania.objects.all()
+        context['companias']=Compania.objects.filter(owner=self.request.user)
         return context
+
 
     def form_valid(self,form):
         """!
@@ -128,7 +129,9 @@ class CompaniaViews(FormView):
         except Exception as e:
             msg = "Ocurrio un problema al guardar la información: "+str(e)
             messages.error(self.request, msg)
-        return super().form_valid(form)
+        # return super().form_valid(form)
+        return HttpResponseRedirect(self.success_url)
+
     def form_invalid(self, form):
         """!
         Form Invalid Method
@@ -136,20 +139,23 @@ class CompaniaViews(FormView):
         @param form Recives form object
         @return errors on form
         """
-        messages.error(self.request, form.errors)
+        messages.error(self.request, "No se pudo crear la compania")
+
         return super().form_invalid(form)
+    #     return HttpResponseRedirect(self.success_url)
 
 class CompaniaUpdate(FormView):
-    form_class = FormCompania
-    template_name = 'registrar_compania.html'
+    form_class = CompaniaUpdateForm
+    template_name = 'actualizar_compania.html'
     success_url =reverse_lazy('conectores:registrar_compania')
     model = Compania
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         print(self.kwargs)
-        context['form']=FormCompania(instance=Compania.objects.get(pk=self.kwargs['pk']))
-        context['companias']=Compania.objects.all()
+        context['form']=CompaniaUpdateForm(instance=Compania.objects.get(pk=self.kwargs['pk']))
+        context['object'] = Compania.objects.get(pk=self.kwargs['pk'])
+        context['companias']=Compania.objects.filter(owner=self.request.user)
         return context
 
     def form_valid(self,form):
@@ -172,7 +178,9 @@ class CompaniaUpdate(FormView):
                 'correo_sii': form['correo_sii'].value(),
                 'pass_correo_intercambio': form['pass_correo_intercambio'].value(),
                 'correo_intercambio': form['correo_intercambio'].value(),
-                'logo': form['logo'].value()
+                'logo': form['logo'].value(),
+                'tasa_de_iva': form['tasa_de_iva'].value()
+
                 })
             msg = "Se Actualizo la Compañia con éxito"
             messages.info(self.request, msg)
