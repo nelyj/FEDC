@@ -104,7 +104,7 @@ class ListaFacturasViews(TemplateView):
         solo_facturas  = []
         for i , item in enumerate(data):
 
-            if not item['name'].startswith('BOL'):
+            if item['name'].startswith('Nº'):
 
                 solo_facturas.append(item['name'])
 

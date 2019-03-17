@@ -1,22 +1,22 @@
 """
-  Facturador TIMG
-  @package utils.SIISdk
+Facturador TIMG
+@package utils.SIISdk
 
-  Sdk para comunicarse con el SII(Servicio de Impuestos Internos)
-  @copyright TIMG
-  @version 1.0
+Sdk para comunicarse con el SII(Servicio de Impuestos Internos)
+@copyright TIMG
+@version 1.0
 """
 import requests
 import xml.etree.ElementTree as ET
 
 class SII_SDK():
-  """
-  Clase principal del sdk
-  @author Rodrigo Boet (rodrigoale.b at timg.cl)
-  @copyright TIMG
-  @date 27-02-19 (dd-mm-YY)
-  @version 1.0
-  """
+	"""
+	Clase principal del sdk
+	@author Rodrigo Boet (rodrigoale.b at timg.cl)
+	@copyright TIMG
+	@date 27-02-19 (dd-mm-YY)
+	@version 1.0
+	"""
 	def _get_soap_body(self,soap_string):
 		"""!
 		Método para obtener el cuerpo de una petición

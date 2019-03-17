@@ -39,14 +39,46 @@
             </li>
             {% endif %}
             <li>
-                <a data-toggle="collapse" href="#facturas-collapse" aria-expanded="false" aria-controls="facturas-collapse">Documentos</a>
+                <a data-toggle="collapse" href="#facturas-collapse" aria-expanded="false" aria-controls="facturas-collapse">Facturas</a>
             </li>
             <div class="collapse" id="facturas-collapse">
                 <ul class="submenu" id="marketing_services">
                     <li><a href="{% url 'facturas:seleccionar-empresa' %}">Facturas no enviadas</a></li>
                     <li><a href="{% url 'facturas:seleccionar-empresa' %}?enviadas=1">Facturas enviadas</a></li>
+                </ul>
+            </div>
+            <li>
+                <a data-toggle="collapse" href="#notasCredito-collapse" aria-expanded="false" aria-controls="notasCredito-collapse">Notas de Credito</a>
+            </li>
+            <div class="collapse" id="notasCredito-collapse">
+                <ul class="submenu" id="marketing_services">
+                    <li><a href="{% url 'notaCredito:seleccionar-empresa' %}">NC no enviadas</a></li>
+                    <li><a href="{% url 'notaCredito:seleccionar-empresa' %}?enviadas=1">NC enviadas</a></li>
+                </ul>
+            </div>
+            <li>
+                <a data-toggle="collapse" href="#notasDebito-collapse" aria-expanded="false" aria-controls="notasDebito-collapse">Notas de Debito</a>
+            </li>
+            <div class="collapse" id="notasDebito-collapse">
+                <ul class="submenu" id="marketing_services">
+                    <li><a href="{% url 'notaDebito:seleccionar-empresa' %}">ND no enviadas</a></li>
+                    <li><a href="{% url 'notaDebito:seleccionar-empresa' %}?enviadas=1">ND enviadas</a></li>
+                </ul>
+            </div>
+            <li>
+                <a data-toggle="collapse" href="#boletas-collapse" aria-expanded="false" aria-controls="boletas-collapse">Boletas</a>
+            </li>
+            <div class="collapse" id="boletas-collapse">
+                <ul class="submenu" id="marketing_services">
                     <li><a href="{% url 'boletas:seleccionar-empresa' %}">Boletas no enviadas</a></li>
-                    <!-- <li><a href="{% url 'boletas:seleccionar-empresa' %}?enviadas=1">Boletas enviadas</a> --></li>
+                </ul>
+            </div>
+            <li>
+                <a data-toggle="collapse" href="#guias-collapse" aria-expanded="false" aria-controls="guias-collapse">Guia de Despacho</a>
+            </li>
+            <div class="collapse" id="guias-collapse">
+                <ul class="submenu" id="marketing_services">
+                    <li><a href="{% url 'guiaDespacho:seleccionar-empresa' %}">Guias no enviadas</a></li>
                 </ul>
             </div>
             <li>
