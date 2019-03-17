@@ -41,10 +41,34 @@ class Reporte(CreationModificationDateMixin):
 	fecha_de_inicio = models.DateField(_('Fecha de inicio'),null=False)
 	fecha_de_culminacion = models.DateField(_('Fecha de culminación'),null=False)
 	version_xml	= models.FileField(upload_to=upload_file_to, blank=True, null=True, validators=[FileExtensionValidator(['xml'])])
+	enviado = models.BooleanField(default=False)
 
 
 	def __str__(self):
 
-		return "{}".format(self.tipo_de_reporte)
+		reporte = self.get_tipo_de_reporte()
+
+		return "{} {}/{} {}".format(self.compania, self.fecha_de_inicio, self.fecha_de_culminacion, reporte)
+
+
+	def get_tipo_de_reporte(self):
+
+		if self.tipo_de_reporte == '33':
+
+			return 'Libro de Ventas'
+
+		elif self.tipo_de_reporte == '39': 
+
+			return 'Libro de Boletas'
+
+	@staticmethod
+	def check_reporte_len(queryset):
+
+		if len(queryset) == 0: 
+
+			raise ValueError("No hay facturas para agregar al reporte")
+
+		return 
+
 
 

@@ -59,8 +59,6 @@ class SeleccionarEmpresaView(TemplateView):
             return HttpResponseRedirect('/')
 
 
-
-
 class ListaFacturasViews(TemplateView):
     template_name = 'lista_facturas.html'
 
@@ -350,13 +348,18 @@ class SendInvoice(FormView):
         elif disponibles < 50:
             messages.info(self.request, str('Quedan ')+str(disponibles)+str('folios disponibles'))
         form.compania = compania
-        form.save()
+        
 
-        # response_dd = render_to_string('snippets/DD_tag.xml', {'data':data,'folio':folio, 'instance':form})
         response_dd = Factura._firmar_dd(data, folio, form)
         documento_firmado = Factura.firmar_documento(response_dd,data,folio, compania, form)
         documento_final_firmado = Factura.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
         caratula_firmada = Factura.generar_documento_final(documento_final_firmado)
+
+        form.dte_xml = caratula_firmada
+        form.save()
+
+        print(form.created)
+        print(type(form.created))
 
         try:
             os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug'])

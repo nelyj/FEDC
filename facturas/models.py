@@ -47,6 +47,7 @@ class Factura(CreationModificationDateMixin):
 	iva = models.CharField(max_length=128, blank=True, null=True)
 	total = models.CharField(max_length=128, blank=True, null=True)
 	n_folio = models.IntegerField(null=True, default=0)
+	dte_xml = models.TextField(null=True, blank=True)
 
 	
 	class Meta:
@@ -78,7 +79,7 @@ class Factura(CreationModificationDateMixin):
 
 			return 
 
-
+	
 	def _firmar_dd(data, folio, instance): 
 
 		"""

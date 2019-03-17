@@ -44,6 +44,7 @@ urlpatterns = [
     path('', include('folios.urls', namespace="folios")),
     path('', include('boletas.urls',namespace="boletas")),
     path('', include('reportes.urls',namespace="reportes")),
+    path('', include('intercambios.urls',namespace="intercambios")),
 ]
 
 if settings.DEBUG:

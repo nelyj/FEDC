@@ -13,51 +13,32 @@
 {% endblock extras_js %}
 {% block content_center %}
 <a class="glyphicon glyphicon-list" id="menu-toggle"></a>
-<div class="container-fluid">
-	<div class="row">
-		<div class="form-wrapper">
-			<form id="form_register" method="post" enctype="multipart/form-data">
-			  {% csrf_token %}
-			  <div class="col-xs-12" >
-			    {{form.as_p}}
-			  </div>
-			  <button id="submit" type="submit" class="btn btn-success btn-block btn-flat">Generar</button>               
-			</form>
-		</div>
-	</div>
-</div>
+<h3>{{ object }}</h3>
 <table id="myTable" class="display" style="width:100%">
     <thead>
         <tr>
-            <th>Reporte</th>
-            <th>Fecha de inicio</th>
-            <th>Fecha de culminacion</th>
-            <th>Acciones</th>
+            <th>Factura</th>
+            <th>Compañía</th>
+            <th>N° de folio</th>
+            <th>Fecha</th>
         </tr>
     </thead>
-
     <tbody>
-       {% for reporte in lista_de_reportes %}
+        {%for factura in facturas_del_reporte %}
         <tr>
-            <td>{{reporte.pk}}</td>
-            <td>{{reporte.fecha_de_inicio|date:'d/m/Y'}}</td>
-            <td>{{reporte.fecha_de_culminacion|date:'d/m/Y'}}</td>
-            <td>
-                <!-- Trigger the modal with a button -->
-                <a  id="edit_foo" href="{% url 'reportes:detalle' reporte.pk %}" class="btn btn-info">Ver</a>
-                <a  id="edit_foo" href="#" class="btn btn-info">Enviar</a>
-                <a  id="edit_foo" href="{% url 'reportes:borrar' compania.pk reporte.pk %}" class="btn btn-info">Eliminar</a>
-
-            </td>
+            <td> <a href="#">{{factura.numero_factura}}</a></td>
+            <td>{{factura.compania.razon_social}}</td>
+            <td>{{ factura.n_folio }}</td>
+            <td>{{ factura.created }}</td>
         </tr>
-        {% endfor %}
+        {%endfor%}
     </tbody>
     <tfoot>
         <tr>
-            <th>Reporte</th>
-            <th>Compania</th>
-            <th>Fecha de inicio</th>
-            <th>Fecha de culminacion</th>
+            <th>Factura</th>
+            <th>Compañía</th>
+            <th>N° de folio</th>
+            <th>Acciones</th>
         </tr>
     </tfoot>
 </table>
@@ -80,7 +61,5 @@
         $(document).ready( function () {
           $('#myTable').DataTable();
       });
-
-
   </script>
   {% endblock content_center %}
