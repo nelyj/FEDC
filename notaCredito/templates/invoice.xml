@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<EnvioDTE xmlns="http://www.sii.cl/SiiDte" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sii.cl/SiiDte EnvioDTE_v10.xsd" version="1.0">
+	<SetDTE ID="SetDoc">
+	<Caratula version="1.0">
+		<RutEmisor>{{compania.rut}}</RutEmisor>
+		<RutReceptor>{{form.rut}}</RutReceptor>
+		<FchResol>{{compania.fecha_resolucion}}</FchResol>
+		<NroResol>{{compania.numero_resolucion}}</NroResol>
+		<TmstFirmaEnv>2018-11-21T16:59:45</TmstFirmaEnv>
+		<SubTotDTE>
+			<TpoDTE>33</TpoDTE>
+			<NroDTE>1</NroDTE>
+		</SubTotDTE>
+	</Caratula>
+	<DTE version="1.0">
+	<Documento ID="{{form.numero_factura}}">
+		<Encabezado>
+			<IdDoc>
+				<TipoDTE>33</TipoDTE>
+				<Folio>518518</Folio>
+				<FchEmis>2018-11-21</FchEmis>
+				<FmaPago>1</FmaPago>
+			</IdDoc>
+			<Emisor>
+				<RUTEmisor>{{compania.rut}}</RUTEmisor>
+				<RznSoc>{{compania.razon_social}}</RznSoc>
+				<GiroEmis>{{compania.giro}}</GiroEmis>
+				<Acteco>{{compania.actividad_principal}}</Acteco>
+				<DirOrigen>{{compania.direccion}}</DirOrigen>
+				<CmnaOrigen>{{compania.comuna}}</CmnaOrigen>
+			</Emisor>
+			<Receptor>
+				<RUTRecep>{{form.rut}}</RUTRecep>
+				<RznSocRecep> {{form.senores}}</RznSocRecep>
+				<GiroRecep>{{form.giro}}</GiroRecep>
+				<DirRecep>{{form.direccion}}</DirRecep>
+				<CmnaRecep>RECOLETA</CmnaRecep>
+				<CiudadRecep>REGION METROPOLITANA</CiudadRecep>
+			</Receptor>
+			<Totales>
+				<MntNeto>{{form.neto}}</MntNeto>
+				<TasaIVA>19</TasaIVA>
+				<IVA>{{form.iva}}</IVA>
+				<MntTotal>{{form.total}}</MntTotal>
+			</Totales>
+		</Encabezado>{%for prod in form.productos%}
+		<Detalle>
+			<NroLinDet>{{forloop.counter}</NroLinDet>
+			<CdgItem>
+				<TpoCodigo>INT1</TpoCodigo>
+				<VlrCodigo>{{prod.item_code}}</VlrCodigo>
+			</CdgItem>
+			<NmbItem>{{prod.description}}</NmbItem>
+			<DscItem/>
+			<QtyItem>{{prod.qty}}</QtyItem>
+			<PrcItem>{{prod.base_net_rate}}</PrcItem>
+			<MontoItem>{{prod.amount}}</MontoItem>
+		</Detalle>{%endfor%}
+		<Referencia>
+			<NroLinRef>1</NroLinRef>
+			<TpoDocRef>801</TpoDocRef>
+			<FolioRef>BXF-7654</FolioRef>
+			<FchRef>2018-11-21</FchRef>
+		</Referencia>
+		<TED version="1.0">
+			{{ DD }}
+		</TED>
+		<TmstFirma>2018-11-21T16:59:44</TmstFirma>
+	</Documento>
+	{{ signature_Documento }}
+</DTE></SetDTE>
+	{{ signature_SetDTE }}
+</EnvioDTE>
