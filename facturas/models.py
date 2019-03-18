@@ -150,16 +150,18 @@ class Factura(CreationModificationDateMixin):
 
 
 		# Elimina tabulaciones y espacios para la generacion del digest
-		digest_string = documento_sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
+		# digest_string = documento_sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
 
 		# Crea firma electronica compuesta utilizando la plantillka signature.xml
-		firma_electronica = generar_firma_con_certificado(compania, digest_string)
+		# firma_electronica = generar_firma_con_certificado(compania, digest_string)
 
 		# Llena la plantilla signature.xml con los datos de la firma electronica 
-		signature_tag = render_to_string('snippets/signature.xml', {'signature':firma_electronica})
+		# signature_tag = render_to_string('snippets/signature.xml', {'signature':firma_electronica})
 
 		# Agrega la plantilla signature.xml al final del documento
-		documento_sin_aplanar += "\n{}".format(signature_tag)
+		# documento_sin_aplanar += "\n{}".format(signature_tag)
+
+		
 
 	
 		return documento_sin_aplanar
@@ -183,16 +185,16 @@ class Factura(CreationModificationDateMixin):
 		)
 
 		# Crea el digest eliminando espacios y tabulaciones
-		digest_string = set_dte_sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
+		# digest_string = set_dte_sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
 
 		# Firma el digest y retorna diccionario con datos de la firma
-		firma_electronica = generar_firma_con_certificado(compania, digest_string)
+		# firma_electronica = generar_firma_con_certificado(compania, digest_string)
 
 		# Llena los datos de la plantilla signature.xml con los datos de la firma
-		signature_tag = render_to_string('snippets/signature.xml', {'signature':firma_electronica})
+		# signature_tag = render_to_string('snippets/signature.xml', {'signature':firma_electronica})
 
 		# Agrega la firma al final del documento 
-		set_dte_sin_aplanar += "\n{}".format(signature_tag)
+		# set_dte_sin_aplanar += "\n{}".format(signature_tag)
 
 		return set_dte_sin_aplanar
 
