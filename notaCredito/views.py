@@ -1,24 +1,28 @@
-import codecs, dicttoxml, json, os, requests
-from requests import Request, Session
-from django.conf import settings
 from django.contrib import messages
-from django.http import HttpResponse, HttpResponseRedirect
-from django.http import HttpResponse
-from django.urls import reverse_lazy
-from django.http import FileResponse
 from django.views.generic.edit import FormView
 from django.shortcuts import render
 from django.views.generic.base import TemplateView, View
 from django.views.generic import ListView
+import requests
+from requests import Request, Session
+import dicttoxml
+import json
 from django.template.loader import render_to_string
+from django.http import HttpResponse, HttpResponseRedirect
 from conectores.models import *
+import codecs
 from conectores.forms import FormCompania
 from conectores.models import *
+from django.http import HttpResponse
+from .forms import *
+from django.urls import reverse_lazy
+from django.http import FileResponse
+import os
+from django.conf import settings
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
-from utils.SIISdk import SII_SDK
-from .forms import *
-from .models import Factura
+from facturas.models import Factura
+from notaCredito.models import notaCredito
 
 class SeleccionarEmpresaView(TemplateView):
     template_name = 'seleccionar_empresa.html'
@@ -35,26 +39,20 @@ class SeleccionarEmpresaView(TemplateView):
         return context
 
     def post(self, request):
-
         enviadas = self.request.POST.get('enviadas', None)
-
-        # print(enviadas)
-        # enviadas = int(enviadas)
-
         empresa = int(request.POST.get('empresa'))
-
         if not empresa:
             return HttpResponseRedirect('/')
         empresa_obj = Compania.objects.get(pk=empresa)
         if empresa_obj and self.request.user == empresa_obj.owner:
             if enviadas == "1":
-                return HttpResponseRedirect(reverse_lazy('facturas:lista-enviadas', kwargs={'pk':empresa}))
+                return HttpResponseRedirect(reverse_lazy('notaCredito:lista-enviadas', kwargs={'pk':empresa}))
             else:
-                return HttpResponseRedirect(reverse_lazy('facturas:lista_facturas', kwargs={'pk':empresa}))
+                return HttpResponseRedirect(reverse_lazy('notaCredito:lista_nota_credito', kwargs={'pk':empresa}))
         else:
             return HttpResponseRedirect('/')
 
-class ListaFacturasViews(TemplateView):
+class ListaNotaCreditoViews(TemplateView):
     template_name = 'lista_facturas.html'
 
     def dispatch(self, *args, **kwargs):
@@ -66,7 +64,7 @@ class ListaFacturasViews(TemplateView):
         if not usuario:
 
             messages.info(self.request, "No posee conectores asociados a esta empresa")
-            return HttpResponseRedirect(reverse_lazy('facturas:seleccionar-empresa'))
+            return HttpResponseRedirect(reverse_lazy('notaCredito:seleccionar-empresa'))
 
         return super().dispatch(*args, **kwargs)
             
@@ -96,32 +94,22 @@ class ListaFacturasViews(TemplateView):
         # Consulta en la base de datos todos los numeros de facturas
         # cargadas por la empresa correspondiente para hacer una comparacion
         # con el ERP y eliminar las que ya se encuentran cargadas
-        enviadas = [factura.numero_factura for factura in Factura.objects.filter(compania=compania).only('numero_factura')]
-        
-        # print(enviadas)
-
+        enviadas = [factura.numero_factura for factura in notaCredito.objects.filter(compania=compania).only('numero_factura')]
         # Elimina todas las boletas de la lista
         # y crea una nueva lista con todas las facturas 
         solo_facturas  = []
         for i , item in enumerate(data):
 
-            if item['name'].startswith('Nº'):
+            if item['name'].startswith('NC'):
 
                 solo_facturas.append(item['name'])
-
         # Verifica si la factura que vienen del ERP 
         # ya se encuentran cargadas en el sistema
         # y en ese caso las elimina de la lista
         solo_nuevas = []
         for i , item in enumerate(solo_facturas):
-
             if not item in enviadas:
-
                 solo_nuevas.append(item)
-
-        # print(solo_nuevas)
-
-
         url=usuario.url_erp+'/api/resource/Sales%20Invoice/'
         context['detail']=[]
         for tmp in solo_nuevas:
@@ -155,7 +143,7 @@ class DeatailInvoice(TemplateView):
 
 class SendInvoice(FormView):
     template_name = 'envio_sii.html'
-    form_class =FormFactura
+    form_class =FormNotaCredito
 
     def get_initial(self):
         initial = super().get_initial()
@@ -260,7 +248,7 @@ class SendInvoice(FormView):
 
         id_ = self.kwargs.get('pk')
 
-        return reverse_lazy('facturas:send-invoice', kwargs={'pk':id_,'slug':self.kwargs['slug']})
+        return reverse_lazy('notaCredito:send-invoice', kwargs={'pk':id_,'slug':self.kwargs['slug']})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -310,9 +298,17 @@ class SendInvoice(FormView):
             return super().form_invalid(form)
         assert compania, "compania no existe"
         data['productos']=eval(data['productos'])
-
+        response = render_to_string('invoice.xml', {'form':data,'compania':compania})
+        # try:
+        #     os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug'])
+        #     file = open(settings.MEDIA_ROOT+'facturas'+'/'+self.kwargs['slug']+'/'+self.kwargs['slug']+'.xml','w')
+        #     file.write(response)
+        # except Exception as e:
+        #     messages.error(self.request, 'XML ya almacenado en el directorio')
+        #     return super().form_invalid(form)
         # rut = self.request.POST.get('rut', None)
         # assert rut, "rut no existe"
+
         form = form.save(commit=False)
         try:
             folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=33).order_by('fecha_de_autorizacion').first()
@@ -343,27 +339,10 @@ class SendInvoice(FormView):
         elif disponibles < 50:
             messages.info(self.request, str('Quedan ')+str(disponibles)+str('folios disponibles'))
         form.compania = compania
-        
-
-        response_dd = Factura._firmar_dd(data, folio, form)
-        documento_firmado = Factura.firmar_documento(response_dd,data,folio, compania, form)
-        documento_final_firmado = Factura.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
-        caratula_firmada = Factura.generar_documento_final(documento_final_firmado)
-
-        form.dte_xml = caratula_firmada
         form.save()
 
-        print(form.created)
-        print(type(form.created))
-
-        try:
-            os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug'])
-            file = open(settings.MEDIA_ROOT+'facturas'+'/'+self.kwargs['slug']+'/'+self.kwargs['slug']+'.xml','w')
-            file.write(caratula_firmada)
-        except Exception as e:
-            messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
-            return super().form_invalid(form)
-
+        # response_dd = render_to_string('snippets/DD_tag.xml', {'data':data,'folio':folio, 'instance':form})
+        response_dd = notaCredito._firmar_dd(data, folio, form)
 
         # print(response_dd)
 
@@ -374,14 +353,11 @@ class SendInvoice(FormView):
             usuario = Conector.objects.filter(pk=1).first()
         except Exception as e:
             print(e)
-
         payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
         headers = {'content-type': "application/json"}
         response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
         url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+self.kwargs['slug']
-
         aux=session.put(url,json={'status_sii':'Aprobado'})
-
         session.close()
         # else:
         #     msg = "La factura %s ya se encuentra almacenada en la base de datos del Faturador" % (self.kwargs['slug'])
@@ -391,22 +367,12 @@ class SendInvoice(FormView):
         messages.error(self.request, form.errors)
         return super().form_invalid(form)
 
-    def send_invoice_sii(self):
-        try:
-            sii_sdk = SII_SDK()
-            seed = sii_sdk.getSeed()
-            print(seed)
-            return True
-        except Exception as e:
-            print(e)
-            return False
-
-class FacturasEnviadasView(ListView):
+class NotaCreditoEnviadasView(ListView):
     template_name = 'facturas_enviadas.html'
 
 
     def get_queryset(self):
 
         compania = self.kwargs.get('pk')
-
-        return Factura.objects.filter(compania=compania).order_by('-created')
+        print(notaCredito.objects.filter(compania=compania).order_by('-created'))
+        return notaCredito.objects.filter(compania=compania).order_by('-created')

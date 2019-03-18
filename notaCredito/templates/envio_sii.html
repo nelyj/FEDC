@@ -1,0 +1,424 @@
+{% extends "utils_start.html" %}
+{% block titulo %}Factura{% endblock titulo %}
+{% block extras_css %}
+{% load staticfiles %}
+<link type="text/css" rel="stylesheet" href="{% static 'jquery-entropizer-master/dist/css/jquery-entropizer.min.css' %}" />
+<link rel="stylesheet" href="{% static 'DataTables/media/css/jquery.dataTables.min.css' %}">
+{% endblock extras_css %}
+{% block extras_js %}
+<script type="text/javascript" src="{% static 'jquery-entropizer-master/lib/entropizer.js' %}"></script>
+<script type="text/javascript" src="{% static 'jquery-entropizer-master/dist/js/jquery-entropizer.min.js' %}"></script>
+<script src="{% static 'DataTables/media/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'users/user_register.js' %}"></script>
+{% endblock extras_js %}
+{% block content_center %}
+<a class="glyphicon glyphicon-list" id="menu-toggle"></a>
+<form id="form_register" method="post" enctype="multipart/form-data">
+	{% csrf_token %}
+	<button id="submit" type="submit" class="btn btn-success btn-block btn-flat">Guardar</button>
+	<div class="container-fluid">
+
+		<div class="form-group">
+			<div class="col-sm-6">
+				<label>
+					{{form.status.label}}
+				</label>
+			</div>
+			<div class="col-sm-6">
+				{{form.status}}
+			</div>
+		</div>
+		<!-- Ad basic information -->
+<!-- 		<div class="col-sm-6">
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							{{compania.rut.label}}
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{compania.rut}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							{{compania.razon_social.label}}
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{compania.razon_social}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							{{compania.actividad_principal.label}}
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{compania.actividad_principal}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							{{compania.giro.label}}
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{compania.giro}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							{{compania.direccion.label}}
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{compania.direccion}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							{{compania.comuna.label}}
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{compania.comuna}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							{{compania.fecha_resolucion.label}}
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{compania.fecha_resolucion}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							{{compania.numero_resolucion.label}}
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{compania.numero_resolucion}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							{{compania.correo_intercambio.label}}
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{compania.correo_intercambio}}
+					</div>
+				</div>
+			</div>
+		</div>
+ -->		<div class="col-sm-12">
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Senores:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.senores}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Direccion:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.direccion}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Transporte:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.transporte}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Despachar A:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.despachar}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Observaciones:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.observaciones}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Giro:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.giro}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Cond. de Venta:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						<input type="text" id="condicion_venta" class="form-control">
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Vencimiento:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						<input type="text" id="vencimiento" class="form-control">
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Vendedor:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.vendedor}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Rut:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.rut}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Fecha:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.fecha}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Guia:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						<input type="text" id="guia" class="form-control">
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							O. de Compra:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						<input type="text" id="orden_compra" class="form-control">
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Nota de Venta:
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.nota_venta}}
+					</div>
+				</div>
+			</div>
+		</div>
+		<table id="myTable" class="display" style="width:100%">
+			<thead>
+				<tr>
+					<th>Cant.</th>
+					<th>Unidad</th>
+					<th>Código</th>
+					<th>Descripcion</th>
+					<th>P.Unit.</th>
+					<th>Dcto(%)</th>
+					<th>Total</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for product in factura.items %}
+				<tr>
+					<td>{{product.qty}}</td>
+					<td>Unidad</td>
+					<td>{{product.item_code}}</td>
+					<td>{{product.item_name}}</td>
+					<td>{{product.rate}}</td>
+					<td>{{product.discount_percentage}}</td>
+					<td>{{product.amount}}</td>
+				</tr>
+				{%endfor%}
+			</tbody>
+		</table>
+		<div class="col-sm-6">
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-1">
+						<label>
+							Son:
+						</label>
+					</div>
+					<div class="col-sm-11">
+						{{form.monto_palabra}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							NETO
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.neto}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Excento
+						</label>
+					</div>
+					<div class="col-sm-6">
+						<input type="text" id="excento" class="form-control">
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							IVA(19%)
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.iva}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group">
+					<div class="col-sm-6">
+						<label>
+							Total
+						</label>
+					</div>
+					<div class="col-sm-6">
+						{{form.total}}
+					</div>
+				</div>
+			</div>	
+		</div>
+	</form>
+
+	<script type="text/javascript">
+		var rut = $('#id_rut');
+		rut.prop('disabled', true);
+		var razon_social = $('#id_razon_social');
+		razon_social.prop('disabled', true);
+		var actividad_principal = $('#id_actividad_principal');
+		actividad_principal.prop('disabled', true);
+		var giro = $('#id_giro');
+		giro.prop('disabled', true);
+		var direccion = $('#id_direccion');
+		direccion.prop('disabled', true);
+		var comuna = $('#id_comuna');
+		comuna.prop('disabled', true);
+		var fecha_resolucion = $('#id_fecha_resolucion');
+		fecha_resolucion.prop('disabled', true);
+		var numero_resolucion = $('#id_numero_resolucion');
+		numero_resolucion.prop('disabled', true);
+		var correo_intercambio = $('#id_correo_intercambio');
+		correo_intercambio.prop('disabled', true);
+
+	</script>
+
+	{% endblock content_center %}

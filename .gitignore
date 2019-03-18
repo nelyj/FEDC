@@ -17,6 +17,16 @@ folios/migrations
 folios/__pycache__
 boletas/migrations
 boletas/__pycache__
+certificados/migrations
+certificados/__pycache__
+conectores/migrations
+conectores/__pycache__
+guiaDespacho/migrations
+guiaDespacho/__pycache__
+notaCredito/migrations
+notaCredito/__pycache__
+notaDebito/migrations
+notaDebito/__pycache__
 *.*.backup
 *.*~
 *.swp
@@ -32,3 +42,5 @@ sources/*
 mydatabase
 config/settings.py
 config/wsgi.py
+__pycache__/
+migrations/

@@ -8,7 +8,7 @@ urlpatterns = [
     re_path(r'lista-facturas/(?P<pk>\d+)', ListaFacturasViews.as_view(), name='lista_facturas'),
     re_path(r'^lista-facturas/empresa/$', SeleccionarEmpresaView.as_view(),name='seleccionar-empresa'),
     re_path(r'^invoice/(?P<slug>[a-zA-Z0-9º-]+)/$', DeatailInvoice.as_view(),name='detail-invoice'),
-    re_path(r'^invoice/(?P<pk>\d+)/enviadas/$', FacturasEnviadasView.as_view(),name='lista-enviadas'),
+    re_path(r'^factura/(?P<pk>\d+)/enviadas/$', FacturasEnviadasView.as_view(),name='lista-enviadas'),
     path('enviar-factura/<int:pk>/<str:slug>/', SendInvoice.as_view(),name='send-invoice'),
 ]
 
