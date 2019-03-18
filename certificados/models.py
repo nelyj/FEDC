@@ -9,15 +9,6 @@ from conectores.models import Compania
 # Create your models here.
 
 
-def upload_certificate_to(instance, filename):
-	now = timezone_now()
-	filename_base, filename_ext = os.path.splitext(filename)
-	return "certificados/%s%s" % (
-		now.strftime("%Y/%m/%Y%m%d%H%M%S"),
-		filename_ext.lower(),
-	)
-
-
 class Certificado(CreationModificationDateMixin):
 
 	empresa = models.ForeignKey(Compania, on_delete=models.CASCADE, blank=True, null=True, related_name='cert')
@@ -32,11 +23,3 @@ class Certificado(CreationModificationDateMixin):
 	    verbose_name = 'Certificado'
 	    verbose_name_plural = 'Certificados'
 
-
-	def upload_file_to(instance, filename):
-		now = timezone_now()
-		filename_base, filename_ext = os.path.splitext(filename)
-		return "certificados/%s%s" % (
-			now.strftime("%Y/%m/%Y%m%d%H%M%S"),
-			filename_ext.lower(),
-		)

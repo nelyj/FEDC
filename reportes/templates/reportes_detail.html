@@ -1,0 +1,65 @@
+{% extends "utils_start.html" %}
+{% block titulo %}Registrar Conectores{% endblock titulo %}
+{% block extras_css %}
+{% load staticfiles %}
+<link type="text/css" rel="stylesheet" href="{% static 'jquery-entropizer-master/dist/css/jquery-entropizer.min.css' %}" />
+<link rel="stylesheet" href="{% static 'DataTables/media/css/jquery.dataTables.min.css' %}">
+{% endblock extras_css %}
+{% block extras_js %}
+<script type="text/javascript" src="{% static 'jquery-entropizer-master/lib/entropizer.js' %}"></script>
+<script type="text/javascript" src="{% static 'jquery-entropizer-master/dist/js/jquery-entropizer.min.js' %}"></script>
+<script src="{% static 'DataTables/media/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'users/user_register.js' %}"></script>
+{% endblock extras_js %}
+{% block content_center %}
+<a class="glyphicon glyphicon-list" id="menu-toggle"></a>
+<h3>{{ object }}</h3>
+<table id="myTable" class="display" style="width:100%">
+    <thead>
+        <tr>
+            <th>Factura</th>
+            <th>Compañía</th>
+            <th>N° de folio</th>
+            <th>Fecha</th>
+        </tr>
+    </thead>
+    <tbody>
+        {%for factura in facturas_del_reporte %}
+        <tr>
+            <td> <a href="#">{{factura.numero_factura}}</a></td>
+            <td>{{factura.compania.razon_social}}</td>
+            <td>{{ factura.n_folio }}</td>
+            <td>{{ factura.created }}</td>
+        </tr>
+        {%endfor%}
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>Factura</th>
+            <th>Compañía</th>
+            <th>N° de folio</th>
+            <th>Acciones</th>
+        </tr>
+    </tfoot>
+</table>
+
+    <script type="text/javascript">
+        {% comment %} 
+        function validar(url) {
+            console.log(url)
+            $.ajax({
+                type: 'GET',
+                url: url,
+                success: function (data) {
+                    $('#foo_modal').find('.modal-body').html(data);
+                    $('#foo_modal').modal('show');
+                },
+            });
+            return false; 
+        }     
+        {% endcomment %}
+        $(document).ready( function () {
+          $('#myTable').DataTable();
+      });
+  </script>
+  {% endblock content_center %}

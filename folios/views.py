@@ -47,8 +47,8 @@ class FolioCreateView(CreateView):
 			pk_exponente = root.xpath('//AUTORIZACION/CAF/DA/RSAPK/E/text()')[0]
 			pem_private = root.xpath('//AUTORIZACION/RSASK/text()')[0]
 			pem_public = root.xpath('//AUTORIZACION/RSAPUBK/text()')[0]
-			assert pem_public
-			assert pem_private
+			assert pem_public, "Error de obtencion de clave publica"
+			assert pem_private, "Error de obtencion de clave privada"
 		except:
 			messages.error(self.request, 'Algo anda mal con el CAF')
 			return super().form_invalid(form)

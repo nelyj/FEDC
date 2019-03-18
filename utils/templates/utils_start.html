@@ -19,7 +19,6 @@
 <!-- End Modal -->
 {% endblock modals %}
 <div id="wrapper">
-
     <!-- Sidebar -->
     {% block sidebar %}
     <div id="sidebar-wrapper">
@@ -75,6 +74,7 @@
             </div>
             <li>
                 <a data-toggle="collapse" href="#guias-collapse" aria-expanded="false" aria-controls="guias-collapse">Guia de Despacho</a>
+                <a href="{% url 'reportes:seleccionar-empresa' %}">Reportes</a>
             </li>
             <div class="collapse" id="guias-collapse">
                 <ul class="submenu" id="marketing_services">

@@ -18,39 +18,15 @@
         <!-- Inicio Tab panes -->
         <div class="tab-content">
           <div role="tabpanel" class="tab-pane active" id="cuenta">
-            <h3>Registrar Compañia</h3>
-            <form id="form_register" action="{% url 'conectores:registrar_compania' %}" method="post" enctype="multipart/form-data">
+            <h3>Actualizar Compañia</h3>
+            <form id="form_register" action="{% url 'conectores:update_compania' object.pk %}" method="post" enctype="multipart/form-data">
               {% csrf_token %}
               <div class="col-xs-12" >
                 {{form.as_p}}
               </div>
               <button id="submit" type="submit" class="btn btn-success btn-block btn-flat">Registrar</button>               
             </form>
-            <br>
-            <table id="myTable" class="display" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>Id</th>
-                            <th>RUT</th>
-                            <th>Razon Social</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for comp in companias %}
-                        <tr>
-                            <td>{{ comp.pk }}</td>
-                            <td>{{ comp.rut }}</td>
-                            <td>{{ comp.razon_social }}</td>
-                            <td>
-                              <a href="{% url 'conectores:update_compania' pk=comp.pk %}"><i class="fa fa-edit"></i></a>
-                              <a href="{% url 'conectores:delete_compania' pk=comp.pk %}"><i class="fa fa-close"></i></a>
-                            </td>
-                        </tr>
-                        {%endfor%}
-                    </tbody>
-                </table>
-            <br>
+
           </div>
           <!-- Fin Tab panel -->
         </div>

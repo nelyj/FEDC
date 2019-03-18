@@ -1,3 +1,4 @@
+import os
 from enum import Enum
 from django.db import models
 from django.contrib.auth.models import User
@@ -6,6 +7,9 @@ from django.core.validators import FileExtensionValidator
 from .exceptions import ContrasenaDeCertificadoIncorrecta
 
 import OpenSSL.crypto
+from Crypto.Hash import MD5
+
+from base64 import b64decode,b64encode
 
 
 class Compania(models.Model):
@@ -15,7 +19,18 @@ class Compania(models.Model):
         return "logos/%s/%s" % (self.rut, filename)
 
     def get_cert_upload_to(self, filename):
-        return "certificados/%s/%s" % (self.rut, filename)
+
+        """ 
+        Crea un hash del nombre del certificado, antes de almacenarlo en 
+        el servidor
+        """
+
+        filename_base, filename_ext = os.path.splitext(filename)
+
+        hash = MD5.new()
+        hash.update(filename_base.encode())
+
+        return "certificados/%s%s" % (hash.hexdigest(),filename_ext.lower())
     
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE, default=1)     
@@ -33,7 +48,9 @@ class Compania(models.Model):
     correo_intercambio = models.EmailField(blank=True, null=True)
     pass_correo_intercambio = models.CharField(max_length=128, blank=True, null=True)
     certificado = models.FileField('Certificado', upload_to=get_cert_upload_to,validators=[FileExtensionValidator(allowed_extensions=['pfx'])], blank=False, null=True)
-    pass_certificado = models.CharField(max_length=128, blank=True, null=True)
+    tasa_de_iva = models.IntegerField("Tasa IVA", blank=False, null=False, default=0)
+    
+
 
 
 
@@ -49,25 +66,30 @@ class Compania(models.Model):
         return self.razon_social
 
     def validar_certificado(string_archivo_pfx, password):
+        """
+        Recibe un archivo de certificado .pfx y su correspondiente contrasena
+        y retorna una tupla con la clave privada, la clave publica y el certificado extraido del mismo
+        """
 
         try:
-
+            # Carga el archivo .pfx y muestra un error si la contrasena
+            # es incorrecta
             p12 = OpenSSL.crypto.load_pkcs12(string_archivo_pfx, password)
 
         except OpenSSL.crypto.Error:
 
             raise ContrasenaDeCertificadoIncorrecta
 
+        # Extraccion de clave privada
         private = OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_PEM, p12.get_privatekey()).decode()
-        certificate = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, p12.get_certificate()).decode()
+
+        # Extraccion de certificado
+        certificate = OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, p12.get_certificate()).decode().replace('\n-----END CERTIFICATE-----\n', '').replace('-----BEGIN CERTIFICATE-----\n', '')
+        # Extraccion de clave publica
         public_key = OpenSSL.crypto.dump_publickey(OpenSSL.crypto.FILETYPE_PEM,p12.get_certificate().get_pubkey()).decode()
 
+
         return (private, certificate, public_key)
-
-
-
-
-
 
 
 

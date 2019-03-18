@@ -10,21 +10,22 @@
 		<DigestValue>{{ signature.digest }}</DigestValue>
 		</Reference>
 	</SignedInfo>
-	<SignatureValue>{{ signature.value }}</SignatureValue>
+	<SignatureValue>{{ signature.firma }}</SignatureValue>
 	<KeyInfo>
 		<KeyValue>
 			<RSAKeyValue>
-			<Modulus>
-			{{ signature.modulus }}
+			<Modulus>{% autoescape off %}
+		{{ signature.modulo }}{% endautoescape %}
 			</Modulus>
-			<Exponent>
-			{{ signature.exponent }}
+			<Exponent>{% autoescape off %}
+		{{ signature.exponente }}{% endautoescape %}
 			</Exponent>
 			</RSAKeyValue>
 		</KeyValue>
 		<X509Data>
-
-		<X509Certificate>{{ signature.certificate }}</X509Certificate>
+		<X509Certificate>
+			{{ signature.certificado }}
+		</X509Certificate>
 		</X509Data>
 	</KeyInfo>
 </Signature>

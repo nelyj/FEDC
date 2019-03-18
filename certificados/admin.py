@@ -4,4 +4,8 @@ from django.contrib import admin
 
 from .models import Certificado
 
-admin.site.register(Certificado)
+
+class CertificadoAdmin(admin.ModelAdmin):
+	readonly_fields = ["private_key", "public_key", "certificado"]
+
+admin.site.register(Certificado, CertificadoAdmin)

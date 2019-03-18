@@ -47,7 +47,6 @@ class Folio(CreationModificationDateMixin):
 	pk_exponente = models.CharField(null=False, max_length=255)
 	idk = models.CharField(null=False, max_length=255, default="N/A")
 	firma = models.CharField(null=False, max_length=255, default="N/A")
-	idk = models.CharField(null=False, max_length=255, default="N/A")
 	pem_private = models.TextField(null=True, default='')
 	pem_public = models.TextField(null=True, default='')
 

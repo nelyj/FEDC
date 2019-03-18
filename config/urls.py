@@ -46,6 +46,8 @@ urlpatterns = [
     path('', include('guiaDespacho.urls',namespace="guiaDespacho")),
     path('', include('notaCredito.urls',namespace="notaCredito")),
     path('', include('notaDebito.urls',namespace="notaDebito")),
+    path('', include('reportes.urls',namespace="reportes")),
+    path('', include('intercambios.urls',namespace="intercambios")),
 ]
 
 if settings.DEBUG:
