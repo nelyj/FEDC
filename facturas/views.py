@@ -1,4 +1,6 @@
+import OpenSSL.crypto
 import codecs, dicttoxml, json, os, requests
+
 from requests import Request, Session
 from django.conf import settings
 from django.contrib import messages
@@ -156,6 +158,11 @@ class SendInvoice(FormView):
     template_name = 'envio_sii.html'
     form_class = FormFactura
 
+    def get_form_kwargs(self):
+        kwargs = super(SendInvoice, self).get_form_kwargs()
+        kwargs.update({'compania': self.kwargs['pk']})
+        return kwargs
+
     def get_initial(self):
         initial = super().get_initial()
         session = requests.Session()
@@ -308,8 +315,9 @@ class SendInvoice(FormView):
             compania = Compania.objects.get(pk=compania_id)
         except Compania.DoesNotExist:
             messages.error(self.request, "No ha seleccionado la compania")
-            return super().form_invalid(form)
+            return super().form_valid(form)
         assert compania, "compania no existe"
+        
         data['productos']=eval(data['productos'])
 
         # rut = self.request.POST.get('rut', None)
@@ -323,19 +331,19 @@ class SendInvoice(FormView):
 
         except Folio.DoesNotExist:  
             messages.error(self.request, "No posee folios para asignacion de timbre")
-            return super().form_invalid(form)
+            return super().form_valid(form)
         try:
             
             folio.verificar_vencimiento()
         except ElCAFSenEncuentraVencido:
             messages.error(self.request, "El CAF se encuentra vencido")
-            return super().form_invalid(form)
+            return super().form_valid(form)
         form.status = 'Aprobado'
         try:
             form.recibir_folio(folio)
         except (ElCafNoTieneMasTimbres, ValueError):
             messages.error(self.request, "Ya ha consumido todos sus timbres")
-            return super().form_invalid(form)
+            return super().form_valid(form)
         # Trae la cantidad de folios disponibles y genera una notificacion cuando quedan menos de 5
         # Si queda uno, cambia la estructura de la oracion a singular. 
         disponibles = folio.get_folios_disponibles()
@@ -347,12 +355,11 @@ class SendInvoice(FormView):
        
 
         response_dd = Factura._firmar_dd(data, folio, form)
-        documento_firmado = Factura.firmar_documento(response_dd,data,folio, compania, form)
-        documento_final_firmado = Factura.firmar_etiqueta_set_dte(compania, folio, documento_firmado,pass_certificado)
+        documento_firmado = Factura.firmar_documento(response_dd,data,folio, compania, form, pass_certificado)
+        documento_final_firmado = Factura.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
         caratula_firmada = Factura.generar_documento_final(compania,documento_final_firmado,pass_certificado)
 
         form.dte_xml = caratula_firmada
-        print(caratula_firmada)
         form.save()
         caratula_firmada = ""
         send_sii = self.send_invoice_sii(compania,caratula_firmada,pass_certificado)
@@ -368,7 +375,7 @@ class SendInvoice(FormView):
             file.write(documento_final_firmado)
         except Exception as e:
             messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
-            return super().form_invalid(form)
+            return super().form_valid(form)
 
 
         # print(response_dd)

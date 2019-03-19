@@ -103,6 +103,31 @@ class SII_SDK():
         else:
             return etree.tostring(template).decode()
 
+    def multipleSign(self,compania,xml_string, pass_certificado, index):
+        """
+        Método para firmar cualquier xml
+        @param compania recibe el objeto compañia
+        @param compania recibe el string a firmar
+        @return xml con la fima 
+        """
+        tree = etree.fromstring(xml_string)
+        sig = tree.findall(".//{http://www.w3.org/2000/09/xmldsig#}Signature")
+        s = sig[index]
+        ctx = xmlsec.SignatureContext()
+        ruta_pfx = settings.MEDIA_ROOT + str(compania.certificado)
+        key = xmlsec.Key.from_file(ruta_pfx, xmlsec.constants.KeyDataFormatPkcs12, pass_certificado)
+        ctx.key = key
+        ctx.sign(s)
+        tree= etree.XML(etree.tostring(tree).decode())
+        sig = tree.findall(".//{http://www.w3.org/2000/09/xmldsig#}Signature")
+        s = sig[index]
+        rem = s.findall(".//{http://www.w3.org/2000/09/xmldsig#}X509Certificate")
+        if(len(rem)>1):
+            for element in rem[:-1]:
+                element.getparent().remove(element)
+        return etree.tostring(tree).decode()
+
+
     def sendInvoice(self,token,invoice,rut_sender,rut_company):
         """
         Método para enviar la factura

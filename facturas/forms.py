@@ -1,8 +1,12 @@
+import OpenSSL.crypto
+
 from django import forms
+from django.conf import settings
 from django.forms import ModelForm
 from django.forms.fields import CharField
 from django.forms.widgets import PasswordInput
 from .models import *
+from conectores.models import Compania
 
 
 class FormFactura(ModelForm):
@@ -16,6 +20,7 @@ class FormFactura(ModelForm):
                     'productos','monto_palabra','neto','excento','iva','total']
 
     def __init__(self, *args, **kwargs):
+        self.compania = kwargs.pop("compania")
         super().__init__(*args, **kwargs)
         self.fields['status'].widget.attrs.update({'class': 'form-control'})
         self.fields['status'].required = False
@@ -86,3 +91,20 @@ class FormFactura(ModelForm):
         self.fields['total'].widget.attrs.update({'class': 'form-control'})
         self.fields['total'].required = False
         self.fields['total'].disabled = True
+
+    def clean(self):
+        cleaned_data = super(FormFactura, self).clean()
+        pass_certificado = cleaned_data.get("pass_certificado")
+        try:
+            compania = Compania.objects.get(pk=self.compania)
+        except Compania.DoesNotExist:
+            self.add_error("pass_certificado", "No ha seleccionado la compania")
+        if pass_certificado:
+            ruta_pfx = open(settings.MEDIA_ROOT + str(compania.certificado), 'rb').read()
+            try:
+                #: Comprobar la contraseña del certificado
+                OpenSSL.crypto.load_pkcs12(ruta_pfx, pass_certificado)
+            except:
+                msg = "La contraseña del certificado no es valida"
+                self.add_error("pass_certificado", msg)
+        return cleaned_data

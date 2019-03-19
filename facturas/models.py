@@ -123,7 +123,7 @@ class Factura(CreationModificationDateMixin):
 		return sin_aplanar
 
 
-	def firmar_documento(etiqueta_DD, datos, folio, compania, instance):
+	def firmar_documento(etiqueta_DD, datos, folio, compania, instance,pass_certificado):
 
 		"""
 		Llena los campos de la etiqueta <Documento>, y la firma usando la 
@@ -148,6 +148,9 @@ class Factura(CreationModificationDateMixin):
 				'instance':instance
 			})
 
+		sii_sdk = SII_SDK()
+		set_dte_sin_aplanar = sii_sdk.generalSign(compania,documento_sin_aplanar,pass_certificado)
+
 		# Elimina tabulaciones y espacios para la generacion del digest
 		# digest_string = documento_sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
 
@@ -160,10 +163,10 @@ class Factura(CreationModificationDateMixin):
 		# Agrega la plantilla signature.xml al final del documento
 		# documento_sin_aplanar += "\n{}".format(signature_tag)
 	
-		return documento_sin_aplanar
+		return set_dte_sin_aplanar
 
 
-	def firmar_etiqueta_set_dte(compania, folio, etiqueta_Documento, pass_certificado):
+	def firmar_etiqueta_set_dte(compania, folio, etiqueta_Documento):
 
 
 		# Genera timestamp en formato correspondiente
@@ -210,11 +213,12 @@ class Factura(CreationModificationDateMixin):
 
 		# Se firmó el archivo xml
 		sii_sdk = SII_SDK()
-		set_dte_sin_aplanar = sii_sdk.generalSign(compania,documento_final,pass_certificado)
+		set_dte_sin_aplanar = sii_sdk.multipleSign(compania,documento_final,pass_certificado,1)
+		#set_dte_sin_aplanar = sii_sdk.generalSign(compania,set_dte_sin_aplanar,pass_certificado,1)
 
 		#documento_final_sin_tabs = documento_final.replace('\t','').replace('\r','')
 
-		#print(documento_final_sin_tabs)
+		#print(set_dte_sin_aplanar)
 
 		return '<?xml version="1.0" encoding="ISO-8859-1"?>'+set_dte_sin_aplanar
 
