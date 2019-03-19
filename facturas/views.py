@@ -154,7 +154,7 @@ class DeatailInvoice(TemplateView):
 
 class SendInvoice(FormView):
     template_name = 'envio_sii.html'
-    form_class =FormFactura
+    form_class = FormFactura
 
     def get_initial(self):
         initial = super().get_initial()
@@ -298,6 +298,8 @@ class SendInvoice(FormView):
 
     def form_valid(self, form, **kwargs):
         compania_id = self.kwargs['pk']
+        pass_certificado = form.cleaned_data['pass_certificado']
+        print(pass_certificado)
 
         # if form.cleaned_data['status'] == 'En proceso':
         data = form.clean()
@@ -342,15 +344,20 @@ class SendInvoice(FormView):
         elif disponibles < 50:
             messages.info(self.request, str('Quedan ')+str(disponibles)+str('folios disponibles'))
         form.compania = compania
-        
+       
 
         response_dd = Factura._firmar_dd(data, folio, form)
         documento_firmado = Factura.firmar_documento(response_dd,data,folio, compania, form)
-        documento_final_firmado = Factura.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
-        caratula_firmada = Factura.generar_documento_final(documento_final_firmado)
+        documento_final_firmado = Factura.firmar_etiqueta_set_dte(compania, folio, documento_firmado,pass_certificado)
+        caratula_firmada = Factura.generar_documento_final(compania,documento_final_firmado,pass_certificado)
 
         form.dte_xml = caratula_firmada
+        print(caratula_firmada)
         form.save()
+        caratula_firmada = ""
+        send_sii = self.send_invoice_sii(compania,caratula_firmada,pass_certificado)
+        if(not send_sii['estado']):
+            messages.error(self.request, send_sii['msg'])
 
         print(form.created)
         print(type(form.created))
@@ -358,7 +365,7 @@ class SendInvoice(FormView):
         try:
             os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug'])
             file = open(settings.MEDIA_ROOT+'facturas'+'/'+self.kwargs['slug']+'/'+self.kwargs['slug']+'.xml','w')
-            file.write(caratula_firmada)
+            file.write(documento_final_firmado)
         except Exception as e:
             messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
             return super().form_invalid(form)
@@ -390,15 +397,32 @@ class SendInvoice(FormView):
         messages.error(self.request, form.errors)
         return super().form_invalid(form)
 
-    def send_invoice_sii(self):
+    def send_invoice_sii(self,compania,invoice, pass_certificado):
+        """
+        Método para enviar la factura al sii
+        @param compania recibe el objeto compañia
+        @param compania recibe el xml de la factura
+        @param pass_certificado recibe la contraseña del certificado
+        @return dict con la respuesta
+        """
         try:
             sii_sdk = SII_SDK()
             seed = sii_sdk.getSeed()
-            print(seed)
-            return True
+            try:
+                sign = sii_sdk.signXml(seed, compania, pass_certificado)
+                token = sii_sdk.getAuthToken(sign)
+                if(token):
+                    print(token)
+                else:
+                    return {'estado':False,'msg':'No se pudo obtener el token del sii'}
+            except Exception as e:
+                print(e)
+                return {'estado':False,'msg':'Ocurrió un error al firmar el documento'}
+            return {'estado':True}
         except Exception as e:
             print(e)
-            return False
+            return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
+
 
 class FacturasEnviadasView(ListView):
     template_name = 'facturas_enviadas.html'

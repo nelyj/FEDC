@@ -3,5 +3,5 @@
 <item>
   <Semilla>{{seed}}</Semilla> 
 </item>
-{{signature}}
+{{signature|safe}}
 </getToken> 

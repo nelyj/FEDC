@@ -67,8 +67,8 @@ class notaCredito(CreationModificationDateMixin):
 			return 
 
 	def _firmar_dd(data, folio, instance): 
-		now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S").split()
-		timestamp = f"{now[0]}T{now[1]}"
+		timestamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+		#timestamp = "{}T{}".format(now[0],now[1])
 		sin_aplanar = render_to_string('snippets/DD_tag.xml', {'data':data,'folio':folio, 'instance':instance, 'timestamp':timestamp})
 		digest_string = sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
 		RSAprivatekey = RSA.importKey(folio.pem_private)
@@ -76,7 +76,7 @@ class notaCredito(CreationModificationDateMixin):
 		digest = SHA.new()
 		digest.update(digest_string.encode('iso8859-1'))
 		sign = private_signer.sign(digest)
-		firma = f'<FRMT algoritmo="SHA1withRSA">{b64encode(sign).decode()}</FRMT>'
+		firma = '<FRMT algoritmo="SHA1withRSA">{}</FRMT>'.format(b64encode(sign).decode())
 		sin_aplanar += firma
 		return sin_aplanar
 
