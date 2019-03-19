@@ -48,7 +48,7 @@ class ListaGuiasViews(TemplateView):
         usuario = Conector.objects.filter(t_documento='33',empresa=compania).first()
         if not usuario:
             messages.info(self.request, "No posee conectores asociados a esta empresa")
-            return HttpResponseRedirect(reverse_lazy('guisDespacho:seleccionar-empresa'))
+            return HttpResponseRedirect(reverse_lazy('guiaDespacho:seleccionar-empresa'))
         return super().dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
