@@ -19,7 +19,7 @@
 			<RznSocRecep>{{datos.senores}}</RznSocRecep>
 			<GiroRecep>{{datos.giro}}</GiroRecep>
 			<DirRecep>{{datos.direccion}}</DirRecep>
-			<CmnaRecep>{{datos.comuna|upper}}</CmnaRecep> <!-- No configurado en conector -->
+			<CmnaRecep>{{datos.comuna|upper}}</CmnaRecep>
 			<CiudadRecep>REGION METROPOLITANA</CiudadRecep> <!-- No configurado en conector -->
 		</Receptor>
 		<Totales>

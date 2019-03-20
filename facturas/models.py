@@ -161,7 +161,7 @@ class Factura(CreationModificationDateMixin):
 		# Agrega la plantilla signature.xml al final del documento
 		# documento_sin_aplanar += "\n{}".format(signature_tag)
 
-		
+
 
 	
 		return documento_sin_aplanar

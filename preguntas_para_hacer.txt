@@ -1,0 +1,3 @@
+Los reportes de libros de venta SIEMPRE son mensuales ? Existe algun caso en el cual el reporte puede ser mayor o menor a un mes ? 
+
+Los reportes deben ser enviados todos en la misma fecha ? por ejemplo: Antes de los primeros cinco dias de cada mes etc., o simplemente al terminar el ejercicio fiscal de ese mes que pude ser cualquier fecha dentro de el.

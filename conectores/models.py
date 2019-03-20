@@ -52,8 +52,6 @@ class Compania(models.Model):
     
 
 
-
-
     class Meta:
         """!
         Clase que construye los meta datos del modelo
