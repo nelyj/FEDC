@@ -17,6 +17,7 @@ from bs4 import BeautifulSoup
 from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA
 from Crypto.Signature import PKCS1_v1_5
+from utils.SIISdk import SII_SDK
 
 
 class Factura(CreationModificationDateMixin):
@@ -114,7 +115,7 @@ class Factura(CreationModificationDateMixin):
 		sign = private_signer.sign(digest)
 
 		# Crea la etiqueta FRMT para la firma 
-		firma = f'<FRMT algoritmo="SHA1withRSA">{b64encode(sign).decode()}</FRMT>'
+		firma = '<FRMT algoritmo="SHA1withRSA">{}</FRMT>'.format(b64encode(sign).decode())
 
 		# Incorpora la firma al final de la plantilla DD_tag.xml
 		sin_aplanar += firma
@@ -122,8 +123,7 @@ class Factura(CreationModificationDateMixin):
 
 		return sin_aplanar
 
-
-	def firmar_documento(etiqueta_DD, datos, folio, compania, instance):
+	def firmar_documento(etiqueta_DD, datos, folio, compania, instance,pass_certificado):
 
 		"""
 		Llena los campos de la etiqueta <Documento>, y la firma usando la 
@@ -148,6 +148,8 @@ class Factura(CreationModificationDateMixin):
 				'instance':instance
 			})
 
+		sii_sdk = SII_SDK()
+		set_dte_sin_aplanar = sii_sdk.generalSign(compania,documento_sin_aplanar,pass_certificado)
 
 		# Elimina tabulaciones y espacios para la generacion del digest
 		# digest_string = documento_sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
@@ -160,19 +162,16 @@ class Factura(CreationModificationDateMixin):
 
 		# Agrega la plantilla signature.xml al final del documento
 		# documento_sin_aplanar += "\n{}".format(signature_tag)
-
-
-
 	
-		return documento_sin_aplanar
+		return set_dte_sin_aplanar
 
 
 	def firmar_etiqueta_set_dte(compania, folio, etiqueta_Documento):
 
 
-		now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S").split()
 		# Genera timestamp en formato correspondiente
-		timestamp_firma = "{}T{}".format(now[0],now[1])
+		timestamp_firma = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+		#timestamp_firma = "{}T{}".format(now[0],now[1])
 
 		# LLena la plantilla set_DTE_tag.xml con los datos correspondientes
 		set_dte_sin_aplanar = render_to_string(
@@ -184,6 +183,10 @@ class Factura(CreationModificationDateMixin):
 			}
 		)
 
+		# Se firmó el archivo xml
+		#sii_sdk = SII_SDK()
+		#set_dte_sin_aplanar = sii_sdk.generalSign(compania,set_dte_sin_aplanar,pass_certificado)
+
 		# Crea el digest eliminando espacios y tabulaciones
 		# digest_string = set_dte_sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
 
@@ -193,13 +196,18 @@ class Factura(CreationModificationDateMixin):
 		# Llena los datos de la plantilla signature.xml con los datos de la firma
 		# signature_tag = render_to_string('snippets/signature.xml', {'signature':firma_electronica})
 
+
 		# Agrega la firma al final del documento 
 		# set_dte_sin_aplanar += "\n{}".format(signature_tag)
 
 		return set_dte_sin_aplanar
 
 
-	def generar_documento_final(etiqueta_SetDte):
+	def generar_documento_final(compania,etiqueta_SetDte,pass_certificado):
+
+		"""
+		Incorpora todo el documento firmado al la presentacion final y elimina 
+		las tabulaciones.
 
 		"""
 		Incorpora todo el documento firmado al la presentacion final y elimina 
@@ -208,10 +216,16 @@ class Factura(CreationModificationDateMixin):
 		"""
 		documento_final = render_to_string('invoice.xml', {'set_DTE':etiqueta_SetDte})
 
-		documento_final_sin_tabs = documento_final.replace('\t','').replace('\r','')
+		# Se firmó el archivo xml
+		sii_sdk = SII_SDK()
+		set_dte_sin_aplanar = sii_sdk.multipleSign(compania,documento_final,pass_certificado,1)
+		#set_dte_sin_aplanar = sii_sdk.generalSign(compania,set_dte_sin_aplanar,pass_certificado,1)
 
-		print(documento_final_sin_tabs)
+		#documento_final_sin_tabs = documento_final.replace('\t','').replace('\r','')
 
+		#print(set_dte_sin_aplanar)
+
+		return '<?xml version="1.0" encoding="ISO-8859-1"?>'+set_dte_sin_aplanar
 		return documento_final_sin_tabs
 
 

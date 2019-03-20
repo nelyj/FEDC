@@ -1,4 +1,6 @@
+import OpenSSL.crypto
 import codecs, dicttoxml, json, os, requests
+
 from requests import Request, Session
 from django.conf import settings
 from django.contrib import messages
@@ -87,7 +89,7 @@ class ListaFacturasViews(TemplateView):
 
         headers = {'content-type': "application/json"}
         response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
-        lista = session.get(usuario.url_erp+'/api/resource/Sales%20Invoice/')
+        lista = session.get(usuario.url_erp+'/api/resource/Sales%20Invoice/?limit_page_length')
         erp_data = json.loads(lista.text)
 
         # Todas las facturas y boletas sin discriminacion 
@@ -155,7 +157,12 @@ class DeatailInvoice(TemplateView):
 
 class SendInvoice(FormView):
     template_name = 'envio_sii.html'
-    form_class =FormFactura
+    form_class = FormFactura
+
+    def get_form_kwargs(self):
+        kwargs = super(SendInvoice, self).get_form_kwargs()
+        kwargs.update({'compania': self.kwargs['pk']})
+        return kwargs
 
     def get_initial(self):
         initial = super().get_initial()
@@ -299,6 +306,8 @@ class SendInvoice(FormView):
 
     def form_valid(self, form, **kwargs):
         compania_id = self.kwargs['pk']
+        pass_certificado = form.cleaned_data['pass_certificado']
+        print(pass_certificado)
 
         # if form.cleaned_data['status'] == 'En proceso':
         data = form.clean()
@@ -307,8 +316,9 @@ class SendInvoice(FormView):
             compania = Compania.objects.get(pk=compania_id)
         except Compania.DoesNotExist:
             messages.error(self.request, "No ha seleccionado la compania")
-            return super().form_invalid(form)
+            return super().form_valid(form)
         assert compania, "compania no existe"
+        
         data['productos']=eval(data['productos'])
 
         # rut = self.request.POST.get('rut', None)
@@ -322,19 +332,19 @@ class SendInvoice(FormView):
 
         except Folio.DoesNotExist:  
             messages.error(self.request, "No posee folios para asignacion de timbre")
-            return super().form_invalid(form)
+            return super().form_valid(form)
         try:
             
             folio.verificar_vencimiento()
         except ElCAFSenEncuentraVencido:
             messages.error(self.request, "El CAF se encuentra vencido")
-            return super().form_invalid(form)
+            return super().form_valid(form)
         form.status = 'Aprobado'
         try:
             form.recibir_folio(folio)
         except (ElCafNoTieneMasTimbres, ValueError):
             messages.error(self.request, "Ya ha consumido todos sus timbres")
-            return super().form_invalid(form)
+            return super().form_valid(form)
         # Trae la cantidad de folios disponibles y genera una notificacion cuando quedan menos de 5
         # Si queda uno, cambia la estructura de la oracion a singular. 
         disponibles = folio.get_folios_disponibles()
@@ -343,27 +353,30 @@ class SendInvoice(FormView):
         elif disponibles < 50:
             messages.info(self.request, str('Quedan ')+str(disponibles)+str('folios disponibles'))
         form.compania = compania
-        
-        form.save()
+       
+
         response_dd = Factura._firmar_dd(data, folio, form)
-        documento_firmado = Factura.firmar_documento(response_dd,data,folio, compania, form)
+        documento_firmado = Factura.firmar_documento(response_dd,data,folio, compania, form, pass_certificado)
         documento_final_firmado = Factura.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
-        caratula_firmada = Factura.generar_documento_final(documento_final_firmado)
+        caratula_firmada = Factura.generar_documento_final(compania,documento_final_firmado,pass_certificado)
 
         form.dte_xml = caratula_firmada
         form.save()
+        caratula_firmada = ""
+        send_sii = self.send_invoice_sii(compania,caratula_firmada,pass_certificado)
+        if(not send_sii['estado']):
+            messages.error(self.request, send_sii['msg'])
 
-
-        # print(form.created)
-        # print(type(form.created))
+        print(form.created)
+        print(type(form.created))
 
         try:
             os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug'])
             file = open(settings.MEDIA_ROOT+'facturas'+'/'+self.kwargs['slug']+'/'+self.kwargs['slug']+'.xml','w')
-            file.write(caratula_firmada)
+            file.write(documento_final_firmado)
         except Exception as e:
             messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
-            return super().form_invalid(form)
+            return super().form_valid(form)
 
 
         # print(response_dd)
@@ -392,15 +405,32 @@ class SendInvoice(FormView):
         messages.error(self.request, form.errors)
         return super().form_invalid(form)
 
-    def send_invoice_sii(self):
+    def send_invoice_sii(self,compania,invoice, pass_certificado):
+        """
+        Método para enviar la factura al sii
+        @param compania recibe el objeto compañia
+        @param compania recibe el xml de la factura
+        @param pass_certificado recibe la contraseña del certificado
+        @return dict con la respuesta
+        """
         try:
             sii_sdk = SII_SDK()
             seed = sii_sdk.getSeed()
-            print(seed)
-            return True
+            try:
+                sign = sii_sdk.signXml(seed, compania, pass_certificado)
+                token = sii_sdk.getAuthToken(sign)
+                if(token):
+                    print(token)
+                else:
+                    return {'estado':False,'msg':'No se pudo obtener el token del sii'}
+            except Exception as e:
+                print(e)
+                return {'estado':False,'msg':'Ocurrió un error al firmar el documento'}
+            return {'estado':True}
         except Exception as e:
             print(e)
-            return False
+            return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
+
 
 class FacturasEnviadasView(ListView):
     template_name = 'facturas_enviadas.html'
@@ -409,5 +439,4 @@ class FacturasEnviadasView(ListView):
     def get_queryset(self):
 
         compania = self.kwargs.get('pk')
-
         return Factura.objects.filter(compania=compania).order_by('-created')

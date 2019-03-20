@@ -16,22 +16,22 @@
 <table id="myTable" class="display" style="width:100%">
     <thead>
         <tr>
-            <th>Factura</th>
-            <th>Compañía</th>
-            <th>N° de folio</th>
+            <th>Boleta</th>
+            <th>Cliente</th>
+            <th>Status</th>
             <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
-        {%for factura in object_list%}
+        {%for lista in detail%}
         <tr>
-            <td> <a href="#">{{factura.numero_factura}}</a></td>
-            <td>{{factura.compania.razon_social}}</td>
-            <td>{{ factura.n_folio }}</td>
+            <td> <a href="{% url 'boletas:detail-boleta' lista.data.name %}">{{lista.data.name}}</a></td>
+            <td>{{lista.data.title}}</td>
+            <td>{{lista.data.status_sii}}</td>
             <td>
-                <!-- Trigger the modal with a button -->
-                {% comment %} <button  id="edit_foo" onclick="return validar('{% url 'facturas:send-invoice' lista.data.name%}')" type="button" class="btn btn-info">Intercambio</button> {% endcomment %}
-                <a  id="edit_foo" href="#" class="btn btn-info">Imprimir</a>
+                <!-- <a  id="edit_foo" href="{% url 'facturas:send-invoice' pk=id_empresa slug=lista.data.name %}" class="btn btn-info">Detalle</a>
+                 -->
+                 <a  id="edit_foo" href="#" class="btn btn-info">Detalle</a>
 
             </td>
         </tr>
@@ -39,33 +39,15 @@
     </tbody>
     <tfoot>
         <tr>
-            <th>Factura</th>
-            <th>Compañía</th>
-            <th>N° de folio</th>
+            <th>Boleta</th>
+            <th>Cliente</th>
+            <th>Status</th>
             <th>Acciones</th>
         </tr>
     </tfoot>
 </table>
-{% comment %} 
-{% include 'modal_XML.html'%}
- {% endcomment %}
-
 
     <script type="text/javascript">
-        {% comment %} 
-        function validar(url) {
-            console.log(url)
-            $.ajax({
-                type: 'GET',
-                url: url,
-                success: function (data) {
-                    $('#foo_modal').find('.modal-body').html(data);
-                    $('#foo_modal').modal('show');
-                },
-            });
-            return false; 
-        }     
-        {% endcomment %}
         $(document).ready( function () {
           $('#myTable').DataTable();
       });

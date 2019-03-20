@@ -14,7 +14,7 @@ from django.conf import settings
 from .models import *
 
 class SeleccionarEmpresaView(TemplateView):
-    template_name = 'seleccionar_empresa.html'
+    template_name = 'seleccionar_empresa_guias.html'
 
     def get_context_data(self, *args, **kwargs): 
         context = super().get_context_data(*args, **kwargs)
@@ -64,7 +64,7 @@ class ListaGuiasViews(TemplateView):
         payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
         headers = {'content-type': "application/json"}
         response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
-        lista = session.get(usuario.url_erp+'/api/resource/Delivery%20Note/')
+        lista = session.get(usuario.url_erp+'/api/resource/Delivery%20Note/?limit_page_length')
         erp_data = json.loads(lista.text)
         # Todas las facturas y boletas sin discriminacion 
         data = erp_data['data']
