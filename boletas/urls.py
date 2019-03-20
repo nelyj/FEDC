@@ -7,8 +7,8 @@ app_name = 'boletas'
 urlpatterns = [
     re_path(r'lista-boletas/(?P<pk>\d+)', ListaBoletasViews.as_view(), name='lista_boletas'),
     re_path(r'^lista-boletas/empresa/$', SeleccionarEmpresaView.as_view(),name='seleccionar-empresa'),
-    path('invoice/<str:slug>/',DeatailInvoice.as_view(),name='detail-boleta'),
-    re_path(r'^boleta/(?P<pk>\d+)/enviadas/$', BoletasEnviadasView.as_view(),name='lista-boletas-enviadas'),
+    path('boleta/<str:slug>/',DeatailInvoice.as_view(),name='detail-boleta'),
+    re_path(r'^boletas-enviadas/(?P<pk>\d+)/$', BoletasEnviadasView.as_view(),name='lista-boletas-enviadas'),
 
     # re_path(r'^enviar-boleta/(?P<pk>\d+)/(?P<slug>[a-zA-Z0-9º-]+)/$', SendInvoice.as_view(),name='send-invoice'),
 ]

@@ -22,7 +22,7 @@ from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
 from .models import *
 
 class SeleccionarEmpresaView(TemplateView):
-    template_name = 'seleccionar_empresa.html'
+    template_name = 'seleccionar_empresa_boleta.html'
 
     def get_context_data(self, *args, **kwargs): 
 
@@ -131,7 +131,7 @@ class ListaBoletasViews(TemplateView):
         return context
 
 class DeatailInvoice(TemplateView):
-    template_name = 'detail_invoice.html'
+    template_name = 'detail_boleta.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -153,7 +153,7 @@ class DeatailInvoice(TemplateView):
         return context
 
 class BoletasEnviadasView(ListView):
-    template_name = 'facturas_enviadas.html'
+    template_name = 'boletas_enviadas.html'
 
 
     def get_queryset(self):

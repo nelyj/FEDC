@@ -14,7 +14,7 @@ from django.conf import settings
 from .models import *
 
 class SeleccionarEmpresaView(TemplateView):
-    template_name = 'seleccionar_empresa.html'
+    template_name = 'seleccionar_empresa_guias.html'
 
     def get_context_data(self, *args, **kwargs): 
         context = super().get_context_data(*args, **kwargs)

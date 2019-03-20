@@ -25,7 +25,7 @@ from facturas.models import Factura
 from notaDebito.models import notaDebito
 
 class SeleccionarEmpresaView(TemplateView):
-    template_name = 'seleccionar_empresa.html'
+    template_name = 'seleccionar_empresa_ND.html'
 
     def get_context_data(self, *args, **kwargs): 
 
@@ -53,7 +53,7 @@ class SeleccionarEmpresaView(TemplateView):
             return HttpResponseRedirect('/')
 
 class ListaNotaDebitoViews(TemplateView):
-    template_name = 'lista_facturas.html'
+    template_name = 'lista_ND.html'
 
     def dispatch(self, *args, **kwargs):
 
@@ -120,7 +120,7 @@ class ListaNotaDebitoViews(TemplateView):
         return context
 
 class DeatailInvoice(TemplateView):
-    template_name = 'detail_invoice.html'
+    template_name = 'detail_ND.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -142,7 +142,7 @@ class DeatailInvoice(TemplateView):
         return context
 
 class SendInvoice(FormView):
-    template_name = 'envio_sii.html'
+    template_name = 'envio_sii_ND.html'
     form_class =FormNotaDebito
 
     def get_initial(self):
@@ -368,7 +368,7 @@ class SendInvoice(FormView):
         return super().form_invalid(form)
 
 class NotaDebitoEnviadasView(ListView):
-    template_name = 'facturas_enviadas.html'
+    template_name = 'ND_enviadas.html'
 
 
     def get_queryset(self):
