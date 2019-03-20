@@ -306,7 +306,6 @@ class SendInvoice(FormView):
     def form_valid(self, form, **kwargs):
         compania_id = self.kwargs['pk']
         pass_certificado = form.cleaned_data['pass_certificado']
-        print(pass_certificado)
 
         # if form.cleaned_data['status'] == 'En proceso':
         data = form.clean()
@@ -361,8 +360,7 @@ class SendInvoice(FormView):
 
         form.dte_xml = caratula_firmada
         form.save()
-        caratula_firmada = ""
-        send_sii = self.send_invoice_sii(compania,caratula_firmada,pass_certificado)
+        send_sii = self.send_invoice_sii(compania,factura,caratula_firmada,pass_certificado)
         if(not send_sii['estado']):
             messages.error(self.request, send_sii['msg'])
 
@@ -404,11 +402,12 @@ class SendInvoice(FormView):
         messages.error(self.request, form.errors)
         return super().form_invalid(form)
 
-    def send_invoice_sii(self,compania,invoice, pass_certificado):
+    def send_invoice_sii(self,compania,sender,invoice, pass_certificado):
         """
         Método para enviar la factura al sii
         @param compania recibe el objeto compañia
-        @param compania recibe el xml de la factura
+        @param sender recibe el objeto factura
+        @param invoice recibe el xml de la factura
         @param pass_certificado recibe la contraseña del certificado
         @return dict con la respuesta
         """
@@ -420,6 +419,7 @@ class SendInvoice(FormView):
                 token = sii_sdk.getAuthToken(sign)
                 if(token):
                     print(token)
+                    invoice_reponse = sii_sdk.sendInvoice(token,invoice,factura.rut,compania.rut)
                 else:
                     return {'estado':False,'msg':'No se pudo obtener el token del sii'}
             except Exception as e:

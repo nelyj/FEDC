@@ -141,6 +141,10 @@ class SII_SDK():
         'Cookie':'TOKEN='+token}
         rut_s,dv_s = rut_sender.split('-')
         rut_c,dv_c = rut_company.split('-')
+        if(dv_s=='k'):
+            dv_s = '0'
+        if(dv_c=='k'):
+            dv_c = '0'
         files = {'archivo': invoice}
         values = {'rutSender': rut_s, 'dvSender': dv_s, 'rutCompany': rut_c,'dvCompany':dv_c}
         response = request.post('https://maullin.sii.cl/sii.cl/cgi_dte/UPL/DTEUpload',files=files,data=values)
