@@ -85,7 +85,7 @@ class ListaNotaDebitoViews(TemplateView):
 
         headers = {'content-type': "application/json"}
         response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
-        lista = session.get(usuario.url_erp+'/api/resource/Sales%20Invoice/')
+        lista = session.get(usuario.url_erp+'/api/resource/Sales%20Invoice/?limit_page_length')
         erp_data = json.loads(lista.text)
 
         # Todas las facturas y boletas sin discriminacion 

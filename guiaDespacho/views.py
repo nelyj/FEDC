@@ -64,7 +64,7 @@ class ListaGuiasViews(TemplateView):
         payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
         headers = {'content-type': "application/json"}
         response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
-        lista = session.get(usuario.url_erp+'/api/resource/Delivery%20Note/')
+        lista = session.get(usuario.url_erp+'/api/resource/Delivery%20Note/?limit_page_length')
         erp_data = json.loads(lista.text)
         # Todas las facturas y boletas sin discriminacion 
         data = erp_data['data']
