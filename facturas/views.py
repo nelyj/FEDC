@@ -9,10 +9,13 @@ from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.http import FileResponse
 from django.views.generic.edit import FormView
-from django.shortcuts import render
+from django.shortcuts import (
+    render, redirect
+    )
 from django.views.generic.base import TemplateView, View
 from django.views.generic import ListView
 from django.template.loader import render_to_string
+from django_weasyprint import WeasyTemplateResponseMixin
 from conectores.models import *
 from conectores.forms import FormCompania
 from conectores.models import *
@@ -21,6 +24,7 @@ from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
 from utils.SIISdk import SII_SDK
 from .forms import *
 from .models import Factura
+from .constants import NOMB_DOC
 
 class SeleccionarEmpresaView(TemplateView):
     template_name = 'seleccionar_empresa.html'
@@ -439,3 +443,49 @@ class FacturasEnviadasView(ListView):
 
         compania = self.kwargs.get('pk')
         return Factura.objects.filter(compania=compania).order_by('-created')
+
+
+
+class ImprimirFactura(TemplateView,WeasyTemplateResponseMixin):
+    """!
+    Class para imprimir la factura en PDF
+
+    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @date 21-03-2019
+    @version 1.0.0
+    """
+    template_name = "pdf/factura.pdf.html"
+    model = Factura
+
+    def dispatch(self, request, *args, **kwargs):
+        num_factura = self.kwargs['slug']
+        compania = self.kwargs['pk']
+        try:
+            factura = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
+            return super().dispatch(request, *args, **kwargs)
+        except Exception as e:
+            factura = self.model.objects.select_related().filter(numero_factura=num_factura, compania=compania)
+            if len(factura) > 1:
+                messages.error(self.request, 'Existe mas de un registro con el mismo numero de factura: {0}'.format(num_factura))
+                return redirect(reverse_lazy('facturas:lista-enviadas', kwargs={'pk': compania}))
+            else:
+                messages.error(self.request, "No se encuentra registrada esta factura: {0}".format(str(num_factura)))
+                return redirect(reverse_lazy('facturas:lista-enviadas', kwargs={'pk': compania}))
+
+    def get_context_data(self, *args, **kwargs):
+        """!
+        Method to handle data on get
+
+        @date 21-03-2019
+        @return Returns dict with data
+        """
+        context = super().get_context_data(*args, **kwargs)
+        num_factura = self.kwargs['slug']
+        compania = self.kwargs['pk']
+        
+        context['factura'] = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
+        context['nombre_documento'] = NOMB_DOC['FACT_ELEC']
+        prod = context['factura'].productos.replace('\'{','{').replace('}\'','}').replace('\'',"\"")
+        productos = json.loads(prod)
+        context['productos'] = productos
+        return context
