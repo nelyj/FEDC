@@ -166,7 +166,7 @@ class Factura(CreationModificationDateMixin):
 		return set_dte_sin_aplanar
 
 
-	def firmar_etiqueta_set_dte(compania, folio, etiqueta_Documento):
+	def firmar_etiqueta_set_dte(compania, folio, etiqueta_Documento, form):
 
 
 		# Genera timestamp en formato correspondiente
@@ -179,7 +179,8 @@ class Factura(CreationModificationDateMixin):
 				'compania':compania, 
 				'folio':folio, 
 				'timestamp_firma':timestamp_firma,
-				'documento': etiqueta_Documento
+				'documento': etiqueta_Documento,
+				'form': form
 			}
 		)
 

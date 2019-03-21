@@ -359,25 +359,28 @@ class SendInvoice(FormView):
 
         response_dd = Factura._firmar_dd(data, folio, form)
         documento_firmado = Factura.firmar_documento(response_dd,data,folio, compania, form, pass_certificado)
-        documento_final_firmado = Factura.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
+        documento_final_firmado = Factura.firmar_etiqueta_set_dte(compania, folio, documento_firmado,form)
         caratula_firmada = Factura.generar_documento_final(compania,documento_final_firmado,pass_certificado)
 
         form.dte_xml = caratula_firmada
-        form.save()
-        send_sii = self.send_invoice_sii(compania,factura,caratula_firmada,pass_certificado)
-        if(not send_sii['estado']):
-            messages.error(self.request, send_sii['msg'])
-
+        #form.save()
         print(form.created)
         print(type(form.created))
 
         try:
-            os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug'])
-            file = open(settings.MEDIA_ROOT+'facturas'+'/'+self.kwargs['slug']+'/'+self.kwargs['slug']+'.xml','w')
+            xml_dir = settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug']
+            if(not os.path.isdir(xml_dir)):
+                os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug'])
+            file = open(xml_dir+'/'+self.kwargs['slug']+'.xml','w')
             file.write(documento_final_firmado)
         except Exception as e:
             messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
             return super().form_valid(form)
+
+        send_sii = self.send_invoice_sii(compania,form,caratula_firmada,pass_certificado)
+        if(not send_sii['estado']):
+            messages.error(self.request, send_sii['msg'])
+
 
 
         # print(response_dd)
@@ -423,7 +426,7 @@ class SendInvoice(FormView):
                 token = sii_sdk.getAuthToken(sign)
                 if(token):
                     print(token)
-                    invoice_reponse = sii_sdk.sendInvoice(token,invoice,factura.rut,compania.rut)
+                    invoice_reponse = sii_sdk.sendInvoice(token,invoice,sender.rut,compania.rut)
                 else:
                     return {'estado':False,'msg':'No se pudo obtener el token del sii'}
             except Exception as e:
