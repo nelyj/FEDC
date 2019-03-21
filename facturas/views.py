@@ -204,6 +204,14 @@ class SendInvoice(FormView):
         except Exception as e:
             initial['direccion']=""
         try:
+            initial['comuna']=context['factura']['comuna']
+        except Exception as e:
+            initial['comuna']=""
+        try:
+            initial['ciudad_receptora']=context['factura']['ciudad_receptora']
+        except Exception as e:
+            initial['ciudad_receptora']=""
+        try:
             initial['transporte']=context['factura']['transporte']
         except Exception as e:
             initial['transporte']=""
@@ -234,7 +242,10 @@ class SendInvoice(FormView):
         except Exception as e:
             initial['fecha']=""
         # self.form_class.base_fields['guia'].initial=context['factura']['']
-        # self.form_class.base_fields['orden_compra'].initial=context['factura']['']
+        try:
+            initial['orden_compra']=context['factura']['po_no']
+        except Exception as e:
+            initial['orden_compra']=""
         try:
             initial['nota_venta']=context['factura']['orden_de_venta']
         except Exception as e:
@@ -360,14 +371,13 @@ class SendInvoice(FormView):
         caratula_firmada = Factura.generar_documento_final(compania,documento_final_firmado,pass_certificado)
 
         form.dte_xml = caratula_firmada
+        return False
         form.save()
         caratula_firmada = ""
         send_sii = self.send_invoice_sii(compania,caratula_firmada,pass_certificado)
         if(not send_sii['estado']):
             messages.error(self.request, send_sii['msg'])
 
-        print(form.created)
-        print(type(form.created))
 
         try:
             os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug'])
