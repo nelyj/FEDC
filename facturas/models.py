@@ -90,10 +90,11 @@ class Factura(CreationModificationDateMixin):
 
 		"""
 
-		now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S").split()
+		#now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S").split()
 
 		# Crea el timestamp con el formato adecuado
-		timestamp = "{}T{}".format(now[0],now[1])
+		#timestamp = "{}T{}".format(now[0],now[1])
+		timestamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
 		# Llena los campos de la plantilla DD_tag.xml con la informacion del diccionario
 		sin_aplanar = render_to_string('snippets/DD_tag.xml', {'data':data,'folio':folio, 'instance':instance, 'timestamp':timestamp})
@@ -132,10 +133,11 @@ class Factura(CreationModificationDateMixin):
 		el certificado.
 		"""
 
-		now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S").split()
+		#now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S").split()
 
 		# Crea timestamp en formato correspondiente
-		timestamp = "{}T{}".format(now[0],now[1])
+		#timestamp = "{}T{}".format(now[0],now[1])
+		timestamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
 		# Llena los datos de la plantilla Documento_tag.xml con la informacion pertinente
 		documento_sin_aplanar = render_to_string(
@@ -221,7 +223,7 @@ class Factura(CreationModificationDateMixin):
 
 		#print(set_dte_sin_aplanar)
 
-		return '<?xml version="1.0" encoding="ISO-8859-1"?>'+set_dte_sin_aplanar
+		return '<?xml version="1.0" encoding="ISO-8859-1"?>\n\n'+set_dte_sin_aplanar
 
 
 
