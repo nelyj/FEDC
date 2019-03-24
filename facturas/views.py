@@ -363,7 +363,7 @@ class SendInvoice(FormView):
         caratula_firmada = Factura.generar_documento_final(compania,documento_final_firmado,pass_certificado)
 
         form.dte_xml = caratula_firmada
-        #form.save()
+        form.save()
         print(form.created)
         print(type(form.created))
 
@@ -380,8 +380,10 @@ class SendInvoice(FormView):
         send_sii = self.send_invoice_sii(compania,form,caratula_firmada,pass_certificado)
         if(not send_sii['estado']):
             messages.error(self.request, send_sii['msg'])
-
-
+            return super().form_valid(form)
+        else:
+            form.track_id = send_sii['track_id']
+            form.save()
 
         # print(response_dd)
 
@@ -426,7 +428,12 @@ class SendInvoice(FormView):
                 token = sii_sdk.getAuthToken(sign)
                 if(token):
                     print(token)
-                    invoice_reponse = sii_sdk.sendInvoice(token,invoice,sender.rut,compania.rut)
+                    try:
+                        invoice_reponse = sii_sdk.sendInvoice(token,invoice,sender.rut,compania.rut)
+                        return {'estado':invoice_reponse['success'],'msg':invoice_reponse['message'],
+                        'track_id':invoice_reponse['track_id']}
+                    except Exception as e:
+                        return {'estado':False,'msg':'No se pudo enviar la factura'}    
                 else:
                     return {'estado':False,'msg':'No se pudo obtener el token del sii'}
             except Exception as e:

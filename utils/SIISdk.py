@@ -11,6 +11,7 @@ import xmlsec
 import xml.etree.ElementTree as ET
 from django.conf import settings
 from django.template.loader import render_to_string
+from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 from lxml import etree
 
@@ -145,10 +146,21 @@ class SII_SDK():
             dv_s = '0'
         if(dv_c=='k'):
             dv_c = '0'
-        print(invoice)
-        files = {'archivo': invoice}
-        values = {'rutSender': rut_s, 'dvSender': dv_s, 'rutCompany': rut_c,'dvCompany':dv_c}
-        print(values)
-        response = requests.post('https://maullin.sii.cl/cgi_dte/UPL/DTEUpload',files=files,data=values,headers=headers)
+        datos = MultipartEncoder(
+            fields={'rutSender': rut_s,
+                    'dvSender': dv_s,
+                    'rutCompany': rut_c,
+                    'dvCompany': dv_c,
+                    'archivo': ('envioDTE.xml', invoice, 'text/xml')}
+            )
+        headers['Content-Type'] = datos.content_type
+        response = requests.post('https://maullin.sii.cl/cgi_dte/UPL/DTEUpload',data=datos,headers=headers)
         print(response.content)
         xml_response = ET.fromstring(response.content)
+        estado = xml_response.find('STATUS').text
+        if(estado==0):
+            track_id = xml_response.find('TRACKID').text
+            return {'success':True,'message':'Se envió correctamente al sii','track_id':track_id}
+        else:
+            message = xml_response.find('ERROR').text
+            return {'success':False,'message':message}

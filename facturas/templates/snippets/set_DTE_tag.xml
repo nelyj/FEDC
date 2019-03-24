@@ -1,5 +1,6 @@
 <SetDTE ID="SetDoc">
 	<Caratula version="1.0">
+		<RutEmisor>{{compania.rut}}</RutEmisor>
 		<RutEnvia>{{compania.rut}}</RutEnvia>
 		<RutReceptor>60803000-K</RutReceptor> 
 		<FchResol>{{compania.fecha_resolucion}}</FchResol>
