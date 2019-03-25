@@ -103,7 +103,8 @@ class Factura(CreationModificationDateMixin):
 		productos=data.get('productos')
 		primero=productos[0].get('item_name')
 		data['primero']=primero
-
+		data['neto']=str(round(float(data['neto'])))
+		data['total']=str(round(float(data['total'])))
 		# Llena los campos de la plantilla DD_tag.xml con la informacion del diccionario
 		sin_aplanar = render_to_string('snippets/DD_tag.xml', {'data':data,'folio':folio, 'instance':instance, 'timestamp':timestamp})
 
@@ -154,9 +155,8 @@ class Factura(CreationModificationDateMixin):
 		compania.giro=diccionario.get(str(compania.giro))
 		compania.giro=compania.giro[1 : -1]
 		compania.actividad_principal=compania.actividad_principal[1:-1]
-		# productos=datos.get('productos')
-		# primero=productos[0].get('item_name')
-		# datos['primero']=primero
+		datos['neto']=str(round(float(datos['neto'])))
+		datos['total']=str(round(float(datos['total'])))
 		documento_sin_aplanar = render_to_string(
 			'snippets/Documento_tag.xml', {
 				'datos':datos,

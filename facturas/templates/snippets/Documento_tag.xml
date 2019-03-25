@@ -16,7 +16,6 @@
 <CmnaOrigen>{{compania.comuna}}</CmnaOrigen>
 </Emisor>
 <Receptor>
-<Receptor>
 <RUTRecep>{{datos.rut}}</RUTRecep>
 <RznSocRecep>{{datos.senores}}</RznSocRecep>
 <GiroRecep>{{datos.giro}}</GiroRecep>
