@@ -15,7 +15,7 @@ class FormFactura(ModelForm):
 
     class Meta:
         model = Factura
-        fields = ['status','compania','numero_factura','senores','direccion','transporte','despachar','observaciones',
+        fields = ['status','compania','numero_factura','senores','direccion','comuna','ciudad_receptora','transporte','despachar','observaciones',
                     'giro','condicion_venta','vencimiento','vendedor','rut','fecha','guia','orden_compra','nota_venta',
                     'productos','monto_palabra','neto','excento','iva','total']
 
@@ -37,6 +37,12 @@ class FormFactura(ModelForm):
         self.fields['direccion'].widget.attrs.update({'class': 'form-control'})
         self.fields['direccion'].required = False
         self.fields['direccion'].disabled = True
+        self.fields['comuna'].widget.attrs.update({'class': 'form-control'})
+        self.fields['comuna'].required = False
+        self.fields['comuna'].disabled = True
+        self.fields['ciudad_receptora'].widget.attrs.update({'class': 'form-control'})
+        self.fields['ciudad_receptora'].required = False
+        self.fields['ciudad_receptora'].disabled = True
         self.fields['transporte'].widget.attrs.update({'class': 'form-control'})
         self.fields['transporte'].required = False
         self.fields['transporte'].disabled = True
