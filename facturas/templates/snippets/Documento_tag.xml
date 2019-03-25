@@ -4,7 +4,7 @@
 <IdDoc>
 <TipoDTE>{{ folio.tipo_de_documento }}</TipoDTE>
 <Folio>{{ instance.n_folio }}</Folio>
-<FchEmis>2018-11-21</FchEmis> 
+<FchEmis>{% now "Y-m-d" %}</FchEmis>
 <FmaPago>1</FmaPago> 
 </IdDoc>
 <Emisor>
@@ -16,12 +16,13 @@
 <CmnaOrigen>{{compania.comuna}}</CmnaOrigen>
 </Emisor>
 <Receptor>
+<Receptor>
 <RUTRecep>{{datos.rut}}</RUTRecep>
 <RznSocRecep>{{datos.senores}}</RznSocRecep>
 <GiroRecep>{{datos.giro}}</GiroRecep>
 <DirRecep>{{datos.direccion}}</DirRecep>
-<CmnaRecep>RECOLETA</CmnaRecep> 
-<CiudadRecep>REGION METROPOLITANA</CiudadRecep> 
+<CmnaRecep>{{datos.comuna}}</CmnaRecep>
+<CiudadRecep>{{datos.ciudad_receptora}}</CiudadRecep>
 </Receptor>
 <Totales>
 <MntNeto>{{datos.neto}}</MntNeto>
@@ -41,13 +42,13 @@
 <QtyItem>{{prod.qty}}</QtyItem>
 <PrcItem>{{prod.base_net_rate}}</PrcItem>
 <MontoItem>{{prod.amount}}</MontoItem>
-</Detalle>{%endfor%}
+</Detalle>{%endfor%}{%if datos.orden_compra %}
 <Referencia>
 <NroLinRef>1</NroLinRef> 
 <TpoDocRef>801</TpoDocRef> 
-<FolioRef>BXF-7654</FolioRef> 
-<FchRef>2018-11-21</FchRef> 
-</Referencia>
+<FolioRef>{{datos.orden_compra}}</FolioRef>
+<FchRef>{% now "Y-m-d" %}</FchRef>
+</Referencia>{%endif%}
 <TED version="1.0">{% autoescape off %}
 {{ DD }}{% endautoescape %}
 </TED>
