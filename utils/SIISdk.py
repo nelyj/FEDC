@@ -154,6 +154,7 @@ class SII_SDK():
                     'archivo': ('envioDTE.xml', invoice, 'text/xml')}
             )
         headers['Content-Type'] = datos.content_type
+        print(invoice)
         response = requests.post('https://maullin.sii.cl/cgi_dte/UPL/DTEUpload',data=datos,headers=headers)
         print(response.content)
         xml_response = ET.fromstring(response.content)

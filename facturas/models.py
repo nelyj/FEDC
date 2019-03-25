@@ -240,7 +240,7 @@ class Factura(CreationModificationDateMixin):
 
 		#print(set_dte_sin_aplanar)
 
-		return '<?xml version="1.0" encoding="ISO-8859-1"?>\n\n'+set_dte_sin_aplanar
+		return '<?xml version="1.0" encoding="ISO-8859-1"?>\n'+set_dte_sin_aplanar
 
 
 
