@@ -9,10 +9,13 @@ from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.http import FileResponse
 from django.views.generic.edit import FormView
-from django.shortcuts import render
+from django.shortcuts import (
+    render, redirect
+    )
 from django.views.generic.base import TemplateView, View
 from django.views.generic import ListView
 from django.template.loader import render_to_string
+from django_weasyprint import WeasyTemplateResponseMixin
 from conectores.models import *
 from conectores.forms import FormCompania
 from conectores.models import *
@@ -21,6 +24,7 @@ from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
 from utils.SIISdk import SII_SDK
 from .forms import *
 from .models import Factura
+from .constants import NOMB_DOC
 
 class SeleccionarEmpresaView(TemplateView):
     template_name = 'seleccionar_empresa.html'
@@ -317,7 +321,6 @@ class SendInvoice(FormView):
     def form_valid(self, form, **kwargs):
         compania_id = self.kwargs['pk']
         pass_certificado = form.cleaned_data['pass_certificado']
-        print(pass_certificado)
 
         # if form.cleaned_data['status'] == 'En proceso':
         data = form.clean()
@@ -367,26 +370,28 @@ class SendInvoice(FormView):
 
         response_dd = Factura._firmar_dd(data, folio, form)
         documento_firmado = Factura.firmar_documento(response_dd,data,folio, compania, form, pass_certificado)
-        documento_final_firmado = Factura.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
+        documento_final_firmado = Factura.firmar_etiqueta_set_dte(compania, folio, documento_firmado,form)
         caratula_firmada = Factura.generar_documento_final(compania,documento_final_firmado,pass_certificado)
 
         form.dte_xml = caratula_firmada
-        return False
-        form.save()
-        caratula_firmada = ""
-        send_sii = self.send_invoice_sii(compania,caratula_firmada,pass_certificado)
-        if(not send_sii['estado']):
-            messages.error(self.request, send_sii['msg'])
-
-
+        
         try:
-            os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug'])
-            file = open(settings.MEDIA_ROOT+'facturas'+'/'+self.kwargs['slug']+'/'+self.kwargs['slug']+'.xml','w')
+            xml_dir = settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug']
+            if(not os.path.isdir(xml_dir)):
+                os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug'])
+            file = open(xml_dir+'/'+self.kwargs['slug']+'.xml','w')
             file.write(documento_final_firmado)
         except Exception as e:
             messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
             return super().form_valid(form)
 
+        send_sii = self.send_invoice_sii(compania,form,caratula_firmada,pass_certificado)
+        if(not send_sii['estado']):
+            messages.error(self.request, send_sii['msg'])
+            return super().form_valid(form)
+        else:
+            form.track_id = send_sii['track_id']
+            form.save()
 
         # print(response_dd)
 
@@ -414,11 +419,12 @@ class SendInvoice(FormView):
         messages.error(self.request, form.errors)
         return super().form_invalid(form)
 
-    def send_invoice_sii(self,compania,invoice, pass_certificado):
+    def send_invoice_sii(self,compania,sender,invoice, pass_certificado):
         """
         Método para enviar la factura al sii
         @param compania recibe el objeto compañia
-        @param compania recibe el xml de la factura
+        @param sender recibe el objeto factura
+        @param invoice recibe el xml de la factura
         @param pass_certificado recibe la contraseña del certificado
         @return dict con la respuesta
         """
@@ -430,6 +436,12 @@ class SendInvoice(FormView):
                 token = sii_sdk.getAuthToken(sign)
                 if(token):
                     print(token)
+                    try:
+                        invoice_reponse = sii_sdk.sendInvoice(token,invoice,sender.rut,compania.rut)
+                        return {'estado':invoice_reponse['success'],'msg':invoice_reponse['message'],
+                        'track_id':invoice_reponse['track_id']}
+                    except Exception as e:
+                        return {'estado':False,'msg':'No se pudo enviar la factura'}    
                 else:
                     return {'estado':False,'msg':'No se pudo obtener el token del sii'}
             except Exception as e:
@@ -449,3 +461,49 @@ class FacturasEnviadasView(ListView):
 
         compania = self.kwargs.get('pk')
         return Factura.objects.filter(compania=compania).order_by('-created')
+
+
+
+class ImprimirFactura(TemplateView,WeasyTemplateResponseMixin):
+    """!
+    Class para imprimir la factura en PDF
+
+    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @date 21-03-2019
+    @version 1.0.0
+    """
+    template_name = "pdf/factura.pdf.html"
+    model = Factura
+
+    def dispatch(self, request, *args, **kwargs):
+        num_factura = self.kwargs['slug']
+        compania = self.kwargs['pk']
+        try:
+            factura = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
+            return super().dispatch(request, *args, **kwargs)
+        except Exception as e:
+            factura = self.model.objects.select_related().filter(numero_factura=num_factura, compania=compania)
+            if len(factura) > 1:
+                messages.error(self.request, 'Existe mas de un registro con el mismo numero de factura: {0}'.format(num_factura))
+                return redirect(reverse_lazy('facturas:lista-enviadas', kwargs={'pk': compania}))
+            else:
+                messages.error(self.request, "No se encuentra registrada esta factura: {0}".format(str(num_factura)))
+                return redirect(reverse_lazy('facturas:lista-enviadas', kwargs={'pk': compania}))
+
+    def get_context_data(self, *args, **kwargs):
+        """!
+        Method to handle data on get
+
+        @date 21-03-2019
+        @return Returns dict with data
+        """
+        context = super().get_context_data(*args, **kwargs)
+        num_factura = self.kwargs['slug']
+        compania = self.kwargs['pk']
+        
+        context['factura'] = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
+        context['nombre_documento'] = NOMB_DOC['FACT_ELEC']
+        prod = context['factura'].productos.replace('\'{','{').replace('}\'','}').replace('\'',"\"")
+        productos = json.loads(prod)
+        context['productos'] = productos
+        return context

@@ -1,13 +1,14 @@
 <SetDTE ID="SetDoc">
 	<Caratula version="1.0">
 		<RutEmisor>{{compania.rut}}</RutEmisor>
-		<RutReceptor>{{form.rut}}</RutReceptor> <!-- No lo esta tomando -->
+		<RutEnvia>{{compania.rut}}</RutEnvia>
+		<RutReceptor>60803000-K</RutReceptor> 
 		<FchResol>{{compania.fecha_resolucion}}</FchResol>
 		<NroResol>{{compania.numero_resolucion}}</NroResol>
 		<TmstFirmaEnv>{{ timestamp_firma }}</TmstFirmaEnv>
 		<SubTotDTE>
 			<TpoDTE>{{ folio.tipo_de_documento }}</TpoDTE>
-			<NroDTE>1</NroDTE> <!-- No configurado en Conector -->
+			<NroDTE>1</NroDTE>
 		</SubTotDTE>
 	</Caratula>
 	{% autoescape off %}

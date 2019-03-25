@@ -17,7 +17,7 @@ class FormFactura(ModelForm):
         model = Factura
         fields = ['status','compania','numero_factura','senores','direccion','comuna','ciudad_receptora','transporte','despachar','observaciones',
                     'giro','condicion_venta','vencimiento','vendedor','rut','fecha','guia','orden_compra','nota_venta',
-                    'productos','monto_palabra','neto','excento','iva','total']
+                    'productos','monto_palabra','neto','excento','iva','total','track_id']
 
     def __init__(self, *args, **kwargs):
         self.compania = kwargs.pop("compania")
@@ -97,6 +97,7 @@ class FormFactura(ModelForm):
         self.fields['total'].widget.attrs.update({'class': 'form-control'})
         self.fields['total'].required = False
         self.fields['total'].disabled = True
+        self.fields['track_id'].required = False
 
     def clean(self):
         cleaned_data = super(FormFactura, self).clean()

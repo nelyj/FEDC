@@ -52,6 +52,7 @@ class Factura(CreationModificationDateMixin):
 	total = models.CharField(max_length=128, blank=True, null=True)
 	n_folio = models.IntegerField(null=True, default=0)
 	dte_xml = models.TextField(null=True, blank=True)
+	track_id = models.CharField(max_length=32, blank=True, null=True)
 
 	
 	class Meta:
@@ -93,10 +94,11 @@ class Factura(CreationModificationDateMixin):
 
 		"""
 
-		now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S").split()
+		#now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S").split()
 
 		# Crea el timestamp con el formato adecuado
-		timestamp = "{}T{}".format(now[0],now[1])
+		#timestamp = "{}T{}".format(now[0],now[1])
+		timestamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
 		productos=data.get('productos')
 		primero=productos[0].get('item_name')
@@ -139,10 +141,11 @@ class Factura(CreationModificationDateMixin):
 		el certificado.
 		"""
 
-		now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S").split()
+		#now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S").split()
 
 		# Crea timestamp en formato correspondiente
-		timestamp = "{}T{}".format(now[0],now[1])
+		#timestamp = "{}T{}".format(now[0],now[1])
+		timestamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
 		# Llena los datos de la plantilla Documento_tag.xml con la informacion pertinente
 		diccionario = defaultdict(dict)
@@ -182,7 +185,7 @@ class Factura(CreationModificationDateMixin):
 		return set_dte_sin_aplanar
 
 
-	def firmar_etiqueta_set_dte(compania, folio, etiqueta_Documento):
+	def firmar_etiqueta_set_dte(compania, folio, etiqueta_Documento, form):
 
 
 		# Genera timestamp en formato correspondiente
@@ -195,7 +198,8 @@ class Factura(CreationModificationDateMixin):
 				'compania':compania, 
 				'folio':folio, 
 				'timestamp_firma':timestamp_firma,
-				'documento': etiqueta_Documento
+				'documento': etiqueta_Documento,
+				'form': form
 			}
 		)
 
@@ -236,7 +240,7 @@ class Factura(CreationModificationDateMixin):
 
 		#print(set_dte_sin_aplanar)
 
-		return '<?xml version="1.0" encoding="ISO-8859-1"?>'+set_dte_sin_aplanar
+		return '<?xml version="1.0" encoding="ISO-8859-1"?>\n\n'+set_dte_sin_aplanar
 
 
 
