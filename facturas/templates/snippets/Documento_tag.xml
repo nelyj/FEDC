@@ -10,7 +10,7 @@
 			<RUTEmisor>{{compania.rut}}</RUTEmisor>
 			<RznSoc>{{compania.razon_social}}</RznSoc>
 			<GiroEmis>{{compania.giro}}</GiroEmis>
-			<Acteco>{{compania.actividad_principal}}</Acteco><!-- Eliminar espacios al principio y al final -->
+			<Acteco>{{compania.actividad_principal}}</Acteco>
 			<DirOrigen>{{compania.direccion}}</DirOrigen>
 			<CmnaOrigen>{{compania.comuna}}</CmnaOrigen>
 		</Emisor>

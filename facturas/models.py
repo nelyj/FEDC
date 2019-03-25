@@ -148,8 +148,11 @@ class Factura(CreationModificationDateMixin):
 				'instance':instance
 			})
 
+
 		sii_sdk = SII_SDK()
 		set_dte_sin_aplanar = sii_sdk.generalSign(compania,documento_sin_aplanar,pass_certificado)
+
+
 
 		# Elimina tabulaciones y espacios para la generacion del digest
 		# digest_string = documento_sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
@@ -210,10 +213,9 @@ class Factura(CreationModificationDateMixin):
 		las tabulaciones.
 
 		"""
-		Incorpora todo el documento firmado al la presentacion final y elimina 
-		las tabulaciones.
+		# Incorpora todo el documento firmado al la presentacion final y elimina 
+		# las tabulaciones.
 
-		"""
 		documento_final = render_to_string('invoice.xml', {'set_DTE':etiqueta_SetDte})
 
 		# Se firmó el archivo xml

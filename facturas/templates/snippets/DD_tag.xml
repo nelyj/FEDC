@@ -4,7 +4,7 @@
 	<F>{{ instance.n_folio }}</F>
 	<FE>{{ instance.created|date:"Y-m-d" }}</FE>
 	<RR>{{ data.rut }}</RR> 
-	<RSR>{{ data.senores }}</RSR> <!-- No configuardo en conector -->
+	<RSR>{{ data.senores }}</RSR> 
 	<MNT>19851580</MNT> <!-- No configurado en conector -->
 	<IT1>PLOTER DE CORTE 3XX ACCESORIOS Y </IT1> <!-- No configurado en conector -->
 	<CAF version="1.0">
