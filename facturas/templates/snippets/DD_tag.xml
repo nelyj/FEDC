@@ -5,8 +5,8 @@
 	<FE>{{ instance.fecha|date:"Y-m-d" }}</FE>
 	<RR>{{ data.rut }}</RR> 
 	<RSR>{{ data.senores }}</RSR>
-	<MNT>19851580</MNT>
-	<IT1>PLOTER DE CORTE 3XX ACCESORIOS Y </IT1>
+	<MNT>{{data.total}}</MNT>
+	<IT1>{{data.primero}}</IT1>
 	<CAF version="1.0">
 		<DA>
 			<RE>{{ folio.rut }}</RE>

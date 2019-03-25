@@ -18,6 +18,7 @@ from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA
 from Crypto.Signature import PKCS1_v1_5
 from utils.SIISdk import SII_SDK
+from collections import defaultdict
 
 
 class Factura(CreationModificationDateMixin):
@@ -29,6 +30,8 @@ class Factura(CreationModificationDateMixin):
 	numero_factura = models.CharField(max_length=128, blank=True, null=True, db_index=True)
 	senores = models.CharField(max_length=128, blank=True, null=True)
 	direccion = models.CharField(max_length=128, blank=True, null=True)
+	comuna = models.CharField(max_length=128, blank=True, null=True)
+	ciudad_receptora = models.CharField(max_length=128, blank=True, null=True)
 	transporte = models.CharField(max_length=128, blank=True, null=True)
 	despachar = models.CharField(max_length=128, blank=True, null=True)
 	observaciones = models.CharField(max_length=255, blank=True, null=True)
@@ -97,6 +100,10 @@ class Factura(CreationModificationDateMixin):
 		#timestamp = "{}T{}".format(now[0],now[1])
 		timestamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
+		productos=data.get('productos')
+		primero=productos[0].get('item_name')
+		data['primero']=primero
+
 		# Llena los campos de la plantilla DD_tag.xml con la informacion del diccionario
 		sin_aplanar = render_to_string('snippets/DD_tag.xml', {'data':data,'folio':folio, 'instance':instance, 'timestamp':timestamp})
 
@@ -141,6 +148,15 @@ class Factura(CreationModificationDateMixin):
 		timestamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
 		# Llena los datos de la plantilla Documento_tag.xml con la informacion pertinente
+		diccionario = defaultdict(dict)
+		for x,y in ACTIVIDADES:
+			diccionario[x]=y
+		compania.giro=diccionario.get(str(compania.giro))
+		compania.giro=compania.giro[1 : -1]
+		compania.actividad_principal=compania.actividad_principal[1:-1]
+		# productos=datos.get('productos')
+		# primero=productos[0].get('item_name')
+		# datos['primero']=primero
 		documento_sin_aplanar = render_to_string(
 			'snippets/Documento_tag.xml', {
 				'datos':datos,
