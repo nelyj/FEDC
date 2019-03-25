@@ -26,10 +26,29 @@ class Reporte(CreationModificationDateMixin):
 
 	class TIPO_DE_REPORTE(Enum):
 
-		boletas			= ("39", _('Libro de Boletas'))
-		ventas			= ("33", _('Libro de Ventas'))
+		compras			= ("COMPRAS", _('Informacion Electronica de Compras'))
+		ventas			= ("VENTAS", _('Informacion Electrónica de Ventas'))
 
 
+		@classmethod
+		def get_value(cls, member):
+			return cls[member].value[0]
+
+	class TIPO_DE_ENVIO(Enum):
+
+		total			= ("TOTAL", _('Total'))
+		parcial			= ("PARCIAL", _('Parcial'))
+		final 			= ("FINAL", _('Final'))
+		ajuste			= ("AJUSTE", _('Ajuste'))
+		@classmethod
+		def get_value(cls, member):
+			return cls[member].value[0]
+
+	class TIPO_DE_LIBRO(Enum):
+
+		mensual			= ("MENSUAL", _('Mensual'))
+		especial			= ("ESPECIAL", _('Especial'))
+		
 		@classmethod
 		def get_value(cls, member):
 			return cls[member].value[0]
@@ -37,7 +56,9 @@ class Reporte(CreationModificationDateMixin):
 
 
 	compania = models.ForeignKey(Compania, on_delete=models.CASCADE, blank=False, null=False)
-	tipo_de_reporte = models.CharField(_('Tipo de reporte'),max_length=50,choices=[x.value for x in TIPO_DE_REPORTE],null=False,blank=False)
+	tipo_de_operacion = models.CharField(_('Tipo de reporte'),max_length=10,choices=[x.value for x in TIPO_DE_REPORTE],null=False,blank=False,default='')
+	tipo_de_envio = models.CharField(_('Tipo de envío'),max_length=10,choices=[x.value for x in TIPO_DE_ENVIO],null=False,blank=False,default='')
+	tipo_de_libro = models.CharField(_('Tipo de libro'),max_length=10,choices=[x.value for x in TIPO_DE_LIBRO],null=False,blank=False,default='')
 	fecha_de_inicio = models.DateField(_('Fecha de inicio'),null=False)
 	fecha_de_culminacion = models.DateField(_('Fecha de culminación'),null=False)
 	version_xml	= models.FileField(upload_to=upload_file_to, blank=True, null=True, validators=[FileExtensionValidator(['xml'])])
@@ -53,13 +74,13 @@ class Reporte(CreationModificationDateMixin):
 
 	def get_tipo_de_reporte(self):
 
-		if self.tipo_de_reporte == '33':
+		if self.tipo_de_operacion == 'COMPRAS':
 
-			return 'Libro de Ventas'
+			return 'Informacion electronica de compras'
 
-		elif self.tipo_de_reporte == '39': 
+		elif self.tipo_de_operacion == 'VENTAS': 
 
-			return 'Libro de Boletas'
+			return 'Informacion electronica de ventas'
 
 	@staticmethod
 	def check_reporte_len(queryset):

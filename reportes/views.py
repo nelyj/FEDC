@@ -68,15 +68,15 @@ class ReportesCreateListView(CreateView):
 		instance.compania = compania
 		fecha_de_inicio = instance.fecha_de_inicio
 		fecha_de_culminacion = instance.fecha_de_culminacion
-		tipo_de_reporte = instance.tipo_de_reporte
+		tipo_de_operacion = instance.tipo_de_operacion
 
-		assert type(tipo_de_reporte) == str, "tipo no string"
+		assert type(tipo_de_operacion) == str, "tipo no string"
 
 		print(fecha_de_inicio, fecha_de_culminacion)
 		print(instance.fecha_de_inicio, instance.fecha_de_culminacion)
 
 
-		if tipo_de_reporte == "33":
+		if tipo_de_operacion == "COMPRAS":
 
 
 			queryset_ = []
@@ -86,7 +86,7 @@ class ReportesCreateListView(CreateView):
 			]
 
 
-		elif tipo_de_reporte == "39":
+		elif tipo_de_operacion == "VENTAS":
 
 			queryset_ = []
 			queryset_ = [

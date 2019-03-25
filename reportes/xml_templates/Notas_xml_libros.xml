@@ -1,0 +1,41 @@
+            <OtrosImp>
+                <CodImp>doc.14</CodImp>
+                <TasaImp>doc.19.0</TasaImp>
+                <MntImp>doc.133</MntImp>
+            </OtrosImp>
+
+
+
+<!-- Necesito un ejemplo real de libro de ventas no solamente el xml modelo -->
+
+<TotAnulado></TotAnulado>
+
+IVA fuera plazo
+<TotIVAFueraPlazo>
+Solo aplica para notas de credito
+
+En el diccionario de etiquetas hay mas campos que no estan en el modelo xml
+
+35, Boleta de Venta
+38, Boleta de Venta excenta
+39, Boleta Electronica
+41 
+
+Que es un envio especial ?
+
+<TipoEnvio></TipoEnvio>
+TOTAL: información total del mes. Si no se incluye, se asume que es total.
+PARCIAL: Segmento parcial: tiene parte de la información del período
+FINAL: Corresponde al último segmento
+AJUSTE : Movimientos ingresados con posterioridad al envío final
+
+<TipoLibro></TipoLibro>
+MENSUAL (Corresponde a los libros Regulares)
+ESPECIAL (Corresponde a un libro solicitado vía una notificación)
+
+<TipoOperacion></TipoOperacion> 
+VENTA Si el libro es de venta
+COMPRA Si el libro es de compra
+
+<PeriodoTributario>2005-10</PeriodoTributario>
+

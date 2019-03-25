@@ -1,107 +1,87 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <EnvioDTE xmlns="http://www.sii.cl/SiiDte" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sii.cl/SiiDte EnvioDTE_v10.xsd" version="1.0">
 <SetDTE ID="SetDoc">
-<Caratula version="1.0">
-	<RutEmisor>76263389-2</RutEmisor>
-	<RutEnvia>16424036-3</RutEnvia>
-	<RutReceptor>76030477-8</RutReceptor>
-	<FchResol>2014-08-22</FchResol>
-	<NroResol>80</NroResol>
-	<TmstFirmaEnv>2019-03-06T12:31:01</TmstFirmaEnv>
-	<SubTotDTE>
-		<TpoDTE>52</TpoDTE>
-		<NroDTE>1</NroDTE>
-	</SubTotDTE>
-</Caratula>
+	<Caratula version="1.0">
+		<RutEmisor>{{compania.rut}}</RutEmisor>
+		<RutReceptor>{{form.rut}}</RutReceptor> <!-- No lo esta tomando -->
+		<FchResol>{{compania.fecha_resolucion}}</FchResol>
+		<NroResol>{{compania.numero_resolucion}}</NroResol>
+		<TmstFirmaEnv>{{ timestamp_firma }}</TmstFirmaEnv>
+		<SubTotDTE>
+			<TpoDTE>{{ folio.tipo_de_documento }}</TpoDTE>
+			<NroDTE>1</NroDTE> <!-- No configurado en Conector -->
+		</SubTotDTE>
+	</Caratula>
 <DTE version="1.0">
-	<Documento ID="GDV_TIMG_maipu_511308">
+	<Documento ID="{{datos.numero_factura}}">
 		<Encabezado>
 			<IdDoc>
-				<TipoDTE>52</TipoDTE>
-				<Folio>511308</Folio>
-				<FchEmis>2019-03-06</FchEmis>
-				<TipoDespacho>2</TipoDespacho>
-				<IndTraslado>1</IndTraslado>
+				<TipoDTE>{{ folio.tipo_de_documento }}</TipoDTE>
+				<Folio>{{ instance.n_folio }}</Folio>
+				<FchEmis>{% now "Y-m-d" %}</FchEmis>
+				<FmaPago>{{datos.forma_pago}}1</FmaPago>
 			</IdDoc>
 			<Emisor>
-				<RUTEmisor>76263389-2</RUTEmisor>
-				<RznSoc>FOTOSTYLE SPA</RznSoc>
-				<GiroEmis>COMPRAVTA. COMERC. Y DISTR. O ARR. IMPORT. EXPORT. MAQUIN. INS. Y SUMI</GiroEmis>
-				<Acteco>519000</Acteco>
-				<DirOrigen>LIBERTAD 176 MAIPU</DirOrigen>
-				<CmnaOrigen>094</CmnaOrigen>
-				<CiudadOrigen/>
+				<RUTEmisor>{{compania.rut}}</RUTEmisor>
+				<RznSoc>{{compania.razon_social}}</RznSoc>
+				<GiroEmis>{{compania.giro}}</GiroEmis>
+				<Acteco>{{compania.actividad_principal}}</Acteco>
+				<DirOrigen>{{compania.direccion}}</DirOrigen>
+				<CmnaOrigen>{{compania.comuna}}</CmnaOrigen>
 			</Emisor>
 			<Receptor>
-				<RUTRecep>76030477-8</RUTRecep>
-				<RznSocRecep> Fotostyle Regalos Especiales Limitada</RznSocRecep>
-				<GiroRecep>Venta Insumos Impresion Digital</GiroRecep>
-				<DirRecep>Buenos Aires 417</DirRecep>
-				<CmnaRecep>RECOLETA</CmnaRecep>
-				<CiudadRecep>REGION METROPOLITANA</CiudadRecep>
+				<RUTRecep>{{datos.rut}}</RUTRecep>
+				<RznSocRecep>{{datos.senores}}</RznSocRecep>
+				<GiroRecep>{{datos.giro}}</GiroRecep>
+				<DirRecep>{{datos.direccion}}</DirRecep>
+				<CmnaRecep>{{datos.comuna}}</CmnaRecep>
+				<CiudadRecep>{{datos.ciudad_receptora}}</CiudadRecep>
 			</Receptor>
 			<Totales>
-				<MntNeto>35689000</MntNeto>
-				<TasaIVA>19</TasaIVA>
-				<IVA>6780910</IVA>
-				<MntTotal>42469910</MntTotal>
+				<MntNeto>{{datos.neto}}</MntNeto>
+				<TasaIVA>{{compania.tasa_de_iva}}</TasaIVA> 
+				<IVA>{{datos.iva}}</IVA>
+				<MntTotal>{{datos.total}}</MntTotal>
 			</Totales>
 		</Encabezado>
-		<!-- Begin for loop -->
 		<Detalle>
-			<NroLinDet>1</NroLinDet>
+			<NroLinDet>{{forloop.counter}}</NroLinDet>
 			<CdgItem>
-			<TpoCodigo>INT1</TpoCodigo>
-			<VlrCodigo>ZZ-PC06</VlrCodigo>
+				<TpoCodigo>INT1</TpoCodigo>
+				<VlrCodigo>{{prod.item_code}}</VlrCodigo>
 			</CdgItem>
-			<NmbItem>PLOTER DE CORTE 6XX ACCESORIOS Y REPUESTOS</NmbItem>
+			<NmbItem>{{prod.description}}</NmbItem>
 			<DscItem/>
-			<QtyItem>2</QtyItem>
-			<PrcItem>480000</PrcItem>
-			<MontoItem>960000</MontoItem>
-		</Detalle>
-		<Detalle>
-			<NroLinDet>2</NroLinDet>
-			<CdgItem>
-			<TpoCodigo>INT1</TpoCodigo>
-			<VlrCodigo>ZZ-TP01</VlrCodigo>
-			</CdgItem>
-			<NmbItem>Pack Tintas Pigmentadas 50 litros</NmbItem>
-			<DscItem/>
-			<QtyItem>2</QtyItem>
-			<PrcItem>860000</PrcItem>
-			<MontoItem>1720000</MontoItem>
-		</Detalle>
-		<!-- End for loop -->
+			<QtyItem>{{prod.qty}}</QtyItem>
+			<PrcItem>{{prod.base_net_rate}}</PrcItem>
+			<MontoItem>{{prod.amount}}</MontoItem>
+		</Detalle>{%endfor%}
 		<TED version="1.0">
 		<DD>
-			<RE>76263389-2</RE>
-			<TD>52</TD>
-			<F>511308</F>
-			<FE>2019-03-06</FE>
-			<RR>76030477-8</RR>
-			<RSR>Fotostyle Regalos Especiales Limitada</RSR>
-			<MNT>42469910</MNT>
-			<IT1>PLOTER DE CORTE 6XX ACCESORIOS Y </IT1>
+			<RE>{{ folio.rut }}</RE>
+			<TD>{{ folio.tipo_de_documento }}</TD>
+			<F>{{ instance.n_folio }}</F>
+			<FE>{{ instance.created|date:"Y-m-d" }}</FE>
+			<RR>{{ data.rut }}</RR> 
+			<RSR>{{ data.senores }}</RSR>
+			<MNT>{{data.total}}</MNT>
+			<IT1>{{data.primero}}</IT1>
 			<CAF version="1.0">
-
-			<DA>
-				<RE>76263389-2</RE>
-				<RS>FOTOSTYLE SPA</RS>
-				<TD>52</TD>
-				<RNG><D>511301</D><H>511800</H></RNG>
-				<FA>2019-03-06</FA>
-				<RSAPK><M>14Q/odadGbNCHyGcfRtaH54+nnasgSIFKIWiASYsRmoyJNkno9aiAoq6+cS1v3tYqtH8u3VqEaEfiWZTlGlc5Q==</M><E>Aw==</E></RSAPK>
-				<IDK>300</IDK>
-			</DA>
-			<FRMA algoritmo="SHA1withRSA">VQWpFujL/ajqaGLLgwf35+N30cx/2V6bSzn/v3DVmXmhqav1yMrT0DsTIm19HA9Newevx1UjEr9eFv4C4B0xEg==</FRMA>
-
+				<DA>
+					<RE>{{ folio.rut }}</RE>
+					<RS>{{ folio.razon_social }}</RS>
+					<TD>{{ folio.tipo_de_documento }}</TD>
+					<RNG><D>{{ folio.rango_desde }}</D><H>{{ folio.rango_hasta }}</H></RNG>
+					<FA>{{ folio.fecha_de_autorizacion|date:"Y-m-d" }}</FA>
+					<RSAPK><M>{{ folio.pk_modulo }}</M><E>{{folio.pk_exponente}}</E></RSAPK>
+					<IDK>{{ folio.idk }}</IDK>
+				</DA>
+				<FRMA algoritmo="SHA1withRSA">{{ folio.firma }}</FRMA>
 			</CAF>
-			<TSTED>2019-03-06T10:39:52</TSTED>
+			<TSTED>{{ timestamp }}</TSTED>
 		</DD>
-		<FRMT algoritmo="SHA1withRSA">ZyWqCU723oqEp3d8WCP5Y0JzRmkScAU90BRHJHMiUCdYBedk8BXYoBzBRHUzy35l6n0KWHQ29xK5FsIOjH0LGA==</FRMT>
 		</TED>
-		<TmstFirma>2019-03-06T10:39:52</TmstFirma>
+		<TmstFirma>{{ timestamp_documento }}</TmstFirma>
 	</Documento>
 	<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
 		<SignedInfo>

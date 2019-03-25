@@ -12,7 +12,9 @@ class ReporteCreateForm(forms.ModelForm):
         model = Reporte
         fields = [
 
-            'tipo_de_reporte', 
+            'tipo_de_operacion',
+            'tipo_de_envio',
+            'tipo_de_libro',
             'fecha_de_inicio', 
             'fecha_de_culminacion'
 
@@ -23,7 +25,9 @@ class ReporteCreateForm(forms.ModelForm):
         self.request = kwargs.pop('request', None) 
         super().__init__(*args, **kwargs)
 
-        self.fields['tipo_de_reporte'].widget.attrs.update({'class': 'form-control'})
+        self.fields['tipo_de_operacion'].widget.attrs.update({'class': 'form-control'})
+        self.fields['tipo_de_envio'].widget.attrs.update({'class': 'form-control'})
+        self.fields['tipo_de_libro'].widget.attrs.update({'class': 'form-control'})
         self.fields['fecha_de_inicio'].widget.attrs.update({'autocomplete':'off','class': 'form-control datepicker', 'data-provide': 'datepicker','placeholder':'DD/MM/YYYY'})
         self.fields['fecha_de_culminacion'].widget.attrs.update({'autocomplete':'off','class': 'form-control datepicker', 'data-provide': 'datepicker','placeholder':'DD/MM/YYYY'})
 
