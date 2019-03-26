@@ -138,28 +138,26 @@ class SII_SDK():
         @param rut_company recibe el rut de la compañia
         @return xml con los datos 
         """
-        headers = {'User-Agent': 'Mozilla/4.0 (compatible; PROG 1.0;)',
-        'Cookie':'TOKEN='+token}
+        headers = {'User-Agent': 'Mozilla/4.0 (compatible; PROG 1.0; Windows NT 5.0; YComp 5.0.2.4)',
+        'Cookie':'TOKEN='+token, 'Accept': '*/*'}
         rut_s,dv_s = rut_sender.split('-')
         rut_c,dv_c = rut_company.split('-')
         if(dv_s=='k'):
-            dv_s = '0'
+            dv_s = 'K'
         if(dv_c=='k'):
-            dv_c = '0'
-        datos = MultipartEncoder(
-            fields={'rutSender': rut_s,
-                    'dvSender': dv_s,
-                    'rutCompany': rut_c,
-                    'dvCompany': dv_c,
-                    'archivo': ('envioDTE.xml', invoice, 'text/xml')}
-            )
+            dv_c = 'K'
+        datos = MultipartEncoder([
+                ('rutSender', rut_s),
+                ('dvSender',  dv_s),
+                ('rutCompany',  rut_c),
+                ('dvCompany',  dv_c),
+                ('archivo', ('envioDTE.xml', invoice,'text/xml'))
+            ])
         headers['Content-Type'] = datos.content_type
-        print(invoice)
         response = requests.post('https://maullin.sii.cl/cgi_dte/UPL/DTEUpload',data=datos,headers=headers)
-        print(response.content)
         xml_response = ET.fromstring(response.content)
         estado = xml_response.find('STATUS').text
-        if(estado==0):
+        if(estado=='0'):
             track_id = xml_response.find('TRACKID').text
             return {'success':True,'message':'Se envió correctamente al sii','track_id':track_id}
         else:
