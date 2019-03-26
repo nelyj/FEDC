@@ -379,13 +379,14 @@ class SendInvoice(FormView):
             xml_dir = settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug']
             if(not os.path.isdir(xml_dir)):
                 os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug'])
-            file = open(xml_dir+'/'+self.kwargs['slug']+'.xml','w')
-            file.write(documento_final_firmado)
+            f = open(xml_dir+'/'+self.kwargs['slug']+'.xml','w')
+            f.write(documento_final_firmado)
+            f.close()
         except Exception as e:
             messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
             return super().form_valid(form)
 
-        send_sii = self.send_invoice_sii(compania,form,caratula_firmada,pass_certificado)
+        send_sii = self.send_invoice_sii(compania,caratula_firmada,pass_certificado)
         if(not send_sii['estado']):
             messages.error(self.request, send_sii['msg'])
             return super().form_valid(form)
@@ -419,11 +420,10 @@ class SendInvoice(FormView):
         messages.error(self.request, form.errors)
         return super().form_invalid(form)
 
-    def send_invoice_sii(self,compania,sender,invoice, pass_certificado):
+    def send_invoice_sii(self,compania,invoice, pass_certificado):
         """
         Método para enviar la factura al sii
         @param compania recibe el objeto compañia
-        @param sender recibe el objeto factura
         @param invoice recibe el xml de la factura
         @param pass_certificado recibe la contraseña del certificado
         @return dict con la respuesta
@@ -437,10 +437,11 @@ class SendInvoice(FormView):
                 if(token):
                     print(token)
                     try:
-                        invoice_reponse = sii_sdk.sendInvoice(token,invoice,sender.rut,compania.rut)
+                        invoice_reponse = sii_sdk.sendInvoice(token,invoice,compania.rut,'60803000-K')
                         return {'estado':invoice_reponse['success'],'msg':invoice_reponse['message'],
                         'track_id':invoice_reponse['track_id']}
                     except Exception as e:
+                        print(e)
                         return {'estado':False,'msg':'No se pudo enviar la factura'}    
                 else:
                     return {'estado':False,'msg':'No se pudo obtener el token del sii'}

@@ -103,8 +103,16 @@ class Factura(CreationModificationDateMixin):
 		productos=data.get('productos')
 		primero=productos[0].get('item_name')
 		data['primero']=primero
+
+		# Ajustados montos y rut para el xml
+		if('k' in folio.rut):
+			folio.rut = folio.rut.replace('k','K')
+		if('k' in data['rut']):
+			data['rut'] = data['rut'].replace('k','K')
+
 		data['neto']=str(round(float(data['neto'])))
 		data['total']=str(round(float(data['total'])))
+
 		# Llena los campos de la plantilla DD_tag.xml con la informacion del diccionario
 		sin_aplanar = render_to_string('snippets/DD_tag.xml', {'data':data,'folio':folio, 'instance':instance, 'timestamp':timestamp})
 
@@ -155,8 +163,27 @@ class Factura(CreationModificationDateMixin):
 		compania.giro=diccionario.get(str(compania.giro))
 		compania.giro=compania.giro[1 : -1]
 		compania.actividad_principal=compania.actividad_principal[1:-1]
+		# productos=datos.get('productos')
+		# primero=productos[0].get('item_name')
+		# datos['primero']=primero
+
+		# Ajustados los montos de productos para el xml
+		for producto in datos['productos']:
+			producto['qty'] = str(producto['qty'])
+			producto['base_net_rate'] = str(producto['base_net_rate'])
+			producto['amount'] = round(producto['amount'])
+
+		# Ajustados valores para el xml
+		if('k' in folio.rut):
+			folio.rut = folio.rut.replace('k','K')
+		if('k' in compania.rut):
+			compania.rut = compania.rut.replace('k','K')
+		if('k' in datos['rut']):
+			datos['rut'] = datos['rut'].replace('k','K')
+		datos['numero_factura'] = datos['numero_factura'].replace('º','')
 		datos['neto']=str(round(float(datos['neto'])))
 		datos['total']=str(round(float(datos['total'])))
+
 		documento_sin_aplanar = render_to_string(
 			'snippets/Documento_tag.xml', {
 				'datos':datos,
@@ -192,6 +219,11 @@ class Factura(CreationModificationDateMixin):
 		timestamp_firma = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 		#timestamp_firma = "{}T{}".format(now[0],now[1])
 
+		# Ajustados los rut para el xml
+		if('k' in folio.rut):
+			folio.rut = folio.rut.replace('k','K')
+		if('k' in compania.rut):
+			compania.rut = compania.rut.replace('k','K')
 		# LLena la plantilla set_DTE_tag.xml con los datos correspondientes
 		set_dte_sin_aplanar = render_to_string(
 			'snippets/set_DTE_tag.xml', {
@@ -240,7 +272,7 @@ class Factura(CreationModificationDateMixin):
 
 		#print(set_dte_sin_aplanar)
 
-		return '<?xml version="1.0" encoding="ISO-8859-1"?>\n\n'+set_dte_sin_aplanar
+		return '<?xml version="1.0" encoding="ISO-8859-1"?>\n'+set_dte_sin_aplanar
 
 
 

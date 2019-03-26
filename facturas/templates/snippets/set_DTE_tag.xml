@@ -3,7 +3,7 @@
 		<RutEmisor>{{compania.rut}}</RutEmisor>
 		<RutEnvia>{{compania.rut}}</RutEnvia>
 		<RutReceptor>60803000-K</RutReceptor> 
-		<FchResol>{{compania.fecha_resolucion}}</FchResol>
+		<FchResol>{{compania.fecha_resolucion|date:"Y-m-d"}}</FchResol>
 		<NroResol>{{compania.numero_resolucion}}</NroResol>
 		<TmstFirmaEnv>{{ timestamp_firma }}</TmstFirmaEnv>
 		<SubTotDTE>
