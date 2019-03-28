@@ -2,7 +2,7 @@
 	<RE>{{ folio.rut }}</RE>
 	<TD>{{ folio.tipo_de_documento }}</TD>
 	<F>{{ instance.n_folio }}</F>
-	<FE>{{ instance.created|date:"Y-m-d" }}</FE>
+	<FE>{{ instance.fecha|date:"Y-m-d" }}</FE>
 	<RR>{{ data.rut }}</RR> 
 	<RSR>{{ data.senores }}</RSR>
 	<MNT>{{data.total}}</MNT>

@@ -11,6 +11,7 @@ import xmlsec
 import xml.etree.ElementTree as ET
 from django.conf import settings
 from django.template.loader import render_to_string
+from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 from lxml import etree
 
@@ -137,12 +138,28 @@ class SII_SDK():
         @param rut_company recibe el rut de la compañia
         @return xml con los datos 
         """
-        headers = {'User-Agent': 'Mozilla/4.0 (compatible; PROG 1.0; LibreDTE)',
-        'Cookie':'TOKEN='+token}
+        headers = {'User-Agent': 'Mozilla/4.0 (compatible; PROG 1.0; Windows NT 5.0; YComp 5.0.2.4)',
+        'Cookie':'TOKEN='+token, 'Accept': '*/*'}
         rut_s,dv_s = rut_sender.split('-')
         rut_c,dv_c = rut_company.split('-')
-        files = {'archivo': invoice}
-        values = {'rutSender': rut_s, 'dvSender': dv_s, 'rutCompany': rut_c,'dvCompany':dv_c}
-        response = request.post('https://maullin.sii.cl/sii.cl/cgi_dte/UPL/DTEUpload',files=files,data=values)
-        print(response)
-        xml_response = ET.fromstring(response)
+        if(dv_s=='k'):
+            dv_s = 'K'
+        if(dv_c=='k'):
+            dv_c = 'K'
+        datos = MultipartEncoder([
+                ('rutSender', rut_s),
+                ('dvSender',  dv_s),
+                ('rutCompany',  rut_c),
+                ('dvCompany',  dv_c),
+                ('archivo', ('envioDTE.xml', invoice,'text/xml'))
+            ])
+        headers['Content-Type'] = datos.content_type
+        response = requests.post('https://maullin.sii.cl/cgi_dte/UPL/DTEUpload',data=datos,headers=headers)
+        xml_response = ET.fromstring(response.content)
+        estado = xml_response.find('STATUS').text
+        if(estado=='0'):
+            track_id = xml_response.find('TRACKID').text
+            return {'success':True,'message':'Se envió correctamente al sii','track_id':track_id}
+        else:
+            message = xml_response.find('ERROR').text
+            return {'success':False,'message':message}
