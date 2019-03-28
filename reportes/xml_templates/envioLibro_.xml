@@ -6,12 +6,12 @@
             {% for doc in resumen_periodos %}
             <TotalesPeriodo>
                 <TpoDoc>doc.30</TpoDoc>
-                <TotDoc>doc.1</TotDoc>
-                <TotMntExe>doc.0</TotMntExe>
-                <TotMntNeto>doc.100</TotMntNeto>
-                <TotOpIVARec>doc.1</TotOpIVARec>
-                <TotMntIVA>doc.19</TotMntIVA>
-                <TotMntTotal>doc.119</TotMntTotal>
+                <TotDoc>1</TotDoc> <!-- Cantidad de documentos del tipo especificado en el campo Tipo de Documento. Incluye anulados. -->
+                <TotMntExe>doc.0</TotMntExe> <!-- TOTAL MONTO EXENTO O NO GRAVADO -->
+                <TotMntNeto>doc.100</TotMntNeto> <!-- TOTAL MONTO NETO -->
+                <TotOpIVARec>doc.1</TotOpIVARec> <!-- OPERACIONES CON IVA RECUPERABLE -->
+                <TotMntIVA>doc.19</TotMntIVA> <!-- TOTAL MONTO IVA (recuperable) -->
+                <TotMntTotal>doc.119</TotMntTotal> <!-- TOTAL MONTO TOTAL -->
             </TotalesPeriodo>
             {% endfor %}
         </ResumenPeriodo>

@@ -10,7 +10,7 @@
     <TipoOperacion>VENTA</TipoOperacion> <!-- Checkear tipos de operacion disponibles  -->
     <TipoLibro>ESPECIAL</TipoLibro> <!-- Checkear cuales son los tipos de libros disponibles -->
     <TipoEnvio>TOTAL</TipoEnvio> <!-- Checkear cuales son los tipos de envio disponible -->
-    <FolioNotificacion>102006</FolioNotificacion> <!-- Chequear que es esto  -->
+    <FolioNotificacion>102006</FolioNotificacion> <!-- Folio de notificación. Obligatorio si es un tipo de envío ESPECIAL (No colocar) -->
         </Caratula>
         <ResumenPeriodo>
             <TotalesPeriodo>
