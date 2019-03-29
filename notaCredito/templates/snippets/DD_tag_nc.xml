@@ -13,7 +13,7 @@
 			<RS>{{ folio.razon_social }}</RS>
 			<TD>{{ folio.tipo_de_documento }}</TD>
 			<RNG><D>{{ folio.rango_desde }}</D><H>{{ folio.rango_hasta }}</H></RNG>
-			<FA>{{ folio.fecha_de_autorizacion }}</FA>
+			<FA>{{ folio.fecha_de_autorizacion|date:"Y-m-d" }}</FA>
 			<RSAPK><M>{{ folio.pk_modulo }}</M><E>{{folio.pk_exponente}}</E></RSAPK>
 			<IDK>{{ folio.idk }}</IDK>
 		</DA>

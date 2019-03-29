@@ -48,6 +48,7 @@ class notaCredito(CreationModificationDateMixin):
 	total = models.CharField(max_length=128, blank=True, null=True)
 	n_folio = models.IntegerField(null=True, default=0)
 	dte_xml = models.TextField(null=True, blank=True)
+	track_id = models.CharField(max_length=32, blank=True, null=True)
 	
 	class Meta:
 		ordering = ('numero_factura',)
@@ -91,10 +92,8 @@ class notaCredito(CreationModificationDateMixin):
 		el certificado.
 		"""
 
-		now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S").split()
+		timestamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
-		# Crea timestamp en formato correspondiente
-		timestamp = "{}T{}".format(now[0],now[1])
 
 		# Llena los datos de la plantilla Documento_tag.xml con la informacion pertinente
 		documento_sin_aplanar = render_to_string(
@@ -108,8 +107,8 @@ class notaCredito(CreationModificationDateMixin):
 			})
 
 
-		# sii_sdk = SII_SDK()
-		# set_dte_sin_aplanar = sii_sdk.generalSign(compania,documento_sin_aplanar,pass_certificado)
+		sii_sdk = SII_SDK()
+		set_dte_sin_aplanar = sii_sdk.generalSign(compania,documento_sin_aplanar,pass_certificado)
 
 
 		# Elimina tabulaciones y espacios para la generacion del digest
@@ -124,7 +123,7 @@ class notaCredito(CreationModificationDateMixin):
 		# Agrega la plantilla signature.xml al final del documento
 		# documento_sin_aplanar += "\n{}".format(signature_tag)
 	
-		return documento_sin_aplanar
+		return set_dte_sin_aplanar
 
 	def firmar_etiqueta_set_dte(compania, folio, etiqueta_Documento):
 
@@ -175,15 +174,15 @@ class notaCredito(CreationModificationDateMixin):
 		documento_final = render_to_string('nc_base.xml', {'set_DTE':etiqueta_SetDte})
 
 		# Se firmó el archivo xml
-		# sii_sdk = SII_SDK()
-		# set_dte_sin_aplanar = sii_sdk.multipleSign(compania,documento_final,pass_certificado,1)
+		sii_sdk = SII_SDK()
+		set_dte_sin_aplanar = sii_sdk.multipleSign(compania,documento_final,pass_certificado,1)
 		#set_dte_sin_aplanar = sii_sdk.generalSign(compania,set_dte_sin_aplanar,pass_certificado,1)
 
 		#documento_final_sin_tabs = documento_final.replace('\t','').replace('\r','')
 
 		#print(set_dte_sin_aplanar)
 
-		# return '<?xml version="1.0" encoding="ISO-8859-1"?>'+set_dte_sin_aplanar
+		return '<?xml version="1.0" encoding="ISO-8859-1"?>'+set_dte_sin_aplanar
 		# return documento_final_sin_tabs
 
-		return documento_final
+		#return documento_final

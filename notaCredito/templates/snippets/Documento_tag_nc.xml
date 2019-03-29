@@ -5,7 +5,7 @@
 				<TipoDTE>{{ folio.tipo_de_documento }}</TipoDTE>
 				<Folio>{{ instance.n_folio }}</Folio>
 				<FchEmis>{% now "Y-m-d" %}</FchEmis>
-				<FmaPago>{{datos.forma_pago}}1</FmaPago>
+				<FmaPago>{{datos.forma_pago}}</FmaPago>
 			</IdDoc>
 			<Emisor>
 				<RUTEmisor>{{compania.rut}}</RUTEmisor>
@@ -43,7 +43,7 @@
 			<MontoItem>{{prod.amount}}</MontoItem>
 		</Detalle>{%endfor%}{%if datos.orden_compra %}
 		<Referencia>
-			<NroLinRef>1</NroLinRef> <!-- EXPLICAR de donde sale este numero caso real -->
+			<NroLinRef>1</NroLinRef>
 			<TpoDocRef>801</TpoDocRef>
 			<FolioRef>{{datos.orden_compra}}</FolioRef>
 			<FchRef>{% now "Y-m-d" %}</FchRef>
