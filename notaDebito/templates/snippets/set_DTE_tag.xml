@@ -1,0 +1,40 @@
+	<SetDTE ID="SetDoc">
+	<Caratula version="1.0">
+		<RutEmisor>{{compania.rut}}</RutEmisor>
+		<RutReceptor>{{form.rut}}</RutReceptor> <!-- No lo esta tomando -->
+		<FchResol>{{compania.fecha_resolucion}}</FchResol>
+		<NroResol>{{compania.numero_resolucion}}</NroResol>
+		<TmstFirmaEnv>{{ timestamp_firma }}</TmstFirmaEnv>
+		<SubTotDTE>
+			<TpoDTE>{{ folio.tipo_de_documento }}</TpoDTE>
+			<NroDTE>1</NroDTE> <!-- No configurado en Conector -->
+		</SubTotDTE>
+	</Caratula>
+	<DTE version="1.0">{% autoescape off %}
+	{{ documento }}{% endautoescape %}
+</DTE></SetDTE>
+<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+	<SignedInfo>
+		<CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+		<SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+		<Reference URI="#{{form.numero_factura}}">
+		<Transforms>
+		<Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+		</Transforms>
+		<DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+		<DigestValue></DigestValue>
+		</Reference>
+	</SignedInfo>
+	<SignatureValue></SignatureValue>
+	<KeyInfo>
+		<KeyValue>
+			<RSAKeyValue>
+			<Modulus></Modulus>
+			<Exponent></Exponent>
+			</RSAKeyValue>
+		</KeyValue>
+		<X509Data>
+		<X509Certificate></X509Certificate>
+		</X509Data>
+	</KeyInfo>
+</Signature>

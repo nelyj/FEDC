@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<EnvioDTE xmlns="http://www.sii.cl/SiiDte" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sii.cl/SiiDte EnvioDTE_v10.xsd" version="1.0">
+<SetDTE ID="SetDoc">
+<Caratula version="1.0">
+<RutEmisor>76263389-2</RutEmisor>
+<RutEnvia>16424036-3</RutEnvia>
+<RutReceptor>76030477-8</RutReceptor>
+<FchResol>2014-08-22</FchResol>
+<NroResol>80</NroResol>
+<TmstFirmaEnv>2019-03-06T18:38:35</TmstFirmaEnv>
+<SubTotDTE>
+<TpoDTE>61</TpoDTE>
+<NroDTE>1</NroDTE>
+</SubTotDTE>
+</Caratula>
+<DTE version="1.0">
+<Documento ID="NCV_TIMG_maipu_502036">
+<Encabezado>
+<IdDoc>
+<TipoDTE>61</TipoDTE>
+<Folio>502036</Folio>
+<FchEmis>2019-03-06</FchEmis>
+</IdDoc>
+<Emisor>
+<RUTEmisor>76263389-2</RUTEmisor>
+<RznSoc>FOTOSTYLE SPA</RznSoc>
+<GiroEmis>COMPRAVTA. COMERC. Y DISTR. O ARR. IMPORT. EXPORT. MAQUIN. INS. Y SUMI</GiroEmis>
+<Acteco>519000</Acteco>
+<DirOrigen>LIBERTAD 176 MAIPU</DirOrigen>
+<CmnaOrigen>094</CmnaOrigen>
+<CiudadOrigen/>
+</Emisor>
+<Receptor>
+<RUTRecep>76030477-8</RUTRecep>
+<RznSocRecep>Fotostyle Regalos Especiales Limitada</RznSocRecep>
+<GiroRecep>Venta Insumos Impresion Digital</GiroRecep>
+<DirRecep>Buenos Aires 417</DirRecep>
+<CmnaRecep>329</CmnaRecep>
+<CiudadRecep>REGION METROPOLITANA</CiudadRecep>
+</Receptor>
+<Totales>
+<MntNeto>281000</MntNeto>
+<TasaIVA>19</TasaIVA>
+<IVA>53390</IVA>
+<MntTotal>334390</MntTotal>
+</Totales>
+</Encabezado>
+<Detalle>
+<NroLinDet>1</NroLinDet>
+<CdgItem>
+<TpoCodigo>INT1</TpoCodigo>
+<VlrCodigo>ZZ-TZ01</VlrCodigo>
+</CdgItem>
+<NmbItem>Pack Tazones para Sublimacion </NmbItem>
+<DscItem/>
+<QtyItem>1</QtyItem>
+<PrcItem>68000</PrcItem>
+<MontoItem>68000</MontoItem>
+</Detalle>
+<Detalle>
+<NroLinDet>2</NroLinDet>
+<CdgItem>
+<TpoCodigo>INT1</TpoCodigo>
+<VlrCodigo>ZZ-TD01</VlrCodigo>
+</CdgItem>
+<NmbItem>Pack Tintas DYE Colores Surtidos</NmbItem>
+<DscItem/>
+<QtyItem>1</QtyItem>
+<PrcItem>213000</PrcItem>
+<MontoItem>213000</MontoItem>
+</Detalle>
+<Referencia>
+<NroLinRef>1</NroLinRef>
+<TpoDocRef>33</TpoDocRef>
+<FolioRef>522452</FolioRef>
+<FchRef>2019-03-06</FchRef>
+<CodRef>1</CodRef>
+<RazonRef>Factura a devolver: 522452</RazonRef>
+</Referencia>
+<TED version="1.0">
+<DD>
+<RE>76263389-2</RE>
+<TD>61</TD>
+<F>502036</F>
+<FE>2019-03-06</FE>
+<RR>76030477-8</RR>
+<RSR>Fotostyle Regalos Especiales Limitada</RSR>
+<MNT>334390</MNT>
+<IT1>Pack Tazones para Sublimacion </IT1>
+<CAF version="1.0">
+<DA>
+<RE>76263389-2</RE>
+<RS>FOTOSTYLE SPA</RS>
+<TD>61</TD>
+<RNG><D>501704</D><H>502981</H></RNG>
+<FA>2018-12-03</FA>
+<RSAPK><M>yshfm1LgPq0uPaPbmCq+XXgDkxvqcXCrO44GxHg+xvgut/GLdQalLt9z/FLDHI0+R947/mCKdiO4R3N4Zb8RbQ==</M><E>Aw==</E></RSAPK>
+<IDK>300</IDK>
+</DA>
+<FRMA algoritmo="SHA1withRSA">XMEi2Il7NtPIuCAVBesfutdbzbeKtsmLUm8mbcknUz6M7WYg48uiSWj3CswEjCu2uEAaRIqpkgBN1xMXPkjkFQ==</FRMA>
+</CAF>
+<TSTED>2019-03-06T10:17:01</TSTED>
+</DD>
+<FRMT algoritmo="SHA1withRSA">tfnjtqAA45NCalj8O+aEX7u74MEj1eHH6SU/mPzbzDl6OKuS+aErnsykrdRt6+HyiEPPTcK2hhTuNyHuWdNRzA==</FRMT>
+</TED>
+<TmstFirma>2019-03-06T10:17:01</TmstFirma>
+</Documento>
+<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+<SignedInfo>
+<CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+<SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+<Reference URI="#NCV_TIMG_maipu_502036">
+<Transforms>
+<Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+</Transforms>
+<DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<DigestValue>Mwb5EKuNpWZfLH/EWjhYNVm4W2M=</DigestValue>
+</Reference>
+</SignedInfo>
+<SignatureValue>RLV35I3dXeDfcbedqWZ3554d4h1Qz9WdbaSQf7snaEXy0VR++tjqyPosojuzxw7C
+e+1CKL460MraABbc6MU3HTq1BKlwN7PhIAb5qbemRCZJFAfTUmfPkKrg8HNrJMSy
+wCGdxDTNQ13+rjCHbM2pqURh5o60lFaWT90psIV0+CI=</SignatureValue>
+<KeyInfo>
+<KeyValue>
+<RSAKeyValue>
+<Modulus>
+n0jdpdj7SDma7y1G99MwxUD7y/LVgtagrlVfhuuke8kTR1YUfQ4ERE7l8IVRQcDi
+iiPTz2orUXF1DE+U7h+DMkx/oW0FD1Y9nFZv2kXvx6iCodpG6WJhAQiaKTr1Kc6u
+FkW4UbKSTK7hV4ywIlouYfyaEMynLhT6VSAR+gXXo7M=
+</Modulus>
+<Exponent>
+AQAB
+</Exponent>
+</RSAKeyValue>
+</KeyValue>
+<X509Data>
+<X509Certificate>MIIGWjCCBUKgAwIBAgIKe8lrDAAAAAiFwDANBgkqhkiG9w0BAQUFADCB0jELMAkG
+A1UEBhMCQ0wxHTAbBgNVBAgTFFJlZ2lvbiBNZXRyb3BvbGl0YW5hMREwDwYDVQQH
+EwhTYW50aWFnbzEUMBIGA1UEChMLRS1DRVJUQ0hJTEUxIDAeBgNVBAsTF0F1dG9y
+aWRhZCBDZXJ0aWZpY2Fkb3JhMTAwLgYDVQQDEydFLUNFUlRDSElMRSBDQSBGSVJN
+QSBFTEVDVFJPTklDQSBTSU1QTEUxJzAlBgkqhkiG9w0BCQEWGHNjbGllbnRlc0Bl
+LWNlcnRjaGlsZS5jbDAeFw0xNzA3MzExNTI0MTRaFw0yMDA3MzAxNTI0MTRaMIHd
+MQswCQYDVQQGEwJDTDEiMCAGA1UECBMZTUVUUk9QT0xJVEFOQSBERSBTQU5USUFH
+TzERMA8GA1UEBxMIU2FudGlhZ28xFzAVBgNVBAoTDkZvdG9zdHlsZSBMdGRhMTMw
+MQYDVQQLEypWZW50YSBkZSBNYXF1aW5hcmlhIGUgaW5zdW1vcyBkZSBpbXByZXNp
+b24xJzAlBgNVBAMTHkVsaXphYmV0aCBTaWx2aWEgVmlnbmVhdSBSb2phczEgMB4G
+CSqGSIb3DQEJARYRZWxpemFiZXRoQHRpbWcuY2wwgZ8wDQYJKoZIhvcNAQEBBQAD
+gY0AMIGJAoGBAJ9I3aXY+0g5mu8tRvfTMMVA+8vy1YLWoK5VX4brpHvJE0dWFH0O
+BERO5fCFUUHA4ooj089qK1FxdQxPlO4fgzJMf6FtBQ9WPZxWb9pF78eogqHaRuli
+YQEImik69SnOrhZFuFGykkyu4VeMsCJaLmH8mhDMpy4U+lUgEfoF16OzAgMBAAGj
+ggKnMIICozA9BgkrBgEEAYI3FQcEMDAuBiYrBgEEAYI3FQiC3IMvhZOMZoXVnReC
+4twnge/sPGGBy54UhqiCWAIBZAIBBDAdBgNVHQ4EFgQUScNt9KqTexZilWVS95oU
+sEYrJGEwCwYDVR0PBAQDAgTwMB8GA1UdIwQYMBaAFHjhPp/SErN6PI3NMA5Ts0Mp
+B7NVMD4GA1UdHwQ3MDUwM6AxoC+GLWh0dHA6Ly9jcmwuZS1jZXJ0Y2hpbGUuY2wv
+ZWNlcnRjaGlsZWNhRkVTLmNybDA6BggrBgEFBQcBAQQuMCwwKgYIKwYBBQUHMAGG
+Hmh0dHA6Ly9vY3NwLmVjZXJ0Y2hpbGUuY2wvb2NzcDAjBgNVHREEHDAaoBgGCCsG
+AQQBwQEBoAwWCjE2NDI0MDM2LTMwIwYDVR0SBBwwGqAYBggrBgEEAcEBAqAMFgo5
+NjkyODE4MC01MIIBTQYDVR0gBIIBRDCCAUAwggE8BggrBgEEAcNSBTCCAS4wLQYI
+KwYBBQUHAgEWIWh0dHA6Ly93d3cuZS1jZXJ0Y2hpbGUuY2wvQ1BTLmh0bTCB/AYI
+KwYBBQUHAgIwge8egewAQwBlAHIAdABpAGYAaQBjAGEAZABvACAARgBpAHIAbQBh
+ACAAUwBpAG0AcABsAGUALgAgAEgAYQAgAHMAaQBkAG8AIAB2AGEAbABpAGQAYQBk
+AG8AIABlAG4AIABmAG8AcgBtAGEAIABwAHIAZQBzAGUAbgBjAGkAYQBsACwAIABx
+AHUAZQBkAGEAbgBkAG8AIABoAGEAYgBpAGwAaQB0AGEAZABvACAAZQBsACAAQwBl
+AHIAdABpAGYAaQBjAGEAZABvACAAcABhAHIAYQAgAHUAcwBvACAAdAByAGkAYgB1
+AHQAYQByAGkAbzANBgkqhkiG9w0BAQUFAAOCAQEAGVqwfqj5y4qCfY4G3s00zHO0
+e4GJmaC4cJd1iP09mgdEHSrjYyPkpgB7c9Dwu1MSLoBt/89cZG31uY+106nHQB0M
+lH2VP1RpNLoKwq12fI33/Imkha2TI4CJYbtlPyjemiuzcEeqS9ew1ClMp0/579QH
+GPOn/m7X7RV4ooWm4zdU9o+uv+m2UkGDPSSUqaTkUO/kq/wst+Xty11OFdn7CBf6
+MmNC2Alx7O0zw8h1Fdi9LFzgbrF3iQF29+JTsC2Os0Yd/It8atogE02Mf28k/N5D
+2H3vCO7SK5UzFGa9Vt4e0Jpe7vSH2vW2WlbnanV0BwxIk5Hzatgkjuio4Gqtkw==</X509Certificate>
+</X509Data>
+</KeyInfo>
+</Signature>
+</DTE></SetDTE>
+<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+<SignedInfo>
+<CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+<SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+<Reference URI="#SetDoc">
+<Transforms>
+<Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+</Transforms>
+<DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<DigestValue>RhsBSUdqOoSIsIgDKZh1qMY57zU=</DigestValue>
+</Reference>
+</SignedInfo>
+<SignatureValue>WtapSzC2Vjwg4tCkRD3z/MYHqEqmxcF5InyBZZdSJkaLewOhD8QOrS62Kq4a60kv
+wB3M/0w5boBMYK6lz7rgWmV33Ux3BrZk6leRPDuSGuSHTo/qfWmU7n8QGvopR37S
+cm6U6LKCx6GywFpTzrPDUDTmX8ywRiYAjeXjnp8LePo=</SignatureValue>
+<KeyInfo>
+<KeyValue>
+<RSAKeyValue>
+<Modulus>
+n0jdpdj7SDma7y1G99MwxUD7y/LVgtagrlVfhuuke8kTR1YUfQ4ERE7l8IVRQcDi
+iiPTz2orUXF1DE+U7h+DMkx/oW0FD1Y9nFZv2kXvx6iCodpG6WJhAQiaKTr1Kc6u
+FkW4UbKSTK7hV4ywIlouYfyaEMynLhT6VSAR+gXXo7M=
+</Modulus>
+<Exponent>
+AQAB
+</Exponent>
+</RSAKeyValue>
+</KeyValue>
+<X509Data>
+<X509Certificate>MIIGWjCCBUKgAwIBAgIKe8lrDAAAAAiFwDANBgkqhkiG9w0BAQUFADCB0jELMAkG
+A1UEBhMCQ0wxHTAbBgNVBAgTFFJlZ2lvbiBNZXRyb3BvbGl0YW5hMREwDwYDVQQH
+EwhTYW50aWFnbzEUMBIGA1UEChMLRS1DRVJUQ0hJTEUxIDAeBgNVBAsTF0F1dG9y
+aWRhZCBDZXJ0aWZpY2Fkb3JhMTAwLgYDVQQDEydFLUNFUlRDSElMRSBDQSBGSVJN
+QSBFTEVDVFJPTklDQSBTSU1QTEUxJzAlBgkqhkiG9w0BCQEWGHNjbGllbnRlc0Bl
+LWNlcnRjaGlsZS5jbDAeFw0xNzA3MzExNTI0MTRaFw0yMDA3MzAxNTI0MTRaMIHd
+MQswCQYDVQQGEwJDTDEiMCAGA1UECBMZTUVUUk9QT0xJVEFOQSBERSBTQU5USUFH
+TzERMA8GA1UEBxMIU2FudGlhZ28xFzAVBgNVBAoTDkZvdG9zdHlsZSBMdGRhMTMw
+MQYDVQQLEypWZW50YSBkZSBNYXF1aW5hcmlhIGUgaW5zdW1vcyBkZSBpbXByZXNp
+b24xJzAlBgNVBAMTHkVsaXphYmV0aCBTaWx2aWEgVmlnbmVhdSBSb2phczEgMB4G
+CSqGSIb3DQEJARYRZWxpemFiZXRoQHRpbWcuY2wwgZ8wDQYJKoZIhvcNAQEBBQAD
+gY0AMIGJAoGBAJ9I3aXY+0g5mu8tRvfTMMVA+8vy1YLWoK5VX4brpHvJE0dWFH0O
+BERO5fCFUUHA4ooj089qK1FxdQxPlO4fgzJMf6FtBQ9WPZxWb9pF78eogqHaRuli
+YQEImik69SnOrhZFuFGykkyu4VeMsCJaLmH8mhDMpy4U+lUgEfoF16OzAgMBAAGj
+ggKnMIICozA9BgkrBgEEAYI3FQcEMDAuBiYrBgEEAYI3FQiC3IMvhZOMZoXVnReC
+4twnge/sPGGBy54UhqiCWAIBZAIBBDAdBgNVHQ4EFgQUScNt9KqTexZilWVS95oU
+sEYrJGEwCwYDVR0PBAQDAgTwMB8GA1UdIwQYMBaAFHjhPp/SErN6PI3NMA5Ts0Mp
+B7NVMD4GA1UdHwQ3MDUwM6AxoC+GLWh0dHA6Ly9jcmwuZS1jZXJ0Y2hpbGUuY2wv
+ZWNlcnRjaGlsZWNhRkVTLmNybDA6BggrBgEFBQcBAQQuMCwwKgYIKwYBBQUHMAGG
+Hmh0dHA6Ly9vY3NwLmVjZXJ0Y2hpbGUuY2wvb2NzcDAjBgNVHREEHDAaoBgGCCsG
+AQQBwQEBoAwWCjE2NDI0MDM2LTMwIwYDVR0SBBwwGqAYBggrBgEEAcEBAqAMFgo5
+NjkyODE4MC01MIIBTQYDVR0gBIIBRDCCAUAwggE8BggrBgEEAcNSBTCCAS4wLQYI
+KwYBBQUHAgEWIWh0dHA6Ly93d3cuZS1jZXJ0Y2hpbGUuY2wvQ1BTLmh0bTCB/AYI
+KwYBBQUHAgIwge8egewAQwBlAHIAdABpAGYAaQBjAGEAZABvACAARgBpAHIAbQBh
+ACAAUwBpAG0AcABsAGUALgAgAEgAYQAgAHMAaQBkAG8AIAB2AGEAbABpAGQAYQBk
+AG8AIABlAG4AIABmAG8AcgBtAGEAIABwAHIAZQBzAGUAbgBjAGkAYQBsACwAIABx
+AHUAZQBkAGEAbgBkAG8AIABoAGEAYgBpAGwAaQB0AGEAZABvACAAZQBsACAAQwBl
+AHIAdABpAGYAaQBjAGEAZABvACAAcABhAHIAYQAgAHUAcwBvACAAdAByAGkAYgB1
+AHQAYQByAGkAbzANBgkqhkiG9w0BAQUFAAOCAQEAGVqwfqj5y4qCfY4G3s00zHO0
+e4GJmaC4cJd1iP09mgdEHSrjYyPkpgB7c9Dwu1MSLoBt/89cZG31uY+106nHQB0M
+lH2VP1RpNLoKwq12fI33/Imkha2TI4CJYbtlPyjemiuzcEeqS9ew1ClMp0/579QH
+GPOn/m7X7RV4ooWm4zdU9o+uv+m2UkGDPSSUqaTkUO/kq/wst+Xty11OFdn7CBf6
+MmNC2Alx7O0zw8h1Fdi9LFzgbrF3iQF29+JTsC2Os0Yd/It8atogE02Mf28k/N5D
+2H3vCO7SK5UzFGa9Vt4e0Jpe7vSH2vW2WlbnanV0BwxIk5Hzatgkjuio4Gqtkw==</X509Certificate>
+</X509Data>
+</KeyInfo>
+	</Signature>
+</EnvioDTE>

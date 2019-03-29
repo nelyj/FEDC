@@ -1,9 +1,13 @@
 from django import forms
 from django.forms import ModelForm
+from django.forms.fields import CharField
+from django.forms.widgets import PasswordInput
 from .models import *
 
 
 class FormNotaCredito(ModelForm):
+
+    # pass_certificado = CharField(widget=PasswordInput(attrs={'class':'form-control'}))
 
     class Meta:
         model = notaCredito

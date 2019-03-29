@@ -86,6 +86,7 @@ class Factura(CreationModificationDateMixin):
 
 	
 	def _firmar_dd(data, folio, instance): 
+
 		"""
 		Llena los campos de que se encuentran dentro de la etiqueta
 		<DD> del DTE y anade la firma correspondiente en la etiqueta
@@ -140,7 +141,6 @@ class Factura(CreationModificationDateMixin):
 
 		return sin_aplanar
 
-
 	def firmar_documento(etiqueta_DD, datos, folio, compania, instance,pass_certificado):
 
 		"""
@@ -194,8 +194,11 @@ class Factura(CreationModificationDateMixin):
 				'instance':instance
 			})
 
+
 		sii_sdk = SII_SDK()
 		set_dte_sin_aplanar = sii_sdk.generalSign(compania,documento_sin_aplanar,pass_certificado)
+
+
 
 		# Elimina tabulaciones y espacios para la generacion del digest
 		# digest_string = documento_sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
@@ -248,6 +251,7 @@ class Factura(CreationModificationDateMixin):
 		# Llena los datos de la plantilla signature.xml con los datos de la firma
 		# signature_tag = render_to_string('snippets/signature.xml', {'signature':firma_electronica})
 
+
 		# Agrega la firma al final del documento 
 		# set_dte_sin_aplanar += "\n{}".format(signature_tag)
 
@@ -261,6 +265,9 @@ class Factura(CreationModificationDateMixin):
 		las tabulaciones.
 
 		"""
+		# Incorpora todo el documento firmado al la presentacion final y elimina 
+		# las tabulaciones.
+
 		documento_final = render_to_string('invoice.xml', {'set_DTE':etiqueta_SetDte})
 
 		# Se firmó el archivo xml
@@ -273,8 +280,6 @@ class Factura(CreationModificationDateMixin):
 		#print(set_dte_sin_aplanar)
 
 		return '<?xml version="1.0" encoding="ISO-8859-1"?>\n'+set_dte_sin_aplanar
-
-
 
 
 	

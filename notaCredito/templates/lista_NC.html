@@ -31,7 +31,7 @@
             <td>
                 <!-- <a  id="edit_foo" href="{% url 'facturas:send-invoice' pk=id_empresa slug=lista.data.name %}" class="btn btn-info">Detalle</a>
                  -->
-                 <a  id="edit_foo" href="#" class="btn btn-info">Detalle</a>
+                 <a  id="edit_foo" href="{% url 'notaCredito:send-invoice' pk=id_empresa slug=lista.data.name %}" class="btn btn-info">Detalle</a>
 
             </td>
         </tr>

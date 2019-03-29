@@ -39,11 +39,12 @@ class SeleccionarEmpresaView(TemplateView):
         return context
 
     def post(self, request):
-        enviadas = self.request.POST.get('enviadas', None)
+        enviadas = self.request.GET.get('enviadas', None)
         empresa = int(request.POST.get('empresa'))
         if not empresa:
             return HttpResponseRedirect('/')
         empresa_obj = Compania.objects.get(pk=empresa)
+        print(enviadas)
         if empresa_obj and self.request.user == empresa_obj.owner:
             if enviadas == "1":
                 return HttpResponseRedirect(reverse_lazy('notaDebito:lista-enviadas', kwargs={'pk':empresa}))
@@ -298,20 +299,10 @@ class SendInvoice(FormView):
             return super().form_invalid(form)
         assert compania, "compania no existe"
         data['productos']=eval(data['productos'])
-        response = render_to_string('invoice.xml', {'form':data,'compania':compania})
-        # try:
-        #     os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug'])
-        #     file = open(settings.MEDIA_ROOT+'facturas'+'/'+self.kwargs['slug']+'/'+self.kwargs['slug']+'.xml','w')
-        #     file.write(response)
-        # except Exception as e:
-        #     messages.error(self.request, 'XML ya almacenado en el directorio')
-        #     return super().form_invalid(form)
-        # rut = self.request.POST.get('rut', None)
-        # assert rut, "rut no existe"
 
         form = form.save(commit=False)
         try:
-            folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=33).order_by('fecha_de_autorizacion').first()
+            folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=56).order_by('fecha_de_autorizacion').first()
 
             if not folio:
                 raise Folio.DoesNotExist
@@ -335,16 +326,33 @@ class SendInvoice(FormView):
         # Si queda uno, cambia la estructura de la oracion a singular. 
         disponibles = folio.get_folios_disponibles()
         if disponibles == 1:
+            messages.success(self.request, "Nota de débito enviada exitosamente")
             messages.info(self.request, str('Queda ')+str(disponibles)+str('folio disponible'))
         elif disponibles < 50:
+            messages.success(self.request, "Nota de débito enviada exitosamente")
             messages.info(self.request, str('Quedan ')+str(disponibles)+str('folios disponibles'))
+        else:
+            messages.success(self.request, "Nota de débito enviada exitosamente")
         form.compania = compania
         form.save()
 
-        # response_dd = render_to_string('snippets/DD_tag.xml', {'data':data,'folio':folio, 'instance':form})
-        response_dd = notaCredito._firmar_dd(data, folio, form)
+        response_dd = notaDebito._firmar_dd(data, folio, form)
+        documento_firmado = notaDebito.firmar_documento(response_dd,data,folio, compania, form)
+        documento_final_firmado = notaDebito.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
+        caratula_firmada = notaDebito.generar_documento_final(compania,documento_final_firmado)
+
+        form.dte_xml = caratula_firmada
+        form.save()
 
         # print(response_dd)
+
+        try:
+            os.makedirs(settings.MEDIA_ROOT +'notas_de_debito'+'/'+self.kwargs['slug'])
+            file = open(settings.MEDIA_ROOT+'notas_de_debito'+'/'+self.kwargs['slug']+'/'+self.kwargs['slug']+'.xml','w')
+            file.write(caratula_firmada)
+        except Exception as e:
+            messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
+            return super().form_valid(form)
 
 
         msg = "Se guardo en Base de Datos la factura con éxito"

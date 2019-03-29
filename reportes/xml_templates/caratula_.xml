@@ -1,0 +1,14 @@
+ <Caratula>
+	<RutEmisorLibro>{{compania.rut}}</RutEmisorLibro> <!-- Rut del emisor del libro -->
+	<RutEnvia>{{compania.rut}}</RutEnvia> <!-- Rut del emisor del libro -->
+	<PeriodoTributario>{{ reporte.periodo_tributario }}</PeriodoTributario> <!-- Periodo tributario, año-mes -->
+	<FchResol>{{compania.fecha_de_resol}}</FchResol> <!-- Fecha de resolucion de la empresa -->
+	<NroResol>{{compania.numero_resol}}</NroResol> <!-- Número de Resolución que autoriza al contribuyente como emisor electrónico. -->
+	<TipoOperacion>{{reporte.tipo_reporte}}</TipoOperacion> <!-- Checkear tipos de operacion disponibles  -->
+	<TipoLibro>{{reporte.tipo_libro}}</TipoLibro> <!-- Checkear cuales son los tipos de libros disponibles -->
+	<TipoEnvio>{{reporte.tipo_envio}}</TipoEnvio> <!-- Checkear cuales son los tipos de envio disponible -->
+	{% if reporte.tipo_libro == 'ESPECIAL' %}
+	<FolioNotificacion>{{reporte.folio_notificacion}}</FolioNotificacion><!-- Folio de notificación. Obligatorio si es un tipo de envío ESPECIAL (No colocar) -->
+	{% endif %}
+	
+</Caratula>
