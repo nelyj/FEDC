@@ -60,22 +60,22 @@
 		<Reference URI="">
 		<Transforms>
 			<Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
-		</Transforms>
-		<DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
-		<DigestValue></DigestValue>
-		</Reference>
-	</SignedInfo>
-	<SignatureValue></SignatureValue>
-	<KeyInfo>
-		<KeyValue>
-			<RSAKeyValue>
-			<Modulus></Modulus>
-			<Exponent></Exponent>
-			</RSAKeyValue>
-		</KeyValue>
-		<X509Data>
-		<X509Certificate></X509Certificate>
-		</X509Data>
-	</KeyInfo>
-</Signature>
+			</Transforms>
+			<DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+			<DigestValue></DigestValue>
+			</Reference>
+		</SignedInfo>
+		<SignatureValue></SignatureValue>
+		<KeyInfo>
+			<KeyValue>
+				<RSAKeyValue>
+				<Modulus></Modulus>
+				<Exponent></Exponent>
+				</RSAKeyValue>
+			</KeyValue>
+			<X509Data>
+			<X509Certificate></X509Certificate>
+			</X509Data>
+		</KeyInfo>
+	</Signature>
 </DTE>
