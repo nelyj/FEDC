@@ -11,6 +11,7 @@ from facturas.models import Factura
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres
 from mixins.models import CreationModificationDateMixin
+from utils.SIISdk import SII_SDK
 
 from bs4 import BeautifulSoup
 from Crypto.PublicKey import RSA
@@ -83,7 +84,7 @@ class notaCredito(CreationModificationDateMixin):
 		return sin_aplanar
 
 	
-	def firmar_documento(etiqueta_DD, datos, folio, compania, instance):
+	def firmar_documento(etiqueta_DD, datos, folio, compania, instance,pass_certificado):
 
 		"""
 		Llena los campos de la etiqueta <Documento>, y la firma usando la 
@@ -161,7 +162,7 @@ class notaCredito(CreationModificationDateMixin):
 
 		return set_dte_sin_aplanar
 
-	def generar_documento_final(compania,etiqueta_SetDte,pass_certificado=None):
+	def generar_documento_final(compania,etiqueta_SetDte,pass_certificado):
 
 		"""
 		Incorpora todo el documento firmado al la presentacion final y elimina 

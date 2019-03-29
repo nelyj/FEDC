@@ -338,9 +338,9 @@ class SendInvoice(FormView):
         #form.save()
 
         response_dd = notaCredito._firmar_dd(data, folio, form)
-        documento_firmado = notaCredito.firmar_documento(response_dd,data,folio, compania, form)
+        documento_firmado = notaCredito.firmar_documento(response_dd,data,folio, compania, form, pass_certificado)
         documento_final_firmado = notaCredito.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
-        caratula_firmada = notaCredito.generar_documento_final(compania,documento_final_firmado)
+        caratula_firmada = notaCredito.generar_documento_final(compania,documento_final_firmado,pass_certificado)
 
         form.dte_xml = caratula_firmada
         #form.save()
