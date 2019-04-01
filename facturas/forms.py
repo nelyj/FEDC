@@ -11,8 +11,6 @@ from conectores.models import Compania
 
 class FormFactura(ModelForm):
 
-    pass_certificado = CharField(widget=PasswordInput(attrs={'class':'form-control'}))
-
     class Meta:
         model = Factura
         fields = ['status','compania','numero_factura','senores','direccion','comuna','ciudad_receptora','transporte','despachar','observaciones',
@@ -99,7 +97,7 @@ class FormFactura(ModelForm):
         self.fields['total'].disabled = True
         self.fields['track_id'].required = False
 
-    def clean(self):
+    """def clean(self):
         cleaned_data = super(FormFactura, self).clean()
         pass_certificado = cleaned_data.get("pass_certificado")
         try:
@@ -114,4 +112,4 @@ class FormFactura(ModelForm):
             except:
                 msg = "La contraseña del certificado no es valida"
                 self.add_error("pass_certificado", msg)
-        return cleaned_data
+        return cleaned_data"""

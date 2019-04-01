@@ -15,10 +15,6 @@
 <a class="glyphicon glyphicon-list" id="menu-toggle"></a>
 <form id="form_register" method="post" enctype="multipart/form-data">
 	{% csrf_token %}
-	<div class="form-group">
-		<label>{{form.pass_certificado.label}}</label>
-		{{form.pass_certificado}}
-	</div>
 	<button id="submit" type="submit" class="btn btn-success btn-block btn-flat">Guardar</button>
 	<div class="container-fluid">
 

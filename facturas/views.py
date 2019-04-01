@@ -321,7 +321,6 @@ class SendInvoice(FormView):
 
     def form_valid(self, form, **kwargs):
         compania_id = self.kwargs['pk']
-        pass_certificado = form.cleaned_data['pass_certificado']
 
         # if form.cleaned_data['status'] == 'En proceso':
         data = form.clean()
@@ -332,6 +331,7 @@ class SendInvoice(FormView):
             messages.error(self.request, "No ha seleccionado la compania")
             return super().form_valid(form)
         assert compania, "compania no existe"
+        pass_certificado = compania.pass_certificado
         
         data['productos']=eval(data['productos'])
 
