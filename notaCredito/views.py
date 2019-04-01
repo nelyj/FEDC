@@ -361,13 +361,13 @@ class SendInvoice(FormView):
             messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
             return super().form_valid(form)
 
-        """send_sii = self.send_invoice_sii(compania,caratula_firmada,pass_certificado)
+        send_sii = self.send_invoice_sii(compania,caratula_firmada,pass_certificado)
         if(not send_sii['estado']):
             messages.error(self.request, send_sii['msg'])
             return super().form_valid(form)
         else:
             form.track_id = send_sii['track_id']
-            form.save()"""
+            form.save()
 
         session = requests.Session()
         try:

@@ -2,11 +2,11 @@
 	<RE>{{ folio.rut }}</RE>
 	<TD>{{ folio.tipo_de_documento }}</TD>
 	<F>{{ instance.n_folio }}</F>
-	<FE>{{ instance.created }}</FE>
+	<FE>{{ instance.fecha|date:"Y-m-d" }}</FE>
 	<RR>{{ data.rut }}</RR>
-	<RSR>*** Fotostyle Regalos Especiales Limitada ***</RSR>
-	<MNT>19851580</MNT>
-	<IT1>PLOTER DE CORTE 3XX ACCESORIOS Y </IT1>
+	<RSR>{{ data.senores }}</RSR>
+	<MNT>{{data.total}}</MNT>
+	<IT1>{{data.primero}}</IT1>
 	<CAF version="1.0">
 		<DA>
 			<RE>{{ folio.rut }}</RE>

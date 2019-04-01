@@ -86,7 +86,7 @@ class notaDebito(CreationModificationDateMixin):
 		return sin_aplanar
 
 		
-	def firmar_documento(etiqueta_DD, datos, folio, compania, instance):
+	def firmar_documento(etiqueta_DD, datos, folio, compania, instance, pass_certificado):
 
 		"""
 		Llena los campos de la etiqueta <Documento>, y la firma usando la 
@@ -165,7 +165,7 @@ class notaDebito(CreationModificationDateMixin):
 
 		return set_dte_sin_aplanar
 
-	def generar_documento_final(compania,etiqueta_SetDte,pass_certificado=None):
+	def generar_documento_final(compania,etiqueta_SetDte,pass_certificado):
 
 		"""
 		Incorpora todo el documento firmado al la presentacion final y elimina 

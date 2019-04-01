@@ -4,7 +4,7 @@
 			<IdDoc>
 				<TipoDTE>{{ folio.tipo_de_documento }}</TipoDTE>
 				<Folio>{{ instance.n_folio }}</Folio>
-				<FchEmis>{% now "Y-m-d" %}</FchEmis>
+				<FchEmis>{{ instance.fecha|date:"Y-m-d" }}</FchEmis>
 				<FmaPago>{{datos.forma_pago}}</FmaPago>
 			</IdDoc>
 			<Emisor>

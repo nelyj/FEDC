@@ -4,7 +4,7 @@
 			<IdDoc>
 				<TipoDTE>{{ folio.tipo_de_documento }}</TipoDTE>
 				<Folio>{{ instance.n_folio }}</Folio>
-				<FchEmis>{{ instance.created|date:"Y-m-d" }}</FchEmis>
+				<FchEmis>{{ instance.fecha|date:"Y-m-d" }}</FchEmis>
 				<FmaPago>{% if datos.forma_pago == 'Contado' %}1{% elif datos.forma_pago == 'Crédito' %}2{% elif datos.forma_pago == 'Sin costo' %}3{% endif %}</FmaPago> <!-- Configurado en conector, problemas con las condiciones -->
 			</IdDoc>
 			<Emisor>
