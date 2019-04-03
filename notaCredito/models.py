@@ -95,6 +95,33 @@ class notaCredito(CreationModificationDateMixin):
 
 		timestamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
+		# Llena los datos de la plantilla Documento_tag.xml con la informacion pertinente
+		diccionario = defaultdict(dict)
+		for x,y in ACTIVIDADES:
+			diccionario[x]=y
+		compania.giro=diccionario.get(str(compania.giro))
+		compania.giro=compania.giro[1 : -1]
+		compania.actividad_principal=compania.actividad_principal[1:-1]
+		# productos=datos.get('productos')
+		# primero=productos[0].get('item_name')
+		# datos['primero']=primero
+
+		# Ajustados los montos de productos para el xml
+		for producto in datos['productos']:
+			producto['qty'] = str(producto['qty'])
+			producto['base_net_rate'] = str(producto['base_net_rate'])
+			producto['amount'] = round(producto['amount'])
+
+		# Ajustados valores para el xml
+		if('k' in folio.rut):
+			folio.rut = folio.rut.replace('k','K')
+		if('k' in compania.rut):
+			compania.rut = compania.rut.replace('k','K')
+		if('k' in datos['rut']):
+			datos['rut'] = datos['rut'].replace('k','K')
+		datos['numero_factura'] = datos['numero_factura'].replace('º','')
+		datos['neto']=str(round(float(datos['neto'])))
+		datos['total']=str(round(float(datos['total'])))
 
 		# Llena los datos de la plantilla Documento_tag.xml con la informacion pertinente
 		documento_sin_aplanar = render_to_string(
@@ -132,6 +159,12 @@ class notaCredito(CreationModificationDateMixin):
 		# Genera timestamp en formato correspondiente
 		timestamp_firma = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 		#timestamp_firma = "{}T{}".format(now[0],now[1])
+
+		# Ajustados los rut para el xml
+		if('k' in folio.rut):
+			folio.rut = folio.rut.replace('k','K')
+		if('k' in compania.rut):
+			compania.rut = compania.rut.replace('k','K')
 
 		# LLena la plantilla set_DTE_tag.xml con los datos correspondientes
 		set_dte_sin_aplanar = render_to_string(
