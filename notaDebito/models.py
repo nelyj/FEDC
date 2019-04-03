@@ -19,7 +19,7 @@ from bs4 import BeautifulSoup
 from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA
 from Crypto.Signature import PKCS1_v1_5
-
+from collections import defaultdict
 
 class notaDebito(CreationModificationDateMixin):
 	"""!
@@ -73,7 +73,19 @@ class notaDebito(CreationModificationDateMixin):
 
 	def _firmar_dd(data, folio, instance): 
 		timestamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-		#timestamp = f"{now[0]}T{now[1]}"
+
+		productos=data.get('productos')
+		primero=productos[0].get('item_name')
+		data['primero']=primero
+
+		# Ajustados montos y rut para el xml
+		if('k' in folio.rut):
+			folio.rut = folio.rut.replace('k','K')
+		if('k' in data['rut']):
+			data['rut'] = data['rut'].replace('k','K')
+		if('.' in data['rut']):
+			data['rut'] = data['rut'].replace('.','')
+
 		sin_aplanar = render_to_string('snippets/DD_tag.xml', {'data':data,'folio':folio, 'instance':instance, 'timestamp':timestamp})
 		digest_string = sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
 		RSAprivatekey = RSA.importKey(folio.pem_private)
