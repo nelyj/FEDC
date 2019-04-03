@@ -5,7 +5,7 @@
 				<TipoDTE>{{ folio.tipo_de_documento }}</TipoDTE>
 				<Folio>{{ instance.n_folio }}</Folio>
 				<FchEmis>{{ instance.fecha|date:"Y-m-d" }}</FchEmis>
-				<FmaPago>{% if datos.forma_pago == 'Contado' %}1{% elif datos.forma_pago == 'Crédito' %}2{% elif datos.forma_pago == 'Sin costo' %}3{% endif %}</FmaPago> <!-- Configurado en conector, problemas con las condiciones -->
+				<FmaPago>{% if datos.forma_pago == 'Contado' %}1{% elif datos.forma_pago == 'Crédito' %}2{% elif datos.forma_pago == 'Sin costo' %}3{% endif %}</FmaPago>
 			</IdDoc>
 			<Emisor>
 				<RUTEmisor>{{compania.rut}}</RUTEmisor>
@@ -20,8 +20,8 @@
 				<RznSocRecep>{{datos.senores}}</RznSocRecep>
 				<GiroRecep>{{datos.giro}}</GiroRecep>
 				<DirRecep>{{datos.direccion}}</DirRecep>
-				<CmnaRecep>{{datos.comuna|upper}}</CmnaRecep> <!-- No configurado en conector -->
-				<CiudadRecep>REGION METROPOLITANA</CiudadRecep> <!-- No configurado en conector -->
+				<CmnaRecep>{{datos.comuna|upper}}</CmnaRecep>
+				<CiudadRecep>{{datos.ciudad_receptora}}</CiudadRecep>
 			</Receptor>
 			<Totales>
 				<MntNeto>{{datos.neto}}</MntNeto>
@@ -51,7 +51,7 @@
 		<TED version="1.0">{% autoescape off %}
 			{{ DD }}{% endautoescape %}
 		</TED>
-		<TmstFirma>{{ timestamp_documento }}</TmstFirma>
+		<TmstFirma>{{ timestamp }}</TmstFirma>
 	</Documento>
 	<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
 		<SignedInfo>

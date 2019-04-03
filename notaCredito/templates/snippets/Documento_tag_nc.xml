@@ -51,7 +51,7 @@
 		<TED version="1.0">{% autoescape off %}
 			{{ DD }}{% endautoescape %}
 		</TED>
-		<TmstFirma>{{ timestamp_documento }}</TmstFirma>
+		<TmstFirma>{{ timestamp }}</TmstFirma>
 	</Documento>
 	<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
 		<SignedInfo>
