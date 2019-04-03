@@ -21,6 +21,8 @@ from Crypto.Hash import SHA
 from Crypto.Signature import PKCS1_v1_5
 from collections import defaultdict
 
+from utils.SIISdk import SII_SDK
+
 class notaDebito(CreationModificationDateMixin):
 	"""!
 	Modelo Nota de Debito
@@ -229,7 +231,7 @@ class notaDebito(CreationModificationDateMixin):
 
 		#print(set_dte_sin_aplanar)
 
-		return '<?xml version="1.0" encoding="ISO-8859-1"?>'+set_dte_sin_aplanar
+		return '<?xml version="1.0" encoding="ISO-8859-1"?>\n'+set_dte_sin_aplanar
 		# return documento_final_sin_tabs
 
 		#return documento_final
