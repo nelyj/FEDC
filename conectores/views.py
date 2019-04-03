@@ -179,8 +179,8 @@ class CompaniaUpdate(FormView):
                 'pass_correo_intercambio': form['pass_correo_intercambio'].value(),
                 'correo_intercambio': form['correo_intercambio'].value(),
                 'logo': form['logo'].value(),
-                'tasa_de_iva': form['tasa_de_iva'].value()
-
+                'tasa_de_iva': form['tasa_de_iva'].value(),
+                'pass_certificado': form['pass_certificado'].value()
                 })
             msg = "Se Actualizo la Compañia con éxito"
             messages.info(self.request, msg)

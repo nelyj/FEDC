@@ -44,3 +44,4 @@ config/settings.py
 config/wsgi.py
 __pycache__/
 migrations/
+migrations/*

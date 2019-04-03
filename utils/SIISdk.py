@@ -156,6 +156,7 @@ class SII_SDK():
         headers['Content-Type'] = datos.content_type
         response = requests.post('https://maullin.sii.cl/cgi_dte/UPL/DTEUpload',data=datos,headers=headers)
         xml_response = ET.fromstring(response.content)
+        print(response.content)
         estado = xml_response.find('STATUS').text
         if(estado=='0'):
             track_id = xml_response.find('TRACKID').text

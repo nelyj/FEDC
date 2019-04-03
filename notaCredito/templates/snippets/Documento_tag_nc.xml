@@ -4,8 +4,8 @@
 			<IdDoc>
 				<TipoDTE>{{ folio.tipo_de_documento }}</TipoDTE>
 				<Folio>{{ instance.n_folio }}</Folio>
-				<FchEmis>{% now "Y-m-d" %}</FchEmis>
-				<FmaPago>{{datos.forma_pago}}1</FmaPago>
+				<FchEmis>{{ instance.fecha|date:"Y-m-d" }}</FchEmis>
+				<FmaPago>{{datos.forma_pago}}</FmaPago>
 			</IdDoc>
 			<Emisor>
 				<RUTEmisor>{{compania.rut}}</RUTEmisor>
@@ -43,7 +43,7 @@
 			<MontoItem>{{prod.amount}}</MontoItem>
 		</Detalle>{%endfor%}{%if datos.orden_compra %}
 		<Referencia>
-			<NroLinRef>1</NroLinRef> <!-- EXPLICAR de donde sale este numero caso real -->
+			<NroLinRef>1</NroLinRef>
 			<TpoDocRef>801</TpoDocRef>
 			<FolioRef>{{datos.orden_compra}}</FolioRef>
 			<FchRef>{% now "Y-m-d" %}</FchRef>
@@ -51,7 +51,7 @@
 		<TED version="1.0">{% autoescape off %}
 			{{ DD }}{% endautoescape %}
 		</TED>
-		<TmstFirma>{{ timestamp_documento }}</TmstFirma>
+		<TmstFirma>{{ timestamp }}</TmstFirma>
 	</Documento>
 	<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
 		<SignedInfo>

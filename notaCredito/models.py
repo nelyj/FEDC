@@ -11,11 +11,13 @@ from facturas.models import Factura
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres
 from mixins.models import CreationModificationDateMixin
+from utils.SIISdk import SII_SDK
 
 from bs4 import BeautifulSoup
 from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA
 from Crypto.Signature import PKCS1_v1_5
+from collections import defaultdict
 
 
 class notaCredito(CreationModificationDateMixin):
@@ -48,6 +50,7 @@ class notaCredito(CreationModificationDateMixin):
 	total = models.CharField(max_length=128, blank=True, null=True)
 	n_folio = models.IntegerField(null=True, default=0)
 	dte_xml = models.TextField(null=True, blank=True)
+	track_id = models.CharField(max_length=32, blank=True, null=True)
 	
 	class Meta:
 		ordering = ('numero_factura',)
@@ -69,7 +72,22 @@ class notaCredito(CreationModificationDateMixin):
 
 	def _firmar_dd(data, folio, instance): 
 		timestamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-		#timestamp = "{}T{}".format(now[0],now[1])
+		
+		productos=data.get('productos')
+		primero=productos[0].get('item_name')
+		data['primero']=primero
+
+		# Ajustados montos y rut para el xml
+		if('k' in folio.rut):
+			folio.rut = folio.rut.replace('k','K')
+		if('k' in data['rut']):
+			data['rut'] = data['rut'].replace('k','K')
+		if('.' in data['rut']):
+			data['rut'] = data['rut'].replace('.','')
+
+		data['neto']=str(round(float(data['neto'])))
+		data['total']=str(round(float(data['total'])))
+
 		sin_aplanar = render_to_string('snippets/DD_tag_nc.xml', {'data':data,'folio':folio, 'instance':instance, 'timestamp':timestamp})
 		digest_string = sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
 		RSAprivatekey = RSA.importKey(folio.pem_private)
@@ -82,7 +100,7 @@ class notaCredito(CreationModificationDateMixin):
 		return sin_aplanar
 
 	
-	def firmar_documento(etiqueta_DD, datos, folio, compania, instance):
+	def firmar_documento(etiqueta_DD, datos, folio, compania, instance,pass_certificado):
 
 		"""
 		Llena los campos de la etiqueta <Documento>, y la firma usando la 
@@ -91,10 +109,35 @@ class notaCredito(CreationModificationDateMixin):
 		el certificado.
 		"""
 
-		now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S").split()
+		timestamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
-		# Crea timestamp en formato correspondiente
-		timestamp = "{}T{}".format(now[0],now[1])
+		# Llena los datos de la plantilla Documento_tag.xml con la informacion pertinente
+		diccionario = defaultdict(dict)
+		for x,y in ACTIVIDADES:
+			diccionario[x]=y
+		compania.giro=diccionario.get(str(compania.giro))
+		compania.giro=compania.giro[1 : -1]
+		compania.actividad_principal=compania.actividad_principal[1:-1]
+		# productos=datos.get('productos')
+		# primero=productos[0].get('item_name')
+		# datos['primero']=primero
+
+		# Ajustados los montos de productos para el xml
+		for producto in datos['productos']:
+			producto['qty'] = str(producto['qty'])
+			producto['base_net_rate'] = str(producto['base_net_rate'])
+			producto['amount'] = round(producto['amount'])
+
+		# Ajustados valores para el xml
+		if('k' in folio.rut):
+			folio.rut = folio.rut.replace('k','K')
+		if('k' in compania.rut):
+			compania.rut = compania.rut.replace('k','K')
+		if('k' in datos['rut']):
+			datos['rut'] = datos['rut'].replace('k','K')
+		datos['numero_factura'] = datos['numero_factura'].replace('º','')
+		datos['neto']=str(round(float(datos['neto'])))
+		datos['total']=str(round(float(datos['total'])))
 
 		# Llena los datos de la plantilla Documento_tag.xml con la informacion pertinente
 		documento_sin_aplanar = render_to_string(
@@ -108,8 +151,8 @@ class notaCredito(CreationModificationDateMixin):
 			})
 
 
-		# sii_sdk = SII_SDK()
-		# set_dte_sin_aplanar = sii_sdk.generalSign(compania,documento_sin_aplanar,pass_certificado)
+		sii_sdk = SII_SDK()
+		set_dte_sin_aplanar = sii_sdk.generalSign(compania,documento_sin_aplanar,pass_certificado)
 
 
 		# Elimina tabulaciones y espacios para la generacion del digest
@@ -124,7 +167,7 @@ class notaCredito(CreationModificationDateMixin):
 		# Agrega la plantilla signature.xml al final del documento
 		# documento_sin_aplanar += "\n{}".format(signature_tag)
 	
-		return documento_sin_aplanar
+		return set_dte_sin_aplanar
 
 	def firmar_etiqueta_set_dte(compania, folio, etiqueta_Documento):
 
@@ -132,6 +175,12 @@ class notaCredito(CreationModificationDateMixin):
 		# Genera timestamp en formato correspondiente
 		timestamp_firma = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 		#timestamp_firma = "{}T{}".format(now[0],now[1])
+
+		# Ajustados los rut para el xml
+		if('k' in folio.rut):
+			folio.rut = folio.rut.replace('k','K')
+		if('k' in compania.rut):
+			compania.rut = compania.rut.replace('k','K')
 
 		# LLena la plantilla set_DTE_tag.xml con los datos correspondientes
 		set_dte_sin_aplanar = render_to_string(
@@ -162,7 +211,7 @@ class notaCredito(CreationModificationDateMixin):
 
 		return set_dte_sin_aplanar
 
-	def generar_documento_final(compania,etiqueta_SetDte,pass_certificado=None):
+	def generar_documento_final(compania,etiqueta_SetDte,pass_certificado):
 
 		"""
 		Incorpora todo el documento firmado al la presentacion final y elimina 
@@ -175,15 +224,15 @@ class notaCredito(CreationModificationDateMixin):
 		documento_final = render_to_string('nc_base.xml', {'set_DTE':etiqueta_SetDte})
 
 		# Se firmó el archivo xml
-		# sii_sdk = SII_SDK()
-		# set_dte_sin_aplanar = sii_sdk.multipleSign(compania,documento_final,pass_certificado,1)
+		sii_sdk = SII_SDK()
+		set_dte_sin_aplanar = sii_sdk.multipleSign(compania,documento_final,pass_certificado,1)
 		#set_dte_sin_aplanar = sii_sdk.generalSign(compania,set_dte_sin_aplanar,pass_certificado,1)
 
 		#documento_final_sin_tabs = documento_final.replace('\t','').replace('\r','')
 
 		#print(set_dte_sin_aplanar)
 
-		# return '<?xml version="1.0" encoding="ISO-8859-1"?>'+set_dte_sin_aplanar
+		return '<?xml version="1.0" encoding="ISO-8859-1"?>\n'+set_dte_sin_aplanar
 		# return documento_final_sin_tabs
 
-		return documento_final
+		#return documento_final

@@ -1,28 +1,27 @@
-from django.contrib import messages
-from django.views.generic.edit import FormView
-from django.shortcuts import render
-from django.views.generic.base import TemplateView, View
-from django.views.generic import ListView
 import requests
-from requests import Request, Session
 import dicttoxml
 import json
-from django.template.loader import render_to_string
-from django.http import HttpResponse, HttpResponseRedirect
-from conectores.models import *
 import codecs
+import os
+from requests import Request, Session
+from django.conf import settings
+from django.contrib import messages
+from django.http import HttpResponse, HttpResponseRedirect, FileResponse
+from django.shortcuts import render
+from django.template.loader import render_to_string
+from django.urls import reverse_lazy
+from django.views.generic import ListView
+from django.views.generic.base import TemplateView, View
+from django.views.generic.edit import FormView
+from conectores.models import *
 from conectores.forms import FormCompania
 from conectores.models import *
-from django.http import HttpResponse
-from .forms import *
-from django.urls import reverse_lazy
-from django.http import FileResponse
-import os
-from django.conf import settings
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
 from facturas.models import Factura
 from notaCredito.models import notaCredito
+from utils.SIISdk import SII_SDK
+from .forms import *
 
 class SeleccionarEmpresaView(TemplateView):
     template_name = 'seleccionar_empresa_NC.html'
@@ -297,6 +296,7 @@ class SendInvoice(FormView):
             messages.error(self.request, "No ha seleccionado la compania")
             return super().form_invalid(form)
         assert compania, "compania no existe"
+        pass_certificado = compania.pass_certificado
         data['productos']=eval(data['productos'])
 
         form = form.save(commit=False)
@@ -335,15 +335,15 @@ class SendInvoice(FormView):
         else:
             messages.success(self.request, "Nota de crédito enviada exitosamente")
         form.compania = compania
-        form.save()
+        #form.save()
 
         response_dd = notaCredito._firmar_dd(data, folio, form)
-        documento_firmado = notaCredito.firmar_documento(response_dd,data,folio, compania, form)
+        documento_firmado = notaCredito.firmar_documento(response_dd,data,folio, compania, form, pass_certificado)
         documento_final_firmado = notaCredito.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
-        caratula_firmada = notaCredito.generar_documento_final(compania,documento_final_firmado)
+        caratula_firmada = notaCredito.generar_documento_final(compania,documento_final_firmado,pass_certificado)
 
         form.dte_xml = caratula_firmada
-        form.save()
+        #form.save()
         print(caratula_firmada)
         # documento_final_firmado = Factura.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
         # caratula_firmada = Factura.generar_documento_final(compania,documento_final_firmado,pass_certificado)
@@ -351,12 +351,23 @@ class SendInvoice(FormView):
         # print(response_dd)
 
         try:
-            os.makedirs(settings.MEDIA_ROOT +'notas_de_credito'+'/'+self.kwargs['slug'])
-            file = open(settings.MEDIA_ROOT+'notas_de_credito'+'/'+self.kwargs['slug']+'/'+self.kwargs['slug']+'.xml','w')
-            file.write(caratula_firmada)
+            xml_dir = settings.MEDIA_ROOT +'notas_de_credito'+'/'+self.kwargs['slug']
+            if(not os.path.isdir(xml_dir)):
+                os.makedirs(xml_dir)
+            f = open(xml_dir+'/'+self.kwargs['slug']+'.xml','w')
+            f.write(caratula_firmada)
+            f.close()
         except Exception as e:
             messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
             return super().form_valid(form)
+
+        send_sii = self.send_invoice_sii(compania,caratula_firmada,pass_certificado)
+        if(not send_sii['estado']):
+            messages.error(self.request, send_sii['msg'])
+            return super().form_valid(form)
+        else:
+            form.track_id = send_sii['track_id']
+            form.save()
 
         session = requests.Session()
         try:
@@ -376,6 +387,39 @@ class SendInvoice(FormView):
     def form_invalid(self, form):
         messages.error(self.request, form.errors)
         return super().form_invalid(form)
+
+    def send_invoice_sii(self,compania,invoice, pass_certificado):
+        """
+        Método para enviar la factura al sii
+        @param compania recibe el objeto compañia
+        @param invoice recibe el xml de la factura
+        @param pass_certificado recibe la contraseña del certificado
+        @return dict con la respuesta
+        """
+        try:
+            sii_sdk = SII_SDK()
+            seed = sii_sdk.getSeed()
+            try:
+                sign = sii_sdk.signXml(seed, compania, pass_certificado)
+                token = sii_sdk.getAuthToken(sign)
+                if(token):
+                    print(token)
+                    try:
+                        invoice_reponse = sii_sdk.sendInvoice(token,invoice,compania.rut,'60803000-K')
+                        return {'estado':invoice_reponse['success'],'msg':invoice_reponse['message'],
+                        'track_id':invoice_reponse['track_id']}
+                    except Exception as e:
+                        print(e)
+                        return {'estado':False,'msg':'No se pudo enviar la factura'}    
+                else:
+                    return {'estado':False,'msg':'No se pudo obtener el token del sii'}
+            except Exception as e:
+                print(e)
+                return {'estado':False,'msg':'Ocurrió un error al firmar el documento'}
+            return {'estado':True}
+        except Exception as e:
+            print(e)
+            return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
 
 class NotaCreditoEnviadasView(ListView):
     template_name = 'NC_enviadas.html'
