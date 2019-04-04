@@ -11,6 +11,7 @@ urlpatterns = [
     re_path(r'^facturas-enviadas/(?P<pk>\d+)/$', FacturasEnviadasView.as_view(),name='lista-enviadas'),
     path('enviar-factura/<int:pk>/<str:slug>/', SendInvoice.as_view(),name='send-invoice'),
     path('imprimir-factura/<int:pk>/<str:slug>/', ImprimirFactura.as_view(),name="imprimir_factura"),
+    path('estado-factura/<int:pk>/<str:slug>/',VerEstadoFactura.as_view(),name="ver_estado"),
 ]
 
 
