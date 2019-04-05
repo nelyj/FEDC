@@ -4,6 +4,7 @@ import codecs, dicttoxml, json, os, requests
 from requests import Request, Session
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect
 from django.http import HttpResponse
 from django.urls import reverse_lazy
@@ -26,7 +27,7 @@ from .forms import *
 from .models import Factura
 from .constants import NOMB_DOC
 
-class SeleccionarEmpresaView(TemplateView):
+class SeleccionarEmpresaView(LoginRequiredMixin,TemplateView):
     template_name = 'seleccionar_empresa.html'
 
     def get_context_data(self, *args, **kwargs): 
@@ -60,7 +61,7 @@ class SeleccionarEmpresaView(TemplateView):
         else:
             return HttpResponseRedirect('/')
 
-class ListaFacturasViews(TemplateView):
+class ListaFacturasViews(LoginRequiredMixin,TemplateView):
     template_name = 'lista_facturas.html'
 
     def dispatch(self, *args, **kwargs):
@@ -137,7 +138,7 @@ class ListaFacturasViews(TemplateView):
         session.close()
         return context
 
-class DeatailInvoice(TemplateView):
+class DeatailInvoice(LoginRequiredMixin, TemplateView):
     template_name = 'detail_invoice.html'
 
     def get_context_data(self, **kwargs):
@@ -159,7 +160,7 @@ class DeatailInvoice(TemplateView):
         context['values'] = list(aux['data'].values())
         return context
 
-class SendInvoice(FormView):
+class SendInvoice(LoginRequiredMixin, FormView):
     template_name = 'envio_sii.html'
     form_class = FormFactura
 
@@ -459,7 +460,7 @@ class SendInvoice(FormView):
             return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
 
 
-class FacturasEnviadasView(ListView):
+class FacturasEnviadasView(LoginRequiredMixin, ListView):
     template_name = 'facturas_enviadas.html'
 
 
@@ -470,7 +471,7 @@ class FacturasEnviadasView(ListView):
 
 
 
-class ImprimirFactura(TemplateView,WeasyTemplateResponseMixin):
+class ImprimirFactura(LoginRequiredMixin, TemplateView,WeasyTemplateResponseMixin):
     """!
     Class para imprimir la factura en PDF
 
@@ -514,7 +515,7 @@ class ImprimirFactura(TemplateView,WeasyTemplateResponseMixin):
         context['productos'] = productos
         return context
 
-class VerEstadoFactura(TemplateView):
+class VerEstadoFactura(LoginRequiredMixin, TemplateView):
     """!
     Clase para ver el estado de envio de una factura
 

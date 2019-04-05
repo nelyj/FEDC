@@ -1,23 +1,20 @@
+import requests, dicttoxml, json, codecs, os
 from django.contrib import messages
-from django.views.generic.edit import FormView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.views.generic.base import TemplateView, View
+from django.views.generic.edit import FormView
 from django.views.generic import ListView
-import requests
 from requests import Request, Session
-import dicttoxml
-import json
 from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect
 from conectores.models import *
-import codecs
 from conectores.forms import FormCompania
 from conectores.models import *
 from django.http import HttpResponse
 from .forms import *
 from django.urls import reverse_lazy
 from django.http import FileResponse
-import os
 from django.conf import settings
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
@@ -25,7 +22,7 @@ from facturas.models import Factura
 from notaDebito.models import notaDebito
 from utils.SIISdk import SII_SDK
 
-class SeleccionarEmpresaView(TemplateView):
+class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
     template_name = 'seleccionar_empresa_ND.html'
 
     def get_context_data(self, *args, **kwargs): 
@@ -54,7 +51,7 @@ class SeleccionarEmpresaView(TemplateView):
         else:
             return HttpResponseRedirect('/')
 
-class ListaNotaDebitoViews(TemplateView):
+class ListaNotaDebitoViews(LoginRequiredMixin, TemplateView):
     template_name = 'lista_ND.html'
 
     def dispatch(self, *args, **kwargs):
@@ -121,7 +118,7 @@ class ListaNotaDebitoViews(TemplateView):
         session.close()
         return context
 
-class DeatailInvoice(TemplateView):
+class DeatailInvoice(LoginRequiredMixin, TemplateView):
     template_name = 'detail_ND.html'
 
     def get_context_data(self, **kwargs):
@@ -143,7 +140,7 @@ class DeatailInvoice(TemplateView):
         context['values'] = list(aux['data'].values())
         return context
 
-class SendInvoice(FormView):
+class SendInvoice(LoginRequiredMixin, FormView):
     template_name = 'envio_sii_ND.html'
     form_class =FormNotaDebito
 
@@ -420,7 +417,7 @@ class SendInvoice(FormView):
             print(e)
             return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
 
-class NotaDebitoEnviadasView(ListView):
+class NotaDebitoEnviadasView(LoginRequiredMixin, ListView):
     template_name = 'ND_enviadas.html'
 
 

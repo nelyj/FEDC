@@ -6,6 +6,7 @@ import os
 from requests import Request, Session
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect, FileResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
@@ -23,7 +24,7 @@ from notaCredito.models import notaCredito
 from utils.SIISdk import SII_SDK
 from .forms import *
 
-class SeleccionarEmpresaView(TemplateView):
+class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
     template_name = 'seleccionar_empresa_NC.html'
 
     def get_context_data(self, *args, **kwargs): 
@@ -51,7 +52,7 @@ class SeleccionarEmpresaView(TemplateView):
         else:
             return HttpResponseRedirect('/')
 
-class ListaNotaCreditoViews(TemplateView):
+class ListaNotaCreditoViews(LoginRequiredMixin, TemplateView):
     template_name = 'lista_NC.html'
 
     def dispatch(self, *args, **kwargs):
@@ -118,7 +119,7 @@ class ListaNotaCreditoViews(TemplateView):
         session.close()
         return context
 
-class DeatailInvoice(TemplateView):
+class DeatailInvoice(LoginRequiredMixin, TemplateView):
     template_name = 'detail_NC.html'
 
     def get_context_data(self, **kwargs):
@@ -140,7 +141,7 @@ class DeatailInvoice(TemplateView):
         context['values'] = list(aux['data'].values())
         return context
 
-class SendInvoice(FormView):
+class SendInvoice(LoginRequiredMixin, FormView):
     template_name = 'envio_sii_NC.html'
     form_class =FormNotaCredito
 
@@ -421,7 +422,7 @@ class SendInvoice(FormView):
             print(e)
             return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
 
-class NotaCreditoEnviadasView(ListView):
+class NotaCreditoEnviadasView(LoginRequiredMixin, ListView):
     template_name = 'NC_enviadas.html'
 
 
