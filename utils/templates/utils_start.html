@@ -70,18 +70,19 @@
             <div class="collapse" id="boletas-collapse">
                 <ul class="submenu" id="marketing_services">
                     <li><a href="{% url 'boletas:seleccionar-empresa' %}">Boletas no enviadas</a></li>
-                    <!-- <li><a href="{% url 'boletas:seleccionar-empresa' %}?enviadas=1">Boletas enviadas</a> </li>-->
                 </ul>
             </div>
             <li>
                 <a data-toggle="collapse" href="#guias-collapse" aria-expanded="false" aria-controls="guias-collapse">Guia de Despacho</a>
-                <a href="{% url 'reportes:seleccionar-empresa' %}">Reportes</a>
             </li>
             <div class="collapse" id="guias-collapse">
                 <ul class="submenu" id="marketing_services">
                     <li><a href="{% url 'guiaDespacho:seleccionar-empresa' %}">Guias no enviadas</a></li>
                 </ul>
             </div>
+                <a href="{% url 'reportes:seleccionar-empresa' %}">Reportes</a>
+            </li>
+            <li>
                 <li>
                     <a href="{% url 'conectores:registrar_conector' %}">Configuracion de conectores</a>
                 </li>

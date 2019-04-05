@@ -77,6 +77,16 @@ class LoginView(FormView):
     model = UserProfile
     form_vali = FormTwoStepLogin
 
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Returns the initial data to use for forms on this view.
+        """
+        dispatch = super(LoginView,self).dispatch(request, *args, **kwargs)
+        if request.user.is_authenticated:
+            print('utenticado')
+            return redirect('utils:inicio')
+        return dispatch
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form_validationcode'] = self.form_vali

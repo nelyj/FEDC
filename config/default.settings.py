@@ -48,9 +48,9 @@ PROJECT_APPS = [
     'folios',
     'boletas',
     'certificados',
-    'guiaDespacho',
-    'notaDebito',
-    'notaCredito',
+    'guia_despacho',
+    'nota_debito',
+    'nota_credito',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS

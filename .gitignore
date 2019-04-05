@@ -27,6 +27,8 @@ notaCredito/migrations/
 notaCredito/__pycache__
 notaDebito/migrations/
 notaDebito/__pycache__
+*/__pycache__
+*/migrations
 *.*.backup
 *.*~
 *.swp
@@ -44,3 +46,4 @@ config/settings.py
 config/wsgi.py
 __pycache__/
 migrations/
+migrations/*

@@ -156,6 +156,7 @@ class SII_SDK():
         headers['Content-Type'] = datos.content_type
         response = requests.post('https://maullin.sii.cl/cgi_dte/UPL/DTEUpload',data=datos,headers=headers)
         xml_response = ET.fromstring(response.content)
+        print(response.content)
         estado = xml_response.find('STATUS').text
         if(estado=='0'):
             track_id = xml_response.find('TRACKID').text
@@ -163,3 +164,67 @@ class SII_SDK():
         else:
             message = xml_response.find('ERROR').text
             return {'success':False,'message':message}
+
+    def checkDTEstatus(self, rut_consultante, track_id, token):
+        """
+        Método para chequear el estado de una factura enviada
+        @param rut_consultante recibe el rut
+        @param track_id recibe el id de rastreo
+        @param token recibe el token
+        @return xml con los datos 
+        """
+        rut, dv = rut_consultante.split('-')
+        soap = '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">'
+        soap += '<SOAP-ENV:Body><m:getEstUp xmlns:m="http://maullin.sii.cl/DTEWS/QueryEstUp.jws">'
+        soap += '<Rut xsi:type="xsd:string">'+rut+'</Rut>'
+        soap += '<Dv xsi:type="xsd:string">'+dv+'</Dv>'
+        soap += '<TrackId xsi:type="xsd:string">'+track_id+'</TrackId>'
+        soap += '<Token xsi:type="xsd:string">'+token+'</Token> '
+        soap += '</m:getEstUp></SOAP-ENV:Body></SOAP-ENV:Envelope>'
+        headers = {'content-type': 'text/xml', 'SOAPAction':''}
+        response = requests.post('https://maullin.sii.cl/DTEWS/QueryEstUp.jws?WSDL',data=soap,headers=headers)
+        body = self._get_soap_body(response.content)
+        response = body.find('{http://maullin.sii.cl/DTEWS/QueryEstUp.jws}getEstUpResponse').find('{http://maullin.sii.cl/DTEWS/QueryEstUp.jws}getEstUpReturn').text
+        xml_response = ET.fromstring(response)
+        estado = xml_response.find('{http://www.sii.cl/XMLSchema}RESP_HDR').find('ESTADO').text
+        glosa = xml_response.find('{http://www.sii.cl/XMLSchema}RESP_HDR').find('GLOSA').text
+        return {'estado':estado,'glosa':glosa}
+
+    def checkDTE(self,rut_consultante, rut_compania, rut_receptor, TipoDte, FolioDte,
+        FechaEmisionDte, MontoDte, Token):
+        """
+        Método para chequear el estado de una factura enviada
+        @param rut_consultante recibe el rut del consultante
+        @param rut_compania recibe el rut de la compañia
+        @param rut_receptor recibe el rut del receptor
+        @param TipoDte recibe el tipo de DTE
+        @param FolioDte recibe el número del folio
+        @param FechaEmisionDte recibe la fecha de emisión del DTE
+        @param MontoDte recibe el monto del DTE
+        @param Token recibe el token
+        @return xml con los datos 
+        """
+        RutConsultante, DvConsultante = rut_consultante.split('-')
+        RutCompania, DvCompania = rut_compania.split('-')
+        RutReceptor, DvReceptor = rut_receptor.split('-')
+        soap = '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">'
+        soap += '<SOAP-ENV:Body><m:getEstDte xmlns:m="http://maullin.sii.cl/DTEWS/QueryEstDte.jws">'
+        soap += '<RutConsultante xsi:type="xsd:string">'+RutConsultante+'</RutConsultante>'
+        soap += '<DvConsultante xsi:type="xsd:string">'+DvConsultante+'</DvConsultante>'
+        soap += '<RutCompania xsi:type="xsd:string">'+RutCompania+'</RutCompania>'
+        soap += '<DvCompania xsi:type="xsd:string">'+DvCompania+'</DvCompania>'
+        soap += '<RutReceptor xsi:type="xsd:string">'+RutReceptor+'</RutReceptor>'
+        soap += '<DvReceptor xsi:type="xsd:string">'+DvReceptor+'</DvReceptor>'
+        soap += '<TipoDte xsi:type="xsd:string">'+TipoDte+'</TipoDte>'
+        soap += '<FolioDte xsi:type="xsd:string">'+FolioDte+'</FolioDte>'
+        soap += '<FechaEmisionDte xsi:type="xsd:string">'+FechaEmisionDte+'</FechaEmisionDte>'
+        soap += '<MontoDte xsi:type="xsd:string">'+MontoDte+'</MontoDte>'
+        soap += '<Token xsi:type="xsd:string">'+Token+'</Token> '
+        soap += '</m:getEstDte></SOAP-ENV:Body></SOAP-ENV:Envelope>'
+        headers = {'content-type': 'text/xml', 'SOAPAction':''}
+        response = requests.post('https://maullin.sii.cl/D TEWS/QueryEstDte.jws?WSDL',data=soap,headers=headers)
+        body = self._get_soap_body(response.content)
+        response = body.find('{http://maullin.sii.cl/DTEWS/QueryEstDte.jws}getEstDteResponse').find('{http://maullin.sii.cl/DTEWS/QueryEstDte.jws}getEstDteReturn').text
+        xml_response = ET.fromstring(response)
+        estado = xml_response.find('{http://www.sii.cl/XMLSchema}RESP_HDR').find('ESTADO').text
+        glosa = xml_response.find('{http://www.sii.cl/XMLSchema}RESP_HDR').find('GLOSA').text

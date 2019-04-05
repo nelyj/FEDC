@@ -1,0 +1,23 @@
+<DD>
+	<RE>{{ folio.rut }}</RE>
+	<TD>{{ folio.tipo_de_documento }}</TD>
+	<F>{{ instance.n_folio }}</F>
+	<FE>{{ instance.fecha|date:"Y-m-d" }}</FE>
+	<RR>{{ data.rut }}</RR>
+	<RSR>{{ data.senores }}</RSR>
+	<MNT>{{data.total}}</MNT>
+	<IT1>{{data.primero}}</IT1>
+	<CAF version="1.0">
+		<DA>
+			<RE>{{ folio.rut }}</RE>
+			<RS>{{ folio.razon_social }}</RS>
+			<TD>{{ folio.tipo_de_documento }}</TD>
+			<RNG><D>{{ folio.rango_desde }}</D><H>{{ folio.rango_hasta }}</H></RNG>
+			<FA>{{ folio.fecha_de_autorizacion|date:"Y-m-d" }}</FA>
+			<RSAPK><M>{{ folio.pk_modulo }}</M><E>{{folio.pk_exponente}}</E></RSAPK>
+			<IDK>{{ folio.idk }}</IDK>
+		</DA>
+		<FRMA algoritmo="SHA1withRSA">{{ folio.firma }}</FRMA>
+	</CAF>
+	<TSTED>{{ timestamp }}</TSTED>
+</DD>

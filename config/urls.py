@@ -43,9 +43,9 @@ urlpatterns = [
     path('', include('facturas.urls', namespace="facturas")),
     path('', include('folios.urls', namespace="folios")),
     path('', include('boletas.urls',namespace="boletas")),
-    path('', include('guiaDespacho.urls',namespace="guiaDespacho")),
-    path('', include('notaCredito.urls',namespace="notaCredito")),
-    path('', include('notaDebito.urls',namespace="notaDebito")),
+    path('', include('guia_despacho.urls',namespace="guiaDespacho")),
+    path('', include('nota_credito.urls',namespace="notaCredito")),
+    path('', include('nota_debito.urls',namespace="notaDebito")),
     path('', include('reportes.urls',namespace="reportes")),
     path('', include('intercambios.urls',namespace="intercambios")),
 ]

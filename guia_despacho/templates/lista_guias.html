@@ -1,0 +1,55 @@
+{% extends "utils_start.html" %}
+{% block titulo %}Registrar Conectores{% endblock titulo %}
+{% block extras_css %}
+{% load staticfiles %}
+<link type="text/css" rel="stylesheet" href="{% static 'jquery-entropizer-master/dist/css/jquery-entropizer.min.css' %}" />
+<link rel="stylesheet" href="{% static 'DataTables/media/css/jquery.dataTables.min.css' %}">
+{% endblock extras_css %}
+{% block extras_js %}
+<script type="text/javascript" src="{% static 'jquery-entropizer-master/lib/entropizer.js' %}"></script>
+<script type="text/javascript" src="{% static 'jquery-entropizer-master/dist/js/jquery-entropizer.min.js' %}"></script>
+<script src="{% static 'DataTables/media/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'users/user_register.js' %}"></script>
+{% endblock extras_js %}
+{% block content_center %}
+<a class="glyphicon glyphicon-list" id="menu-toggle"></a>
+<table id="myTable" class="display" style="width:100%">
+    <thead>
+        <tr>
+            <th>Guia</th>
+            <th>Cliente</th>
+            <th>Status</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {%for lista in detail%}
+        <tr>
+            <td> <a href="{% url 'guiaDespacho:detail-guia' lista.data.name %}">{{lista.data.name}}</a></td>
+            <td>{{lista.data.title}}</td>
+            <td>{{lista.data.status_sii}}</td>
+            <td>
+                <a  id="edit_foo" href="{% url 'guiaDespacho:send-invoice' pk=id_empresa slug=lista.data.name %}" class="btn btn-info">Detalle</a>
+                <!-- 
+                 <a  id="edit_foo" href="#" class="btn btn-info">Detalle</a>
+ -->
+            </td>
+        </tr>
+        {%endfor%}
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>Guia</th>
+            <th>Cliente</th>
+            <th>Status</th>
+            <th>Acciones</th>
+        </tr>
+    </tfoot>
+</table>
+
+    <script type="text/javascript">
+        $(document).ready( function () {
+          $('#myTable').DataTable();
+      });
+  </script>
+  {% endblock content_center %}

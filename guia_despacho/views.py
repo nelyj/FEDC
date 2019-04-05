@@ -1,10 +1,8 @@
 import OpenSSL.crypto
 import codecs, dicttoxml, json, os, requests
-
 from requests import Request, Session
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect
 from django.http import HttpResponse
 from django.urls import reverse_lazy
@@ -24,14 +22,13 @@ from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
 from utils.SIISdk import SII_SDK
 from .forms import *
-from .models import Factura
-from .constants import NOMB_DOC
+from .models import guiaDespacho
+from facturas.constants import NOMB_DOC
 
-class SeleccionarEmpresaView(LoginRequiredMixin,TemplateView):
-    template_name = 'seleccionar_empresa.html'
+class SeleccionarEmpresaView(TemplateView):
+    template_name = 'seleccionar_empresa_guias.html'
 
     def get_context_data(self, *args, **kwargs): 
-
         context = super().get_context_data(*args, **kwargs)
         context['empresas'] = Compania.objects.filter(owner=self.request.user)
         if Compania.objects.filter(owner=self.request.user).exists():
@@ -42,94 +39,64 @@ class SeleccionarEmpresaView(LoginRequiredMixin,TemplateView):
         return context
 
     def post(self, request):
-
         enviadas = self.request.POST.get('enviadas', None)
-
-        # print(enviadas)
-        # enviadas = int(enviadas)
-
         empresa = int(request.POST.get('empresa'))
-
         if not empresa:
             return HttpResponseRedirect('/')
         empresa_obj = Compania.objects.get(pk=empresa)
         if empresa_obj and self.request.user == empresa_obj.owner:
             if enviadas == "1":
-                return HttpResponseRedirect(reverse_lazy('facturas:lista-enviadas', kwargs={'pk':empresa}))
+                return HttpResponseRedirect(reverse_lazy('guiaDespacho:lista-guias-enviadas', kwargs={'pk':empresa}))
             else:
-                return HttpResponseRedirect(reverse_lazy('facturas:lista_facturas', kwargs={'pk':empresa}))
+                return HttpResponseRedirect(reverse_lazy('guiaDespacho:lista_guias', kwargs={'pk':empresa}))
         else:
             return HttpResponseRedirect('/')
 
-class ListaFacturasViews(LoginRequiredMixin,TemplateView):
-    template_name = 'lista_facturas.html'
+class ListaGuiasViews(TemplateView):
+    template_name = 'lista_guias.html'
 
     def dispatch(self, *args, **kwargs):
-
         compania = self.kwargs.get('pk')
-
         usuario = Conector.objects.filter(t_documento='33',empresa=compania).first()
-
         if not usuario:
-
             messages.info(self.request, "No posee conectores asociados a esta empresa")
-            return HttpResponseRedirect(reverse_lazy('facturas:seleccionar-empresa'))
-
+            return HttpResponseRedirect(reverse_lazy('guiaDespacho:seleccionar-empresa'))
         return super().dispatch(*args, **kwargs)
-            
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         session = requests.Session()
         compania = self.kwargs.get('pk')
         context['id_empresa'] = compania
-
         try:
             usuario = Conector.objects.filter(t_documento='33',empresa=compania).first()
         except Exception as e:
-
-            print(e)
-
+            messages.info(self.request, "No posee conectores asociados a esta empresa")
+            return HttpResponseRedirect(reverse_lazy('guisDespacho:seleccionar-empresa'))
         payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
-
         headers = {'content-type': "application/json"}
         response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
-        lista = session.get(usuario.url_erp+'/api/resource/Sales%20Invoice/?limit_page_length')
+        lista = session.get(usuario.url_erp+'/api/resource/Delivery%20Note/?limit_page_length')
         erp_data = json.loads(lista.text)
-
         # Todas las facturas y boletas sin discriminacion 
         data = erp_data['data']
-
         # Consulta en la base de datos todos los numeros de facturas
         # cargadas por la empresa correspondiente para hacer una comparacion
         # con el ERP y eliminar las que ya se encuentran cargadas
-        enviadas = [factura.numero_factura for factura in Factura.objects.filter(compania=compania).only('numero_factura')]
-        
-        # print(enviadas)
-
+        enviadas = [factura.numero_factura for factura in guiaDespacho.objects.filter(compania=compania).only('numero_factura')]
         # Elimina todas las boletas de la lista
         # y crea una nueva lista con todas las facturas 
         solo_facturas  = []
         for i , item in enumerate(data):
-
-            if item['name'].startswith('Nº'):
-
-                solo_facturas.append(item['name'])
-
+            solo_facturas.append(item['name'])
         # Verifica si la factura que vienen del ERP 
         # ya se encuentran cargadas en el sistema
         # y en ese caso las elimina de la lista
         solo_nuevas = []
         for i , item in enumerate(solo_facturas):
-
             if not item in enviadas:
-
                 solo_nuevas.append(item)
-
-        # print(solo_nuevas)
-
-
-        url=usuario.url_erp+'/api/resource/Sales%20Invoice/'
+        url=usuario.url_erp+'/api/resource/Delivery%20Note/'
         context['detail']=[]
         for tmp in solo_nuevas:
             aux1=url+str(tmp)
@@ -138,9 +105,8 @@ class ListaFacturasViews(LoginRequiredMixin,TemplateView):
         session.close()
         return context
 
-class DeatailInvoice(LoginRequiredMixin, TemplateView):
-    template_name = 'detail_invoice.html'
-
+class DetailGuia(TemplateView):
+    template_name = 'detail_guia.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         session = requests.Session()
@@ -151,7 +117,7 @@ class DeatailInvoice(LoginRequiredMixin, TemplateView):
         payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
         headers = {'content-type': "application/json"}
         response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
-        url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+str(kwargs['slug'])
+        url=usuario.url_erp+'/api/resource/Delivery%20Note/'+str(kwargs['slug'])
         aux=session.get(url)
         session.close()
         aux=json.loads(aux.text)
@@ -160,9 +126,9 @@ class DeatailInvoice(LoginRequiredMixin, TemplateView):
         context['values'] = list(aux['data'].values())
         return context
 
-class SendInvoice(LoginRequiredMixin, FormView):
-    template_name = 'envio_sii.html'
-    form_class = FormFactura
+class SendInvoice(FormView):
+    template_name = 'envio_sii_guia.html'
+    form_class = FormGuia
 
     def get_form_kwargs(self):
         kwargs = super(SendInvoice, self).get_form_kwargs()
@@ -185,10 +151,12 @@ class SendInvoice(LoginRequiredMixin, FormView):
             response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
         except Exception as e:
             messages.warning(self.request, "No se pudo establecer conexion con el ERP Next, se genera el siguiente error: "+str(e))
-        url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+url
+        url=usuario.url_erp+'/api/resource/Delivery%20Note/'+url
         try:
             aux=session.get(url)
             session.close()
+            # f = open('/home/ricardo/Escritorio/GDE-N 000030.json','r')
+            # txt = f.read()
             aux=json.loads(aux.text)
             context={}
             context['factura'] = dict(zip(aux['data'].keys(), aux['data'].values()))
@@ -240,7 +208,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
         except Exception as e:
             initial['vendedor']=""
         try:
-            initial['rut']=context['factura']['rut']
+            initial['rut']=context['factura']['id']
         except Exception as e:
             initial['rut']=""
         try:
@@ -301,7 +269,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
             response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
         except Exception as e:
             messages.warning(self.request, "No se pudo establecer conexion con el ERP Next, se genera el siguiente error: "+str(e))
-        url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+url
+        url=usuario.url_erp+'/api/resource/Delivery%20Note/'+url
         try:
             aux=session.get(url)
             session.close()
@@ -333,7 +301,6 @@ class SendInvoice(LoginRequiredMixin, FormView):
             return super().form_valid(form)
         assert compania, "compania no existe"
         pass_certificado = compania.pass_certificado
-        
         data['productos']=eval(data['productos'])
 
         # rut = self.request.POST.get('rut', None)
@@ -364,33 +331,36 @@ class SendInvoice(LoginRequiredMixin, FormView):
         # Si queda uno, cambia la estructura de la oracion a singular. 
         disponibles = folio.get_folios_disponibles()
         if disponibles == 1:
-            messages.success(self.request, "Factura enviada exitosamente")
+            messages.success(self.request, "Guia enviada exitosamente")
             messages.info(self.request, str('Queda ')+str(disponibles)+str('folio disponible'))
         elif disponibles < 50:
-            messages.success(self.request, "Factura enviada exitosamente")
+            messages.success(self.request, "Guia enviada exitosamente")
             messages.info(self.request, str('Quedan ')+str(disponibles)+str('folios disponibles'))
         else:
-            messages.success(self.request, "Factura enviada exitosamente")
+            messages.success(self.request, "Guia enviada exitosamente")
         form.compania = compania
        
 
-        response_dd = Factura._firmar_dd(data, folio, form)
-        documento_firmado = Factura.firmar_documento(response_dd,data,folio, compania, form, pass_certificado)
-        documento_final_firmado = Factura.firmar_etiqueta_set_dte(compania, folio, documento_firmado,form)
-        caratula_firmada = Factura.generar_documento_final(compania,documento_final_firmado,pass_certificado)
+        response_dd = guiaDespacho._firmar_dd(data, folio, form)
+        documento_firmado = guiaDespacho.firmar_documento(response_dd,data,folio, compania, form, pass_certificado)
+        documento_final_firmado = guiaDespacho.firmar_etiqueta_set_dte(compania, folio, documento_firmado,form)
+        caratula_firmada = guiaDespacho.generar_documento_final(compania,documento_final_firmado,pass_certificado)
 
         form.dte_xml = caratula_firmada
+        # print(caratula_firmada)
+        # return HttpResponse(False)
         
         try:
-            xml_dir = settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug']
+            xml_dir = settings.MEDIA_ROOT +'guia'+'/'+self.kwargs['slug']
             if(not os.path.isdir(xml_dir)):
-                os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug'])
+                os.makedirs(settings.MEDIA_ROOT +'guia'+'/'+self.kwargs['slug'])
             f = open(xml_dir+'/'+self.kwargs['slug']+'.xml','w')
-            f.write(documento_final_firmado)
+            f.write(caratula_firmada)
             f.close()
         except Exception as e:
             messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
             return super().form_valid(form)
+
 
         send_sii = self.send_invoice_sii(compania,caratula_firmada,pass_certificado)
         if(not send_sii['estado']):
@@ -399,8 +369,6 @@ class SendInvoice(LoginRequiredMixin, FormView):
         else:
             form.track_id = send_sii['track_id']
             form.save()
-
-        # print(response_dd)
 
 
         msg = "Se guardo en Base de Datos la factura con éxito"
@@ -413,7 +381,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
         payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
         headers = {'content-type': "application/json"}
         response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
-        url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+self.kwargs['slug']
+        url=usuario.url_erp+'/api/resource/Delivery%20Note/'+self.kwargs['slug']
 
         aux=session.put(url,json={'status_sii':'Aprobado'})
 
@@ -459,28 +427,23 @@ class SendInvoice(LoginRequiredMixin, FormView):
             print(e)
             return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
 
-
-class FacturasEnviadasView(LoginRequiredMixin, ListView):
-    template_name = 'facturas_enviadas.html'
-
-
+class GuiasEnviadasView(ListView):
+    template_name = 'guias_enviadas.html'
     def get_queryset(self):
-
         compania = self.kwargs.get('pk')
-        return Factura.objects.filter(compania=compania).order_by('-created')
+        return guiaDespacho.objects.filter(compania=compania).order_by('-created')
 
-
-
-class ImprimirFactura(LoginRequiredMixin, TemplateView,WeasyTemplateResponseMixin):
+class ImprimirGuia(TemplateView,WeasyTemplateResponseMixin):
     """!
-    Class para imprimir la factura en PDF
+    Class para imprimir la guia en PDF
 
     @author Rodrigo Boet (rudmanmrrod at gmail.com)
-    @date 21-03-2019
+    @author Luis Barrios (nikeven at gmail.com)
+    @date 01-04-2019
     @version 1.0.0
     """
-    template_name = "pdf/factura.pdf.html"
-    model = Factura
+    template_name = "pdf/guia.pdf.html"
+    model = guiaDespacho
 
     def dispatch(self, request, *args, **kwargs):
         num_factura = self.kwargs['slug']
@@ -491,11 +454,11 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView,WeasyTemplateResponseMixi
         except Exception as e:
             factura = self.model.objects.select_related().filter(numero_factura=num_factura, compania=compania)
             if len(factura) > 1:
-                messages.error(self.request, 'Existe mas de un registro con el mismo numero de factura: {0}'.format(num_factura))
-                return redirect(reverse_lazy('facturas:lista-enviadas', kwargs={'pk': compania}))
+                messages.error(self.request, 'Existe mas de un registro con el mismo numero de guia: {0}'.format(num_factura))
+                return redirect(reverse_lazy('guiaDespacho:lista-guias-enviadas', kwargs={'pk': compania}))
             else:
-                messages.error(self.request, "No se encuentra registrada esta factura: {0}".format(str(num_factura)))
-                return redirect(reverse_lazy('facturas:lista-enviadas', kwargs={'pk': compania}))
+                messages.error(self.request, "No se encuentra registrada esta guia: {0}".format(str(num_factura)))
+                return redirect(reverse_lazy('guiaDespacho:lista-guias-enviadas', kwargs={'pk': compania}))
 
     def get_context_data(self, *args, **kwargs):
         """!
@@ -509,70 +472,8 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView,WeasyTemplateResponseMixi
         compania = self.kwargs['pk']
         
         context['factura'] = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
-        context['nombre_documento'] = NOMB_DOC['FACT_ELEC']
+        context['nombre_documento'] = NOMB_DOC['GUIA_DES_ELEC']
         prod = context['factura'].productos.replace('\'{','{').replace('}\'','}').replace('\'',"\"")
         productos = json.loads(prod)
         context['productos'] = productos
         return context
-
-class VerEstadoFactura(LoginRequiredMixin, TemplateView):
-    """!
-    Clase para ver el estado de envio de una factura
-
-    @author Rodrigo Boet (rudmanmrrod at gmail.com)
-    @date 04-04-2019
-    @version 1.0.0
-    """
-    template_name = "estado_factura.html"
-    model = Factura
-
-    def get_context_data(self, *args, **kwargs):
-        """!
-        Method to handle data on get
-
-        @date 04-04-2019
-        @return Returns dict with data
-        """
-        context = super().get_context_data(*args, **kwargs)
-        num_factura = self.kwargs['slug']
-        compania = self.kwargs['pk']
-
-        factura = self.model.objects.get(numero_factura=num_factura, compania=compania)
-        context['factura'] = factura
-        
-        estado = self.get_invoice_status(factura,factura.compania,)
-
-        if(not estado['estado']):
-            messages.error(self.request, estado['msg'])
-        else:
-            context['estado'] = estado['status']
-            context['glosa'] = estado['glosa']
-
-        return context
-
-    def get_invoice_status(self,factura,compania):
-        """
-        Método para enviar la factura al sii
-        @param factura recibe el objeto de la factura
-        @param compania recibe el objeto compañia
-        @return dict con la respuesta
-        """
-        try:
-            sii_sdk = SII_SDK()
-            seed = sii_sdk.getSeed()
-            try:
-                sign = sii_sdk.signXml(seed, compania, compania.pass_certificado)
-                token = sii_sdk.getAuthToken(sign)
-                if(token):
-                    print(token)
-                    estado = sii_sdk.checkDTEstatus(compania.rut,factura.track_id,token)
-                    return {'estado':True,'status':estado['estado'],'glosa':estado['glosa']} 
-                else:
-                    return {'estado':False,'msg':'No se pudo obtener el token del sii'}
-            except Exception as e:
-                print(e)
-                return {'estado':False,'msg':'Ocurrió un error al firmar el documento'}
-            return {'estado':True}
-        except Exception as e:
-            print(e)
-            return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
