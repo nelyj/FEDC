@@ -1,29 +1,31 @@
-import requests, dicttoxml, json, codecs, os
+import requests
+import dicttoxml
+import json
+import codecs
+import os
+from requests import Request, Session
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse, HttpResponseRedirect, FileResponse
 from django.shortcuts import render
+from django.template.loader import render_to_string
+from django.urls import reverse_lazy
+from django.views.generic import ListView
 from django.views.generic.base import TemplateView, View
 from django.views.generic.edit import FormView
-from django.views.generic import ListView
-from requests import Request, Session
-from django.template.loader import render_to_string
-from django.http import HttpResponse, HttpResponseRedirect
 from conectores.models import *
 from conectores.forms import FormCompania
 from conectores.models import *
-from django.http import HttpResponse
-from .forms import *
-from django.urls import reverse_lazy
-from django.http import FileResponse
-from django.conf import settings
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
 from facturas.models import Factura
-from notaDebito.models import notaDebito
 from utils.SIISdk import SII_SDK
+from .models import notaCredito
+from .forms import *
 
 class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
-    template_name = 'seleccionar_empresa_ND.html'
+    template_name = 'seleccionar_empresa_NC.html'
 
     def get_context_data(self, *args, **kwargs): 
 
@@ -42,17 +44,16 @@ class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
         if not empresa:
             return HttpResponseRedirect('/')
         empresa_obj = Compania.objects.get(pk=empresa)
-        print(enviadas)
         if empresa_obj and self.request.user == empresa_obj.owner:
             if enviadas == "1":
-                return HttpResponseRedirect(reverse_lazy('notaDebito:lista-enviadas', kwargs={'pk':empresa}))
+                return HttpResponseRedirect(reverse_lazy('notaCredito:lista-enviadas', kwargs={'pk':empresa}))
             else:
-                return HttpResponseRedirect(reverse_lazy('notaDebito:lista_nota_debito', kwargs={'pk':empresa}))
+                return HttpResponseRedirect(reverse_lazy('notaCredito:lista_nota_credito', kwargs={'pk':empresa}))
         else:
             return HttpResponseRedirect('/')
 
-class ListaNotaDebitoViews(LoginRequiredMixin, TemplateView):
-    template_name = 'lista_ND.html'
+class ListaNotaCreditoViews(LoginRequiredMixin, TemplateView):
+    template_name = 'lista_NC.html'
 
     def dispatch(self, *args, **kwargs):
 
@@ -63,7 +64,7 @@ class ListaNotaDebitoViews(LoginRequiredMixin, TemplateView):
         if not usuario:
 
             messages.info(self.request, "No posee conectores asociados a esta empresa")
-            return HttpResponseRedirect(reverse_lazy('notaDebito:seleccionar-empresa'))
+            return HttpResponseRedirect(reverse_lazy('notaCredito:seleccionar-empresa'))
 
         return super().dispatch(*args, **kwargs)
             
@@ -93,13 +94,13 @@ class ListaNotaDebitoViews(LoginRequiredMixin, TemplateView):
         # Consulta en la base de datos todos los numeros de facturas
         # cargadas por la empresa correspondiente para hacer una comparacion
         # con el ERP y eliminar las que ya se encuentran cargadas
-        enviadas = [factura.numero_factura for factura in notaDebito.objects.filter(compania=compania).only('numero_factura')]
+        enviadas = [factura.numero_factura for factura in notaCredito.objects.filter(compania=compania).only('numero_factura')]
         # Elimina todas las boletas de la lista
         # y crea una nueva lista con todas las facturas 
         solo_facturas  = []
         for i , item in enumerate(data):
 
-            if item['name'].startswith('ND'):
+            if item['name'].startswith('NC'):
 
                 solo_facturas.append(item['name'])
         # Verifica si la factura que vienen del ERP 
@@ -119,7 +120,7 @@ class ListaNotaDebitoViews(LoginRequiredMixin, TemplateView):
         return context
 
 class DeatailInvoice(LoginRequiredMixin, TemplateView):
-    template_name = 'detail_ND.html'
+    template_name = 'detail_NC.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -141,8 +142,8 @@ class DeatailInvoice(LoginRequiredMixin, TemplateView):
         return context
 
 class SendInvoice(LoginRequiredMixin, FormView):
-    template_name = 'envio_sii_ND.html'
-    form_class =FormNotaDebito
+    template_name = 'envio_sii_NC.html'
+    form_class =FormNotaCredito
 
     def get_initial(self):
         initial = super().get_initial()
@@ -247,7 +248,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
 
         id_ = self.kwargs.get('pk')
 
-        return reverse_lazy('notaDebito:send-invoice', kwargs={'pk':id_,'slug':self.kwargs['slug']})
+        return reverse_lazy('notaCredito:send-invoice', kwargs={'pk':id_,'slug':self.kwargs['slug']})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -286,6 +287,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
 
     def form_valid(self, form, **kwargs):
         compania_id = self.kwargs['pk']
+        # pass_certificado = form.cleaned_data['pass_certificado']
         # if form.cleaned_data['status'] == 'En proceso':
         data = form.clean()
         
@@ -300,7 +302,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
 
         form = form.save(commit=False)
         try:
-            folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=56).order_by('fecha_de_autorizacion').first()
+            folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=61).order_by('fecha_de_autorizacion').first()
 
             if not folio:
                 raise Folio.DoesNotExist
@@ -323,29 +325,34 @@ class SendInvoice(LoginRequiredMixin, FormView):
         # Trae la cantidad de folios disponibles y genera una notificacion cuando quedan menos de 5
         # Si queda uno, cambia la estructura de la oracion a singular. 
         disponibles = folio.get_folios_disponibles()
+
+        print("/////////////////// Disponibles ", disponibles)
         if disponibles == 1:
-            messages.success(self.request, "Nota de débito enviada exitosamente")
+            messages.success(self.request, "Nota de crédito enviada exitosamente")
             messages.info(self.request, str('Queda ')+str(disponibles)+str('folio disponible'))
         elif disponibles < 50:
-            messages.success(self.request, "Nota de débito enviada exitosamente")
+            messages.success(self.request, "Nota de crédito enviada exitosamente")
             messages.info(self.request, str('Quedan ')+str(disponibles)+str('folios disponibles'))
         else:
-            messages.success(self.request, "Nota de débito enviada exitosamente")
+            messages.success(self.request, "Nota de crédito enviada exitosamente")
         form.compania = compania
-        form.save()
+        #form.save()
 
-        response_dd = notaDebito._firmar_dd(data, folio, form)
-        documento_firmado = notaDebito.firmar_documento(response_dd,data,folio, compania, form, pass_certificado)
-        documento_final_firmado = notaDebito.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
-        caratula_firmada = notaDebito.generar_documento_final(compania,documento_final_firmado, pass_certificado)
+        response_dd = notaCredito._firmar_dd(data, folio, form)
+        documento_firmado = notaCredito.firmar_documento(response_dd,data,folio, compania, form, pass_certificado)
+        documento_final_firmado = notaCredito.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
+        caratula_firmada = notaCredito.generar_documento_final(compania,documento_final_firmado,pass_certificado)
 
         form.dte_xml = caratula_firmada
         #form.save()
-
+        print(caratula_firmada)
+        # documento_final_firmado = Factura.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
+        # caratula_firmada = Factura.generar_documento_final(compania,documento_final_firmado,pass_certificado)
+        # form.dte_xml = caratula_firmada
         # print(response_dd)
 
         try:
-            xml_dir = settings.MEDIA_ROOT +'notas_de_debito'+'/'+self.kwargs['slug']
+            xml_dir = settings.MEDIA_ROOT +'notas_de_credito'+'/'+self.kwargs['slug']
             if(not os.path.isdir(xml_dir)):
                 os.makedirs(xml_dir)
             f = open(xml_dir+'/'+self.kwargs['slug']+'.xml','w')
@@ -363,8 +370,6 @@ class SendInvoice(LoginRequiredMixin, FormView):
             form.track_id = send_sii['track_id']
             form.save()
 
-
-        msg = "Se guardo en Base de Datos la factura con éxito"
         session = requests.Session()
         try:
             usuario = Conector.objects.filter(pk=1).first()
@@ -417,12 +422,12 @@ class SendInvoice(LoginRequiredMixin, FormView):
             print(e)
             return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
 
-class NotaDebitoEnviadasView(LoginRequiredMixin, ListView):
-    template_name = 'ND_enviadas.html'
+class NotaCreditoEnviadasView(LoginRequiredMixin, ListView):
+    template_name = 'NC_enviadas.html'
 
 
     def get_queryset(self):
 
         compania = self.kwargs.get('pk')
-        print(notaDebito.objects.filter(compania=compania).order_by('-created'))
-        return notaDebito.objects.filter(compania=compania).order_by('-created')
+        print(notaCredito.objects.filter(compania=compania).order_by('-created'))
+        return notaCredito.objects.filter(compania=compania).order_by('-created')
