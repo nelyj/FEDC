@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.hashers import PBKDF2PasswordHasher
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import FormView
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect
@@ -11,7 +12,7 @@ from django.views.generic.edit import DeleteView
 from certificados.models import Certificado
 from .exceptions import ContrasenaDeCertificadoIncorrecta
 
-class ConectorViews(FormView):
+class ConectorViews(LoginRequiredMixin, FormView):
     """
     """
     form_class = FormConector
@@ -78,7 +79,7 @@ class ConectorViews(FormView):
 
         return kwargs
 
-class CompaniaViews(FormView):
+class CompaniaViews(LoginRequiredMixin, FormView):
     """
     """
     form_class = FormCompania
@@ -144,7 +145,7 @@ class CompaniaViews(FormView):
         return super().form_invalid(form)
     #     return HttpResponseRedirect(self.success_url)
 
-class CompaniaUpdate(FormView):
+class CompaniaUpdate(LoginRequiredMixin, FormView):
     form_class = CompaniaUpdateForm
     template_name = 'actualizar_compania.html'
     success_url =reverse_lazy('conectores:registrar_compania')
@@ -199,7 +200,7 @@ class CompaniaUpdate(FormView):
         messages.error(self.request, form.errors)
         return super().form_invalid(form)
 
-class CompaniaDelete(DeleteView):
+class CompaniaDelete(LoginRequiredMixin, DeleteView):
     template_name = 'compania_confirm_delete.html'
     model = Compania
     success_url =reverse_lazy('conectores:registrar_compania')

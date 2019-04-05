@@ -31,6 +31,7 @@
             <td>
                 <!-- Trigger the modal with a button -->
                 {% comment %} <button  id="edit_foo" onclick="return validar('{% url 'facturas:send-invoice' lista.data.name%}')" type="button" class="btn btn-info">Intercambio</button> {% endcomment %}
+                <a href="{% url 'facturas:ver_estado' factura.compania.pk factura.numero_factura %}"  class="btn btn-success">Ver Estado</a>
                 <a  id="edit_foo" href="{% url 'facturas:imprimir_factura' factura.compania.pk factura.numero_factura %}" target="_blank" class="btn btn-info">Imprimir</a>
 
             </td>

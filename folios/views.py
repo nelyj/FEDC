@@ -2,6 +2,7 @@ import datetime
 
 from django.views.generic import CreateView
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.db import IntegrityError
 from django.db.transaction import TransactionManagementError
@@ -22,7 +23,7 @@ from .models import Folio
 # Create your views here.
 
 
-class FolioCreateView(CreateView):
+class FolioCreateView(LoginRequiredMixin, CreateView):
 	template_name = 'folio-create-view.html'
 	form_class = FolioCreateForm
 	success_url = reverse_lazy('folios:registrar')

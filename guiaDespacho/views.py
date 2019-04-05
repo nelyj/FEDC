@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import TemplateView
 from django.views.generic import ListView
 import requests
@@ -13,7 +14,7 @@ from django.urls import reverse_lazy
 from django.conf import settings
 from .models import *
 
-class SeleccionarEmpresaView(TemplateView):
+class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
     template_name = 'seleccionar_empresa_guias.html'
 
     def get_context_data(self, *args, **kwargs): 
@@ -40,7 +41,7 @@ class SeleccionarEmpresaView(TemplateView):
         else:
             return HttpResponseRedirect('/')
 
-class ListaGuiasViews(TemplateView):
+class ListaGuiasViews(LoginRequiredMixin, TemplateView):
     template_name = 'lista_guias.html'
 
     def dispatch(self, *args, **kwargs):
@@ -93,7 +94,7 @@ class ListaGuiasViews(TemplateView):
         session.close()
         return context
 
-class DetailGuia(TemplateView):
+class DetailGuia(LoginRequiredMixin, TemplateView):
     template_name = 'detail_guia.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -114,7 +115,7 @@ class DetailGuia(TemplateView):
         context['values'] = list(aux['data'].values())
         return context
 
-class GuiasEnviadasView(ListView):
+class GuiasEnviadasView(LoginRequiredMixin, ListView):
     template_name = 'guias_enviadas.html'
     def get_queryset(self):
         compania = self.kwargs.get('pk')

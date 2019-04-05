@@ -4,6 +4,7 @@ import codecs, dicttoxml, json, os, requests
 from requests import Request, Session
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect
 from django.http import HttpResponse
 from django.urls import reverse_lazy
@@ -26,7 +27,7 @@ from .forms import *
 from .models import Factura
 from .constants import NOMB_DOC
 
-class SeleccionarEmpresaView(TemplateView):
+class SeleccionarEmpresaView(LoginRequiredMixin,TemplateView):
     template_name = 'seleccionar_empresa.html'
 
     def get_context_data(self, *args, **kwargs): 
@@ -60,7 +61,7 @@ class SeleccionarEmpresaView(TemplateView):
         else:
             return HttpResponseRedirect('/')
 
-class ListaFacturasViews(TemplateView):
+class ListaFacturasViews(LoginRequiredMixin,TemplateView):
     template_name = 'lista_facturas.html'
 
     def dispatch(self, *args, **kwargs):
@@ -137,7 +138,7 @@ class ListaFacturasViews(TemplateView):
         session.close()
         return context
 
-class DeatailInvoice(TemplateView):
+class DeatailInvoice(LoginRequiredMixin, TemplateView):
     template_name = 'detail_invoice.html'
 
     def get_context_data(self, **kwargs):
@@ -159,7 +160,7 @@ class DeatailInvoice(TemplateView):
         context['values'] = list(aux['data'].values())
         return context
 
-class SendInvoice(FormView):
+class SendInvoice(LoginRequiredMixin, FormView):
     template_name = 'envio_sii.html'
     form_class = FormFactura
 
@@ -459,7 +460,7 @@ class SendInvoice(FormView):
             return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
 
 
-class FacturasEnviadasView(ListView):
+class FacturasEnviadasView(LoginRequiredMixin, ListView):
     template_name = 'facturas_enviadas.html'
 
 
@@ -470,7 +471,7 @@ class FacturasEnviadasView(ListView):
 
 
 
-class ImprimirFactura(TemplateView,WeasyTemplateResponseMixin):
+class ImprimirFactura(LoginRequiredMixin, TemplateView,WeasyTemplateResponseMixin):
     """!
     Class para imprimir la factura en PDF
 
@@ -513,3 +514,65 @@ class ImprimirFactura(TemplateView,WeasyTemplateResponseMixin):
         productos = json.loads(prod)
         context['productos'] = productos
         return context
+
+class VerEstadoFactura(LoginRequiredMixin, TemplateView):
+    """!
+    Clase para ver el estado de envio de una factura
+
+    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @date 04-04-2019
+    @version 1.0.0
+    """
+    template_name = "estado_factura.html"
+    model = Factura
+
+    def get_context_data(self, *args, **kwargs):
+        """!
+        Method to handle data on get
+
+        @date 04-04-2019
+        @return Returns dict with data
+        """
+        context = super().get_context_data(*args, **kwargs)
+        num_factura = self.kwargs['slug']
+        compania = self.kwargs['pk']
+
+        factura = self.model.objects.get(numero_factura=num_factura, compania=compania)
+        context['factura'] = factura
+        
+        estado = self.get_invoice_status(factura,factura.compania,)
+
+        if(not estado['estado']):
+            messages.error(self.request, estado['msg'])
+        else:
+            context['estado'] = estado['status']
+            context['glosa'] = estado['glosa']
+
+        return context
+
+    def get_invoice_status(self,factura,compania):
+        """
+        Método para enviar la factura al sii
+        @param factura recibe el objeto de la factura
+        @param compania recibe el objeto compañia
+        @return dict con la respuesta
+        """
+        try:
+            sii_sdk = SII_SDK()
+            seed = sii_sdk.getSeed()
+            try:
+                sign = sii_sdk.signXml(seed, compania, compania.pass_certificado)
+                token = sii_sdk.getAuthToken(sign)
+                if(token):
+                    print(token)
+                    estado = sii_sdk.checkDTEstatus(compania.rut,factura.track_id,token)
+                    return {'estado':True,'status':estado['estado'],'glosa':estado['glosa']} 
+                else:
+                    return {'estado':False,'msg':'No se pudo obtener el token del sii'}
+            except Exception as e:
+                print(e)
+                return {'estado':False,'msg':'Ocurrió un error al firmar el documento'}
+            return {'estado':True}
+        except Exception as e:
+            print(e)
+            return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
