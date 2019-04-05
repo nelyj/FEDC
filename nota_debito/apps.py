@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class NotadebitoConfig(AppConfig):
-    name = 'notaDebito'
+    name = 'nota_debito'

@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class GuiadespachoConfig(AppConfig):
-    name = 'guiaDespacho'
+    name = 'guia_despacho'
