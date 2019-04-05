@@ -111,7 +111,12 @@ class guiaDespacho(CreationModificationDateMixin):
 		data['neto']=str(round(float(data['neto'])))
 		data['total']=str(round(float(data['total'])))
 		# Llena los campos de la plantilla DD_tag.xml con la informacion del diccionario
-		sin_aplanar = render_to_string('xml_gd/DD_tag.xml', {'data':data,'folio':folio, 'instance':instance, 'timestamp':timestamp})
+		sin_aplanar = render_to_string('xml_gd/DD_tag.xml', {
+			'data':data,
+			'folio':folio, 
+			'instance':instance, 
+			'timestamp':timestamp
+		})
 
 		# Elimina tabulaciones y espacios antes de procesar con la funcion de hash
 		digest_string = sin_aplanar.replace('\n','').replace('\t','').replace('\r','')

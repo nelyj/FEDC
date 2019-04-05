@@ -1,32 +1,34 @@
-import requests, dicttoxml, json, codecs, os
-from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
-from django.views.generic.base import TemplateView, View
-from django.views.generic.edit import FormView
-from django.views.generic import ListView
+import OpenSSL.crypto
+import codecs, dicttoxml, json, os, requests
 from requests import Request, Session
-from django.template.loader import render_to_string
+from django.conf import settings
+from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
+from django.urls import reverse_lazy
+from django.http import FileResponse
+from django.views.generic.edit import FormView
+from django.shortcuts import (
+    render, redirect
+    )
+from django.views.generic.base import TemplateView, View
+from django.views.generic import ListView
+from django.template.loader import render_to_string
+from django_weasyprint import WeasyTemplateResponseMixin
 from conectores.models import *
 from conectores.forms import FormCompania
 from conectores.models import *
-from django.http import HttpResponse
-from .forms import *
-from django.urls import reverse_lazy
-from django.http import FileResponse
-from django.conf import settings
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
-from facturas.models import Factura
-from notaDebito.models import notaDebito
 from utils.SIISdk import SII_SDK
+from .forms import *
+from .models import guiaDespacho
+from facturas.constants import NOMB_DOC
 
-class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
-    template_name = 'seleccionar_empresa_ND.html'
+class SeleccionarEmpresaView(TemplateView):
+    template_name = 'seleccionar_empresa_guias.html'
 
     def get_context_data(self, *args, **kwargs): 
-
         context = super().get_context_data(*args, **kwargs)
         context['empresas'] = Compania.objects.filter(owner=self.request.user)
         if Compania.objects.filter(owner=self.request.user).exists():
@@ -37,71 +39,56 @@ class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
         return context
 
     def post(self, request):
-        enviadas = self.request.GET.get('enviadas', None)
+        enviadas = self.request.POST.get('enviadas', None)
         empresa = int(request.POST.get('empresa'))
         if not empresa:
             return HttpResponseRedirect('/')
         empresa_obj = Compania.objects.get(pk=empresa)
-        print(enviadas)
         if empresa_obj and self.request.user == empresa_obj.owner:
             if enviadas == "1":
-                return HttpResponseRedirect(reverse_lazy('notaDebito:lista-enviadas', kwargs={'pk':empresa}))
+                return HttpResponseRedirect(reverse_lazy('guiaDespacho:lista-guias-enviadas', kwargs={'pk':empresa}))
             else:
-                return HttpResponseRedirect(reverse_lazy('notaDebito:lista_nota_debito', kwargs={'pk':empresa}))
+                return HttpResponseRedirect(reverse_lazy('guiaDespacho:lista_guias', kwargs={'pk':empresa}))
         else:
             return HttpResponseRedirect('/')
 
-class ListaNotaDebitoViews(LoginRequiredMixin, TemplateView):
-    template_name = 'lista_ND.html'
+class ListaGuiasViews(TemplateView):
+    template_name = 'lista_guias.html'
 
     def dispatch(self, *args, **kwargs):
-
         compania = self.kwargs.get('pk')
-
         usuario = Conector.objects.filter(t_documento='33',empresa=compania).first()
-
         if not usuario:
-
             messages.info(self.request, "No posee conectores asociados a esta empresa")
-            return HttpResponseRedirect(reverse_lazy('notaDebito:seleccionar-empresa'))
-
+            return HttpResponseRedirect(reverse_lazy('guiaDespacho:seleccionar-empresa'))
         return super().dispatch(*args, **kwargs)
-            
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         session = requests.Session()
         compania = self.kwargs.get('pk')
         context['id_empresa'] = compania
-
         try:
             usuario = Conector.objects.filter(t_documento='33',empresa=compania).first()
         except Exception as e:
-
-            print(e)
-
+            messages.info(self.request, "No posee conectores asociados a esta empresa")
+            return HttpResponseRedirect(reverse_lazy('guisDespacho:seleccionar-empresa'))
         payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
-
         headers = {'content-type': "application/json"}
         response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
-        lista = session.get(usuario.url_erp+'/api/resource/Sales%20Invoice/?limit_page_length')
+        lista = session.get(usuario.url_erp+'/api/resource/Delivery%20Note/?limit_page_length')
         erp_data = json.loads(lista.text)
-
         # Todas las facturas y boletas sin discriminacion 
         data = erp_data['data']
-
         # Consulta en la base de datos todos los numeros de facturas
         # cargadas por la empresa correspondiente para hacer una comparacion
         # con el ERP y eliminar las que ya se encuentran cargadas
-        enviadas = [factura.numero_factura for factura in notaDebito.objects.filter(compania=compania).only('numero_factura')]
+        enviadas = [factura.numero_factura for factura in guiaDespacho.objects.filter(compania=compania).only('numero_factura')]
         # Elimina todas las boletas de la lista
         # y crea una nueva lista con todas las facturas 
         solo_facturas  = []
         for i , item in enumerate(data):
-
-            if item['name'].startswith('ND'):
-
-                solo_facturas.append(item['name'])
+            solo_facturas.append(item['name'])
         # Verifica si la factura que vienen del ERP 
         # ya se encuentran cargadas en el sistema
         # y en ese caso las elimina de la lista
@@ -109,7 +96,7 @@ class ListaNotaDebitoViews(LoginRequiredMixin, TemplateView):
         for i , item in enumerate(solo_facturas):
             if not item in enviadas:
                 solo_nuevas.append(item)
-        url=usuario.url_erp+'/api/resource/Sales%20Invoice/'
+        url=usuario.url_erp+'/api/resource/Delivery%20Note/'
         context['detail']=[]
         for tmp in solo_nuevas:
             aux1=url+str(tmp)
@@ -118,9 +105,8 @@ class ListaNotaDebitoViews(LoginRequiredMixin, TemplateView):
         session.close()
         return context
 
-class DeatailInvoice(LoginRequiredMixin, TemplateView):
-    template_name = 'detail_ND.html'
-
+class DetailGuia(TemplateView):
+    template_name = 'detail_guia.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         session = requests.Session()
@@ -131,7 +117,7 @@ class DeatailInvoice(LoginRequiredMixin, TemplateView):
         payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
         headers = {'content-type': "application/json"}
         response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
-        url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+str(kwargs['slug'])
+        url=usuario.url_erp+'/api/resource/Delivery%20Note/'+str(kwargs['slug'])
         aux=session.get(url)
         session.close()
         aux=json.loads(aux.text)
@@ -140,9 +126,14 @@ class DeatailInvoice(LoginRequiredMixin, TemplateView):
         context['values'] = list(aux['data'].values())
         return context
 
-class SendInvoice(LoginRequiredMixin, FormView):
-    template_name = 'envio_sii_ND.html'
-    form_class =FormNotaDebito
+class SendInvoice(FormView):
+    template_name = 'envio_sii_guia.html'
+    form_class = FormGuia
+
+    def get_form_kwargs(self):
+        kwargs = super(SendInvoice, self).get_form_kwargs()
+        kwargs.update({'compania': self.kwargs['pk']})
+        return kwargs
 
     def get_initial(self):
         initial = super().get_initial()
@@ -160,10 +151,12 @@ class SendInvoice(LoginRequiredMixin, FormView):
             response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
         except Exception as e:
             messages.warning(self.request, "No se pudo establecer conexion con el ERP Next, se genera el siguiente error: "+str(e))
-        url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+url
+        url=usuario.url_erp+'/api/resource/Delivery%20Note/'+url
         try:
             aux=session.get(url)
             session.close()
+            # f = open('/home/ricardo/Escritorio/GDE-N 000030.json','r')
+            # txt = f.read()
             aux=json.loads(aux.text)
             context={}
             context['factura'] = dict(zip(aux['data'].keys(), aux['data'].values()))
@@ -184,6 +177,14 @@ class SendInvoice(LoginRequiredMixin, FormView):
             initial['direccion']=context['factura']['customer_address']
         except Exception as e:
             initial['direccion']=""
+        try:
+            initial['comuna']=context['factura']['comuna']
+        except Exception as e:
+            initial['comuna']=""
+        try:
+            initial['ciudad_receptora']=context['factura']['ciudad_receptora']
+        except Exception as e:
+            initial['ciudad_receptora']=""
         try:
             initial['transporte']=context['factura']['transporte']
         except Exception as e:
@@ -207,7 +208,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
         except Exception as e:
             initial['vendedor']=""
         try:
-            initial['rut']=context['factura']['rut']
+            initial['rut']=context['factura']['id']
         except Exception as e:
             initial['rut']=""
         try:
@@ -215,7 +216,10 @@ class SendInvoice(LoginRequiredMixin, FormView):
         except Exception as e:
             initial['fecha']=""
         # self.form_class.base_fields['guia'].initial=context['factura']['']
-        # self.form_class.base_fields['orden_compra'].initial=context['factura']['']
+        try:
+            initial['orden_compra']=context['factura']['po_no']
+        except Exception as e:
+            initial['orden_compra']=""
         try:
             initial['nota_venta']=context['factura']['orden_de_venta']
         except Exception as e:
@@ -247,7 +251,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
 
         id_ = self.kwargs.get('pk')
 
-        return reverse_lazy('notaDebito:send-invoice', kwargs={'pk':id_,'slug':self.kwargs['slug']})
+        return reverse_lazy('facturas:send-invoice', kwargs={'pk':id_,'slug':self.kwargs['slug']})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -265,7 +269,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
             response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
         except Exception as e:
             messages.warning(self.request, "No se pudo establecer conexion con el ERP Next, se genera el siguiente error: "+str(e))
-        url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+url
+        url=usuario.url_erp+'/api/resource/Delivery%20Note/'+url
         try:
             aux=session.get(url)
             session.close()
@@ -286,6 +290,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
 
     def form_valid(self, form, **kwargs):
         compania_id = self.kwargs['pk']
+
         # if form.cleaned_data['status'] == 'En proceso':
         data = form.clean()
         
@@ -293,67 +298,69 @@ class SendInvoice(LoginRequiredMixin, FormView):
             compania = Compania.objects.get(pk=compania_id)
         except Compania.DoesNotExist:
             messages.error(self.request, "No ha seleccionado la compania")
-            return super().form_invalid(form)
+            return super().form_valid(form)
         assert compania, "compania no existe"
         pass_certificado = compania.pass_certificado
         data['productos']=eval(data['productos'])
 
+        # rut = self.request.POST.get('rut', None)
+        # assert rut, "rut no existe"
         form = form.save(commit=False)
         try:
-            folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=56).order_by('fecha_de_autorizacion').first()
+            folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=33).order_by('fecha_de_autorizacion').first()
 
             if not folio:
                 raise Folio.DoesNotExist
 
         except Folio.DoesNotExist:  
             messages.error(self.request, "No posee folios para asignacion de timbre")
-            return super().form_invalid(form)
+            return super().form_valid(form)
         try:
             
             folio.verificar_vencimiento()
         except ElCAFSenEncuentraVencido:
             messages.error(self.request, "El CAF se encuentra vencido")
-            return super().form_invalid(form)
+            return super().form_valid(form)
         form.status = 'Aprobado'
         try:
             form.recibir_folio(folio)
         except (ElCafNoTieneMasTimbres, ValueError):
             messages.error(self.request, "Ya ha consumido todos sus timbres")
-            return super().form_invalid(form)
+            return super().form_valid(form)
         # Trae la cantidad de folios disponibles y genera una notificacion cuando quedan menos de 5
         # Si queda uno, cambia la estructura de la oracion a singular. 
         disponibles = folio.get_folios_disponibles()
         if disponibles == 1:
-            messages.success(self.request, "Nota de débito enviada exitosamente")
+            messages.success(self.request, "Guia enviada exitosamente")
             messages.info(self.request, str('Queda ')+str(disponibles)+str('folio disponible'))
         elif disponibles < 50:
-            messages.success(self.request, "Nota de débito enviada exitosamente")
+            messages.success(self.request, "Guia enviada exitosamente")
             messages.info(self.request, str('Quedan ')+str(disponibles)+str('folios disponibles'))
         else:
-            messages.success(self.request, "Nota de débito enviada exitosamente")
+            messages.success(self.request, "Guia enviada exitosamente")
         form.compania = compania
-        form.save()
+       
 
-        response_dd = notaDebito._firmar_dd(data, folio, form)
-        documento_firmado = notaDebito.firmar_documento(response_dd,data,folio, compania, form, pass_certificado)
-        documento_final_firmado = notaDebito.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
-        caratula_firmada = notaDebito.generar_documento_final(compania,documento_final_firmado, pass_certificado)
+        response_dd = guiaDespacho._firmar_dd(data, folio, form)
+        documento_firmado = guiaDespacho.firmar_documento(response_dd,data,folio, compania, form, pass_certificado)
+        documento_final_firmado = guiaDespacho.firmar_etiqueta_set_dte(compania, folio, documento_firmado,form)
+        caratula_firmada = guiaDespacho.generar_documento_final(compania,documento_final_firmado,pass_certificado)
 
         form.dte_xml = caratula_firmada
-        #form.save()
-
-        # print(response_dd)
-
+        # print(caratula_firmada)
+        # return HttpResponse(False)
+        
         try:
-            xml_dir = settings.MEDIA_ROOT +'notas_de_debito'+'/'+self.kwargs['slug']
+            xml_dir = settings.MEDIA_ROOT +'guia'+'/'+self.kwargs['slug']
             if(not os.path.isdir(xml_dir)):
-                os.makedirs(xml_dir)
+                os.makedirs(settings.MEDIA_ROOT +'guia'+'/'+self.kwargs['slug'])
             f = open(xml_dir+'/'+self.kwargs['slug']+'.xml','w')
             f.write(caratula_firmada)
             f.close()
         except Exception as e:
             messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
             return super().form_valid(form)
+
 
         send_sii = self.send_invoice_sii(compania,caratula_firmada,pass_certificado)
         if(not send_sii['estado']):
@@ -370,11 +377,14 @@ class SendInvoice(LoginRequiredMixin, FormView):
             usuario = Conector.objects.filter(pk=1).first()
         except Exception as e:
             print(e)
+
         payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
         headers = {'content-type': "application/json"}
         response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
-        url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+self.kwargs['slug']
+        url=usuario.url_erp+'/api/resource/Delivery%20Note/'+self.kwargs['slug']
+
         aux=session.put(url,json={'status_sii':'Aprobado'})
+
         session.close()
         # else:
         #     msg = "La factura %s ya se encuentra almacenada en la base de datos del Faturador" % (self.kwargs['slug'])
@@ -417,12 +427,53 @@ class SendInvoice(LoginRequiredMixin, FormView):
             print(e)
             return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
 
-class NotaDebitoEnviadasView(LoginRequiredMixin, ListView):
-    template_name = 'ND_enviadas.html'
-
-
+class GuiasEnviadasView(ListView):
+    template_name = 'guias_enviadas.html'
     def get_queryset(self):
-
         compania = self.kwargs.get('pk')
-        print(notaDebito.objects.filter(compania=compania).order_by('-created'))
-        return notaDebito.objects.filter(compania=compania).order_by('-created')
+        return guiaDespacho.objects.filter(compania=compania).order_by('-created')
+
+class ImprimirGuia(TemplateView,WeasyTemplateResponseMixin):
+    """!
+    Class para imprimir la guia en PDF
+
+    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @author Luis Barrios (nikeven at gmail.com)
+    @date 01-04-2019
+    @version 1.0.0
+    """
+    template_name = "pdf/guia.pdf.html"
+    model = guiaDespacho
+
+    def dispatch(self, request, *args, **kwargs):
+        num_factura = self.kwargs['slug']
+        compania = self.kwargs['pk']
+        try:
+            factura = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
+            return super().dispatch(request, *args, **kwargs)
+        except Exception as e:
+            factura = self.model.objects.select_related().filter(numero_factura=num_factura, compania=compania)
+            if len(factura) > 1:
+                messages.error(self.request, 'Existe mas de un registro con el mismo numero de guia: {0}'.format(num_factura))
+                return redirect(reverse_lazy('guiaDespacho:lista-guias-enviadas', kwargs={'pk': compania}))
+            else:
+                messages.error(self.request, "No se encuentra registrada esta guia: {0}".format(str(num_factura)))
+                return redirect(reverse_lazy('guiaDespacho:lista-guias-enviadas', kwargs={'pk': compania}))
+
+    def get_context_data(self, *args, **kwargs):
+        """!
+        Method to handle data on get
+
+        @date 21-03-2019
+        @return Returns dict with data
+        """
+        context = super().get_context_data(*args, **kwargs)
+        num_factura = self.kwargs['slug']
+        compania = self.kwargs['pk']
+        
+        context['factura'] = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
+        context['nombre_documento'] = NOMB_DOC['GUIA_DES_ELEC']
+        prod = context['factura'].productos.replace('\'{','{').replace('}\'','}').replace('\'',"\"")
+        productos = json.loads(prod)
+        context['productos'] = productos
+        return context

@@ -27,6 +27,8 @@ notaCredito/migrations/
 notaCredito/__pycache__
 notaDebito/migrations/
 notaDebito/__pycache__
+*/__pycache__
+*/migrations
 *.*.backup
 *.*~
 *.swp
