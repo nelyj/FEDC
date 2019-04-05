@@ -355,11 +355,12 @@ class SendInvoice(FormView):
             if(not os.path.isdir(xml_dir)):
                 os.makedirs(settings.MEDIA_ROOT +'guia'+'/'+self.kwargs['slug'])
             f = open(xml_dir+'/'+self.kwargs['slug']+'.xml','w')
-            f.write(documento_final_firmado)
+            f.write(caratula_firmada)
             f.close()
         except Exception as e:
             messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
             return super().form_valid(form)
+
 
         send_sii = self.send_invoice_sii(compania,caratula_firmada,pass_certificado)
         if(not send_sii['estado']):
@@ -367,9 +368,7 @@ class SendInvoice(FormView):
             return super().form_valid(form)
         else:
             form.track_id = send_sii['track_id']
-        form.save()
-
-        print(response_dd)
+            form.save()
 
 
         msg = "Se guardo en Base de Datos la factura con éxito"
