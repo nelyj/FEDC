@@ -8,7 +8,7 @@ from .exceptions import ContrasenaDeCertificadoIncorrecta
 
 import OpenSSL.crypto
 from Crypto.Hash import MD5
-
+from django.core.validators import MinValueValidator, MaxValueValidator
 from base64 import b64decode,b64encode
 
 
@@ -42,7 +42,7 @@ class Compania(models.Model):
     comuna = models.CharField(max_length=128, choices=COMUNAS, blank=True, null=True)
     logo = models.FileField(upload_to=get_upload_to, blank=True, null=True)
     fecha_resolucion = models.DateField(blank=True, null=True)
-    numero_resolucion = models.IntegerField(blank=True, null=True)
+    numero_resolucion = models.IntegerField(blank=True, null=True,validators=[MinValueValidator(0),MaxValueValidator(999999)])
     correo_sii = models.EmailField(blank=True, null=True)
     pass_correo_sii = models.CharField(max_length=128, blank=True, null=True)
     correo_intercambio = models.EmailField(blank=True, null=True)

@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<getToken> 
+<item>
+  <Semilla>{{seed}}</Semilla> 
+</item>
+{{signature|safe}}
+</getToken> 
