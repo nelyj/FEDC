@@ -5,6 +5,7 @@ from base64 import b64decode,b64encode
 from django.conf import settings
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.http import HttpResponseRedirect
 
 from django.views.generic import TemplateView, RedirectView, ListView
 from django.shortcuts import get_object_or_404
@@ -12,13 +13,40 @@ from conectores.models import Compania
 from .models import Intercambio, DteIntercambio
 
 
+class SeleccionarEmpresaIntercambioView(TemplateView):
+    template_name = 'intercambio_seleccionar_empresa.html'
+
+    def get_context_data(self, *args, **kwargs): 
+
+        context = super().get_context_data(*args, **kwargs)
+        context['empresas'] = Compania.objects.filter(owner=self.request.user)
+        if Compania.objects.filter(owner=self.request.user).exists():
+            context['tiene_empresa'] = True
+        else:
+            messages.info(self.request, "Registre una empresa para continuar")
+            context['tiene_empresa'] = False
+        return context
+
+    def post(self, request):
+
+        empresa = int(request.POST.get('empresa'))
+
+        if not empresa:
+            return HttpResponseRedirect('/')
+        empresa_obj = Compania.objects.get(pk=empresa)
+        if empresa_obj and self.request.user == empresa_obj.owner:
+
+            return HttpResponseRedirect(reverse_lazy('intercambios:lista', kwargs={'pk':empresa}))
+        else:
+            return HttpResponseRedirect('/')
+
 class IntercambiosListView(ListView):
 	template_name = "intercambios.html"
 	
 	def get_queryset(self):
-
+		pk=self.kwargs.get('pk')
 		user = self.request.user
-		compania = Compania.objects.get(owner=user)
+		compania = Compania.objects.get(pk=pk)
 
 		queryset = Intercambio.objects.filter(receptor=compania).order_by('-codigo_email')
 		print(queryset)
@@ -29,9 +57,10 @@ class RefrescarBandejaRedirectView(RedirectView):
 
 	def get_redirect_url(self, *args, **kwargs):
 
+		pk=self.kwargs.get('pk')
 		mail = imaplib.IMAP4_SSL('imap.gmail.com')
 		user = self.request.user
-		compania = Compania.objects.filter(owner=user).first()
+		compania = Compania.objects.get(pk=pk)
 		print(compania)
 		assert compania.correo_intercambio, "No hay correo"
 		assert compania.pass_correo_intercambio, "No hay password"
@@ -61,7 +90,7 @@ class RefrescarBandejaRedirectView(RedirectView):
 
 		else:
 			messages.info(self.request, "No posee nuevos correos")
-			return reverse_lazy('intercambios:lista')
+			return reverse_lazy('intercambios:lista', kwargs={'pk':pk})
 
 
 		# if id_list[-1].decode() > Intercambio.objects.get(receptor=compania).order_by('-codigo_email').
@@ -114,7 +143,7 @@ class RefrescarBandejaRedirectView(RedirectView):
 
 		# 	print(item['body'])
 		messages.success(self.request, "Cantidad de correos nuevos: {}".format(new_elements))
-		return reverse_lazy('intercambios:lista')
+		return reverse_lazy('intercambios:lista', kwargs={'pk':pk})
 
 
 
