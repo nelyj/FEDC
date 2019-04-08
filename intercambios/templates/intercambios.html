@@ -1,0 +1,42 @@
+{% extends "utils_start.html" %}
+{% block titulo %} Intercambios {% endblock titulo %}
+{% block content_center %}
+<a class="glyphicon glyphicon-list" id="menu-toggle"></a>
+<div class="container">
+	<div class="row">
+		<a  href="{% url 'intercambios:actualizar' view.kwargs.pk %}" class="btn btn-info">Actualizar bandeja de intercambio</a>
+	</div>
+</div>
+<table id="myTable" class="display" style="width:100%">
+    <thead>
+        <tr>
+            <th>Código</th>
+            <th>Recibido</th>
+            <th>Emisor</th>
+            <th>Asunto</th>
+            <th>cantidad de DTE</th>
+            <th>Estado</th>
+            <th>Usuario</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+       {% for mail in object_list %}
+        <tr>
+            <td>{{mail.codigo_email}}</td>
+            <td>{{mail.fecha_de_recepcion}}</td>
+            <td>{{mail.remisor}}</td>
+            <td>{{mail.titulo}}</td>
+            <td>{{mail.cantidad_dte}}</td>
+            <td>#</td>
+            <td>#</td>
+            <td>
+                <!-- Trigger the modal with a button -->
+                <a  id="edit_foo" href="#" class="btn btn-info"><i class="fa fa-search"></i></a>
+                <a  id="edit_foo" href="#" class="btn btn-info"><i class="fa fa-edit"></i></a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock content_center %}
