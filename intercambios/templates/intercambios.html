@@ -4,7 +4,7 @@
 <a class="glyphicon glyphicon-list" id="menu-toggle"></a>
 <div class="container">
 	<div class="row">
-		<a  href="#" class="btn btn-info">Actualizar bandeja de intercambio</a>
+		<a  href="{% url 'intercambios:actualizar' %}" class="btn btn-info">Actualizar bandeja de intercambio</a>
 	</div>
 </div>
 <table id="myTable" class="display" style="width:100%">
@@ -13,6 +13,7 @@
             <th>Código</th>
             <th>Recibido</th>
             <th>Emisor</th>
+            <th>Asunto</th>
             <th>cantidad de DTE</th>
             <th>Estado</th>
             <th>Usuario</th>
@@ -20,12 +21,13 @@
         </tr>
     </thead>
     <tbody>
-       {% for mail in lista_de_emails %}
+       {% for mail in object_list %}
         <tr>
-            <td>{{mail.codigo}}</td>
-            <td>{{mail.received}}</td>
-            <td>{{mail.from_email}}</td>
-            <td>{{mail.attachment_count}}</td>
+            <td>{{mail.codigo_email}}</td>
+            <td>{{mail.fecha_de_recepcion}}</td>
+            <td>{{mail.remisor}}</td>
+            <td>{{mail.titulo}}</td>
+            <td>{{mail.cantidad_dte}}</td>
             <td>#</td>
             <td>#</td>
             <td>

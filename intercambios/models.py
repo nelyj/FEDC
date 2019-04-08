@@ -11,7 +11,7 @@ class Intercambio(CreationModificationDateMixin):
 	receptor = models.ForeignKey(Compania, on_delete=models.CASCADE, blank=True, null=True)
 	remisor = models.CharField(max_length=128,blank=True, null=True)
 	email_remisor = models.EmailField(blank=True, null=True)
-	fecha_de_recepcion = models.CharField(max_length=128,blank=True, null=True)
+	fecha_de_recepcion = models.DateTimeField(auto_now=False, auto_now_add=False,blank=True, null=True)
 	cantidad_dte = models.IntegerField(null=True, default=0)
 	titulo = models.CharField(max_length=128,blank=True, null=True)
 	contenido = models.TextField(null=True, blank=True)
