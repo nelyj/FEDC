@@ -251,7 +251,7 @@ class SendInvoice(FormView):
 
         id_ = self.kwargs.get('pk')
 
-        return reverse_lazy('facturas:send-invoice', kwargs={'pk':id_,'slug':self.kwargs['slug']})
+        return reverse_lazy('guia_despacho:send-invoice', kwargs={'pk':id_,'slug':self.kwargs['slug']})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

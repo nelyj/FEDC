@@ -380,12 +380,12 @@ class SendInvoice(LoginRequiredMixin, FormView):
         caratula_firmada = Factura.generar_documento_final(compania,documento_final_firmado,pass_certificado)
 
         form.dte_xml = caratula_firmada
-        
+        etiqueta=self.kwargs['slug'].replace('º','')
         try:
-            xml_dir = settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug']
+            xml_dir = settings.MEDIA_ROOT +'facturas'+'/'+etiqueta
             if(not os.path.isdir(xml_dir)):
-                os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug'])
-            f = open(xml_dir+'/'+self.kwargs['slug']+'.xml','w')
+                os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+etiqueta)
+            f = open(xml_dir+'/'+etiqueta+'.xml','w')
             f.write(caratula_firmada)
             f.close()
         except Exception as e:
