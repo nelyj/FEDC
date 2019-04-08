@@ -386,7 +386,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
             if(not os.path.isdir(xml_dir)):
                 os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+self.kwargs['slug'])
             f = open(xml_dir+'/'+self.kwargs['slug']+'.xml','w')
-            f.write(documento_final_firmado)
+            f.write(caratula_firmada)
             f.close()
         except Exception as e:
             messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
