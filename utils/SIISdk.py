@@ -75,8 +75,7 @@ class SII_SDK():
         @param compania recibe el objeto compañia
         @return xml con la fima 
         """
-    
-        signature = etree.parse('facturas/templates/snippets/signature_sii.xml').getroot()
+        signature = etree.parse(settings.BASE_DIR+'/facturas/templates/snippets/signature_sii.xml').getroot()
         signature = etree.tostring(signature)
         authentication = render_to_string('snippets/authentication.xml', {'seed':seed,'signature':signature.decode()})
         return self.generalSign(compania,authentication, pass_certificado)

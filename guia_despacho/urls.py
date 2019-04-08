@@ -3,7 +3,7 @@ from django.urls import path, include, re_path
 from django.views.generic.base import TemplateView
 from .views import *
 
-app_name = 'guiaDespacho'
+app_name = 'guia_despacho'
 urlpatterns = [
     re_path(r'lista-guias/(?P<pk>\d+)', ListaGuiasViews.as_view(), name='lista_guias'),
     re_path(r'^lista-guias/empresa/$', SeleccionarEmpresaView.as_view(),name='seleccionar-empresa'),
