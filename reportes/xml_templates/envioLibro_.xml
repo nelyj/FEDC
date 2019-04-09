@@ -7,11 +7,11 @@
             <TotalesPeriodo>
                 <TpoDoc>doc.30</TpoDoc>
                 <TotDoc>1</TotDoc> <!-- Cantidad de documentos del tipo especificado en el campo Tipo de Documento. Incluye anulados. -->
-                <TotMntExe>doc.0</TotMntExe> <!-- TOTAL MONTO EXENTO O NO GRAVADO -->
-                <TotMntNeto>doc.100</TotMntNeto> <!-- TOTAL MONTO NETO -->
-                <TotOpIVARec>doc.1</TotOpIVARec> <!-- OPERACIONES CON IVA RECUPERABLE -->
-                <TotMntIVA>doc.19</TotMntIVA> <!-- TOTAL MONTO IVA (recuperable) -->
-                <TotMntTotal>doc.119</TotMntTotal> <!-- TOTAL MONTO TOTAL -->
+                <TotMntExe>doc.0</TotMntExe> <!-- TOTAL MONTO EXENTO O NO GRAVADO --> <!-- Factura.excento -->
+                <TotMntNeto>doc.100</TotMntNeto> <!-- TOTAL MONTO NETO --><!--  Factura.neto -->
+                <TotOpIVARec>doc.1</TotOpIVARec> <!-- OPERACIONES CON IVA RECUPERABLE --> 
+                <TotMntIVA>doc.19</TotMntIVA> <!-- TOTAL MONTO IVA (recuperable) --> 
+                <TotMntTotal>doc.119</TotMntTotal> <!-- TOTAL MONTO TOTAL --> <!-- Factura.total -->
             </TotalesPeriodo>
             {% endfor %}
         </ResumenPeriodo>
