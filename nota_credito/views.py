@@ -345,7 +345,6 @@ class SendInvoice(LoginRequiredMixin, FormView):
 
         form.dte_xml = caratula_firmada
         #form.save()
-        print(caratula_firmada)
         # documento_final_firmado = Factura.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
         # caratula_firmada = Factura.generar_documento_final(compania,documento_final_firmado,pass_certificado)
         # form.dte_xml = caratula_firmada
