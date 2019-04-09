@@ -120,7 +120,7 @@ class RefrescarBandejaRedirectView(RedirectView):
 				fecha_de_recepcion = self.get_received_time(str(email.header.make_header(email.header.decode_header(email_message['Received'])))),
 				cantidad_dte = attachment_count,
 				titulo = str(email.header.make_header(email.header.decode_header(email_message['Subject']))),
-				contenido = self.get_body(raw_multipart).decode('utf-8')
+				contenido = self.get_body(raw_multipart).decode('latin-1')
 			) 
 
 		messages.success(self.request, "Cantidad de correos nuevos: {}".format(new_elements))
