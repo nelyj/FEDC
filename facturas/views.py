@@ -23,9 +23,10 @@ from conectores.models import *
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
 from utils.SIISdk import SII_SDK
+from utils.utils import validarModelPorDoc
 from .forms import *
 from .models import Factura
-from .constants import NOMB_DOC
+from .constants import NOMB_DOC, LIST_DOC
 
 class SeleccionarEmpresaView(LoginRequiredMixin,TemplateView):
     template_name = 'seleccionar_empresa.html'
@@ -485,17 +486,23 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView,WeasyTemplateResponseMixi
     def dispatch(self, request, *args, **kwargs):
         num_factura = self.kwargs['slug']
         compania = self.kwargs['pk']
-        try:
-            factura = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
-            return super().dispatch(request, *args, **kwargs)
-        except Exception as e:
-            factura = self.model.objects.select_related().filter(numero_factura=num_factura, compania=compania)
-            if len(factura) > 1:
-                messages.error(self.request, 'Existe mas de un registro con el mismo numero de factura: {0}'.format(num_factura))
-                return redirect(reverse_lazy('facturas:lista-enviadas', kwargs={'pk': compania}))
-            else:
-                messages.error(self.request, "No se encuentra registrada esta factura: {0}".format(str(num_factura)))
-                return redirect(reverse_lazy('facturas:lista-enviadas', kwargs={'pk': compania}))
+        tipo_doc = self.kwargs['doc']
+        if tipo_doc in LIST_DOC:
+            self.model = validarModelPorDoc(tipo_doc) 
+            try:
+                factura = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
+                return super().dispatch(request, *args, **kwargs)
+            except Exception as e:
+                factura = self.model.objects.select_related().filter(numero_factura=num_factura, compania=compania)
+                if len(factura) > 1:
+                    messages.error(self.request, 'Existe mas de un registro con el mismo numero de factura: {0}'.format(num_factura))
+                    return redirect(reverse_lazy('facturas:lista-enviadas', kwargs={'pk': compania}))
+                else:
+                    messages.error(self.request, "No se encuentra registrada esta factura: {0}".format(str(num_factura)))
+                    return redirect(reverse_lazy('facturas:lista-enviadas', kwargs={'pk': compania}))
+        else:
+            messages.error(self.request, "No existe este tipo de documento: {0}".format(str(tipo_doc)))
+            return redirect(reverse_lazy('facturas:lista-enviadas', kwargs={'pk': compania}))
 
     def get_context_data(self, *args, **kwargs):
         """!
@@ -507,9 +514,10 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView,WeasyTemplateResponseMixi
         context = super().get_context_data(*args, **kwargs)
         num_factura = self.kwargs['slug']
         compania = self.kwargs['pk']
+        tipo_doc = self.kwargs['doc']
         
         context['factura'] = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
-        context['nombre_documento'] = NOMB_DOC['FACT_ELEC']
+        context['nombre_documento'] = NOMB_DOC[tipo_doc]
         prod = context['factura'].productos.replace('\'{','{').replace('}\'','}').replace('\'',"\"")
         productos = json.loads(prod)
         context['productos'] = productos
