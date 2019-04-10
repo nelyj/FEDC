@@ -334,12 +334,15 @@ class SendInvoice(LoginRequiredMixin, FormView):
         form.compania = compania
         form.save()
 
-        response_dd = notaDebito._firmar_dd(data, folio, form)
-        documento_firmado = notaDebito.firmar_documento(response_dd,data,folio, compania, form, pass_certificado)
-        documento_final_firmado = notaDebito.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
-        caratula_firmada = notaDebito.generar_documento_final(compania,documento_final_firmado, pass_certificado)
-
-        form.dte_xml = caratula_firmada
+        try:
+            response_dd = notaDebito._firmar_dd(data, folio, form)
+            documento_firmado = notaDebito.firmar_documento(response_dd,data,folio, compania, form, pass_certificado)
+            documento_final_firmado = notaDebito.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
+            caratula_firmada = notaDebito.generar_documento_final(compania,documento_final_firmado, pass_certificado)
+            form.dte_xml = caratula_firmada
+        except Exception as e:
+            messages.error(self.request, "Ocurrió un error al firmar el documento")
+            return super().form_valid(form)
         #form.save()
 
         # print(response_dd)

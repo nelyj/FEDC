@@ -340,13 +340,15 @@ class SendInvoice(FormView):
             messages.success(self.request, "Guia enviada exitosamente")
         form.compania = compania
        
-
-        response_dd = guiaDespacho._firmar_dd(data, folio, form)
-        documento_firmado = guiaDespacho.firmar_documento(response_dd,data,folio, compania, form, pass_certificado)
-        documento_final_firmado = guiaDespacho.firmar_etiqueta_set_dte(compania, folio, documento_firmado,form)
-        caratula_firmada = guiaDespacho.generar_documento_final(compania,documento_final_firmado,pass_certificado)
-
-        form.dte_xml = caratula_firmada
+        try:
+            response_dd = guiaDespacho._firmar_dd(data, folio, form)
+            documento_firmado = guiaDespacho.firmar_documento(response_dd,data,folio, compania, form, pass_certificado)
+            documento_final_firmado = guiaDespacho.firmar_etiqueta_set_dte(compania, folio, documento_firmado,form)
+            caratula_firmada = guiaDespacho.generar_documento_final(compania,documento_final_firmado,pass_certificado)
+            form.dte_xml = caratula_firmada
+        except Exception as e:
+            messages.error(self.request, "Ocurrió un error al firmar el documento")
+            return super().form_valid(form)
         # print(caratula_firmada)
         # return HttpResponse(False)
         
