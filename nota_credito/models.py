@@ -86,7 +86,7 @@ class notaCredito(CreationModificationDateMixin):
 			data['rut'] = data['rut'].replace('.','')
 
 		data['neto']=str(round(float(data['neto'])))
-		data['total']=str(round(float(data['total'])))
+		data['total']=str(round(abs(float(data['total']))))
 
 		sin_aplanar = render_to_string('snippets/DD_tag_nc.xml', {'data':data,'folio':folio, 'instance':instance, 'timestamp':timestamp})
 		digest_string = sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
@@ -124,9 +124,9 @@ class notaCredito(CreationModificationDateMixin):
 
 		# Ajustados los montos de productos para el xml
 		for producto in datos['productos']:
-			producto['qty'] = str(producto['qty'])
+			producto['qty'] = str(abs(producto['qty']))
 			producto['base_net_rate'] = str(producto['base_net_rate'])
-			producto['amount'] = round(producto['amount'])
+			producto['amount'] = round(abs(producto['amount']))
 
 		# Ajustados valores para el xml
 		if('k' in folio.rut):
@@ -136,8 +136,8 @@ class notaCredito(CreationModificationDateMixin):
 		if('k' in datos['rut']):
 			datos['rut'] = datos['rut'].replace('k','K')
 		datos['numero_factura'] = datos['numero_factura'].replace('º','')
-		datos['neto']=str(round(float(datos['neto'])))
-		datos['total']=str(round(float(datos['total'])))
+		datos['neto']=str(round(abs(float(datos['neto']))))
+		datos['total']=str(round(abs(float(datos['total']))))
 
 		# Llena los datos de la plantilla Documento_tag.xml con la informacion pertinente
 		documento_sin_aplanar = render_to_string(
