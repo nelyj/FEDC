@@ -29,6 +29,7 @@ class guiaDespacho(CreationModificationDateMixin):
 	senores = models.CharField(max_length=128, blank=True, null=True)
 	direccion = models.CharField(max_length=128, blank=True, null=True)
 	comuna = models.CharField(max_length=128, blank=True, null=True)
+	region = models.CharField(max_length=128, blank=True, null=True)
 	ciudad_receptora = models.CharField(max_length=128, blank=True, null=True)
 	transporte = models.CharField(max_length=128, blank=True, null=True)
 	despachar = models.CharField(max_length=128, blank=True, null=True)

@@ -1,4 +1,15 @@
 #: constantes para el pdf o documentos electronicos
+LIST_DOC = ['FACT_ELEC',
+            'FACT_EX_ELEC',
+            'GUIA_DES_ELEC',
+            'NOTA_DEB_ELEC',
+            'NOTA_CRE_ELEC',
+            'FACT_CRO_ELEC',
+            'LIQ_FACT_ELEC',
+            'FACT_EXP_ELEC',
+            'NOTA_DEB_EXP_ELEC',
+            'NOTA_CRE_EXP_ELEC'
+           ]
 
 NOMB_DOC = {
             'FACT_ELEC': 'Factura Electrónica',

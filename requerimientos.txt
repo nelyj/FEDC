@@ -20,8 +20,7 @@ django-weasyprint==0.5.4
 html5lib==1.0.1
 idna==2.7
 imap-tools==0.5
-lxml==3.6.0
-mysql-connector-python-rf==2.2.2
+lxml==4.1.1
 olefile==0.44
 Pillow==5.4.1
 pkgconfig==1.4.0
