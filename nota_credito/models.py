@@ -51,6 +51,8 @@ class notaCredito(CreationModificationDateMixin):
 	n_folio = models.IntegerField(null=True, default=0)
 	dte_xml = models.TextField(null=True, blank=True)
 	track_id = models.CharField(max_length=32, blank=True, null=True)
+
+	TIPO_DE_DOCUMENTO=61
 	
 	class Meta:
 		ordering = ('numero_factura',)

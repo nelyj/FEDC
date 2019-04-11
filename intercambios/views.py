@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 
-from django.views.generic import TemplateView, RedirectView, ListView
+from django.views.generic import TemplateView, RedirectView, ListView, DetailView
 from django.shortcuts import get_object_or_404
 from conectores.models import Compania
 from .models import Intercambio, DteIntercambio
@@ -52,6 +52,23 @@ class IntercambiosListView(ListView):
 		queryset = Intercambio.objects.filter(receptor=compania).order_by('-codigo_email')
 		print(queryset)
 		return queryset
+
+
+
+class IntercambiosDetailView(DetailView):
+	template_name="intercambio_detail.html"
+
+	def get_object(self):
+
+		compania_pk=self.kwargs.get('pk')
+		intercambio_pk=self.kwargs.get('inter_pk')
+		intercambio = get_object_or_404(
+			Intercambio, 
+			receptor=compania_pk, 
+			pk=intercambio_pk
+		)
+		return intercambio
+
 
 
 class RefrescarBandejaRedirectView(RedirectView):

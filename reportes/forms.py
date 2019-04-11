@@ -16,7 +16,8 @@ class ReporteCreateForm(forms.ModelForm):
             'tipo_de_envio',
             'tipo_de_libro',
             'fecha_de_inicio', 
-            'fecha_de_culminacion'
+            'fecha_de_culminacion',
+            'folio_notificacion'
 
         ]
 

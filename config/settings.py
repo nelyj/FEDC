@@ -1,3 +1,4 @@
+# coding=utf-8
 """
 Django settings for UserManager project.
 
@@ -148,7 +149,7 @@ MEDIA_URL = '/sources/'
 STATIC_ROOT = BASE_DIR + 'static/'
 STATIC_URL = '/static/'
 
-# Configuración de los directorios en donde se encuentran los archivos estáticos
+# Configuración de los directorios en donde se encuentran los archivos estaticos
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static/'),
     os.path.join(BASE_DIR, 'sources/'),
