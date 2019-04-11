@@ -50,9 +50,8 @@ class Compania(models.Model):
     certificado = models.FileField('Certificado', upload_to=get_cert_upload_to,validators=[FileExtensionValidator(allowed_extensions=['pfx'])], blank=False, null=True)
     tasa_de_iva = models.IntegerField("Tasa IVA", blank=False, null=False, default=0)
     pass_certificado = models.CharField(max_length=128)
+    web = models.URLField()
     
-
-
 
 
     class Meta:

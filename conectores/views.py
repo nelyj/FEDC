@@ -163,6 +163,18 @@ class CompaniaUpdate(LoginRequiredMixin, FormView):
 
         try:
 
+            instance = form.save(commit=False)
+            pfx = instance.certificado.read()
+            clave_privada, certificado, clave_publica  = \
+            Compania.validar_certificado(pfx, form.cleaned_data['pass_certificado'])
+
+        except ContrasenaDeCertificadoIncorrecta:
+
+            messages.error(self.request, "Contraseña del certificado incorrecta")
+            return super().form_invalid(form)
+
+        try:
+
             transaction = Compania.objects.update_or_create(
                 pk=self.kwargs['pk'],
                 defaults={
