@@ -521,9 +521,13 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView,WeasyTemplateResponseMixi
         
         context['factura'] = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
         context['nombre_documento'] = NOMB_DOC[tipo_doc]
+        etiqueta=self.kwargs['slug'].replace('º','')
+        context['etiqueta'] = etiqueta
         prod = context['factura'].productos.replace('\'{','{').replace('}\'','}').replace('\'',"\"")
         productos = json.loads(prod)
         context['productos'] = productos
+        ruta = settings.STATIC_URL +'facturas'+'/'+etiqueta+'/timbre.jpg'
+        context['ruta']=ruta
         return context
 
 class VerEstadoFactura(LoginRequiredMixin, TemplateView):

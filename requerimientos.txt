@@ -22,6 +22,7 @@ idna==2.7
 imap-tools==0.5
 lxml==4.1.1
 olefile==0.44
+pdf417gen==0.7.0
 Pillow==5.4.1
 pkgconfig==1.4.0
 psycopg2==2.7.5
