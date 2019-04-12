@@ -18,7 +18,7 @@ from conectores.models import Compania
 from .models import Reporte
 
 
-# Create your views here.
+
 class SeleccionarEmpresaView(TemplateView):
     template_name = 'reportes_seleccionar_empresa.html'
 
@@ -36,12 +36,7 @@ class SeleccionarEmpresaView(TemplateView):
     def post(self, request):
 
         enviadas = self.request.POST.get('enviadas', None)
-
-        # print(enviadas)
-        # enviadas = int(enviadas)
-
         empresa = int(request.POST.get('empresa'))
-
         if not empresa:
             return HttpResponseRedirect('/')
         empresa_obj = Compania.objects.get(pk=empresa)
@@ -53,14 +48,10 @@ class SeleccionarEmpresaView(TemplateView):
 
 class ReportesCreateListView(CreateView):
 
+
 	template_name = "reporte_create_list.html"
 	form_class = ReporteCreateForm
 	get_success_url = reverse_lazy("reportes:crear")
-
-	# def get_success_url(self):
-
-	# 	return self.reques
-
 	def form_valid(self, form):
 		"""
 		
@@ -72,21 +63,15 @@ class ReportesCreateListView(CreateView):
 		fecha_de_inicio = instance.fecha_de_inicio
 		fecha_de_culminacion = instance.fecha_de_culminacion
 		tipo_de_operacion = instance.tipo_de_operacion
-
-		assert type(tipo_de_operacion) == str, "tipo no string"
-
 		report_context = {
-
 			'compania': compania,
 			'reporte': instance,
 			'periodo_tributario': fecha_de_inicio.strftime("%Y-%m"),
 			'resumen_periodos':[],
 			'detalles':[]
-
 		}
 
 		if tipo_de_operacion == "COMPRAS":
-
 
 			facturas_queryset_ = [
 				factura 
@@ -105,21 +90,19 @@ class ReportesCreateListView(CreateView):
 				)
 			]
 
-
-			facturas_data = self.generar_resumen_periodos(facturas_queryset_)
-			nota_credito_data = self.generar_resumen_periodos(nota_credito_queryset)
+			facturas_data = \
+			self.generar_resumen_periodos(facturas_queryset_)
+			nota_credito_data = \
+			self.generar_resumen_periodos(nota_credito_queryset)
 
 			if facturas_data:
-				report_context['resumen_periodos'].append(facturas_data)
+				report_context['resumen_periodos'].append(
+					facturas_data)
 			if nota_credito_data:
-				report_context['resumen_periodos'].append(nota_credito_data)
-
-			
-
-
+				report_context['resumen_periodos'].append(
+					nota_credito_data)
 		print(facturas_data)
 		print(nota_credito_data)
-
 
 		try: 
 			Reporte.check_reporte_len(facturas_queryset_)
@@ -128,26 +111,16 @@ class ReportesCreateListView(CreateView):
 			messages.error(self.request, e)
 			return super().form_invalid(form)
 
-		# print(queryset_)
-
 
 		instance.save()
-		# return super().form_valid(form)
 		return HttpResponseRedirect(reverse_lazy('reportes:crear', kwargs={'pk': compania.pk}))
 
 	def get_context_data(self, *args, **kwargs):
 
 		context = super().get_context_data(*args, **kwargs)
-
 		compania = get_object_or_404(Compania, pk=self.kwargs.get('pk'))
-		print(compania)
-
 		context['lista_de_reportes'] = Reporte.objects.filter(compania=compania).order_by('created')
 		context['compania'] = compania	
-
-	
-		# Filtrar por usuario o empresa 
-
 		return context
 
 	def generar_resumen_periodos(self, queryset):
@@ -188,18 +161,18 @@ class ReportesCreateListView(CreateView):
 
 class ReporteDetailView(DetailView):
 
+
 	template_name="reportes_detail.html"
 
 	def get_context_data(self, *args, **kwargs):
 
 		context = super().get_context_data(*args, **kwargs)
-
 		reporte = self.get_object()
-
 		print(reporte)
-
-		context['facturas_del_reporte'] = Factura.objects.filter(created__gte=reporte.fecha_de_inicio, created__lte=reporte.fecha_de_culminacion)
-
+		context['facturas_del_reporte'] = Factura.objects.filter(
+			created__gte=reporte.fecha_de_inicio, 
+			created__lte=reporte.fecha_de_culminacion
+			)
 		print(context['facturas_del_reporte'])
 
 		return context
@@ -211,6 +184,7 @@ class ReporteDetailView(DetailView):
 
 
 class ReportesDeleteView(LoginRequiredMixin,DeleteView):
+
 
 	template_name="reportes_delete.html"
 	# model = Reporte
