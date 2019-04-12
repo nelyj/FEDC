@@ -25,12 +25,12 @@ class Compania(models.Model):
         el servidor
         """
 
-        filename_base, filename_ext = os.path.splitext(filename)
+        #filename_base, filename_ext = os.path.splitext(filename)
 
-        hash = MD5.new()
-        hash.update(filename_base.encode())
+        #hash = MD5.new()
+        #hash.update(filename_base.encode())
 
-        return "certificados/%s%s" % (hash.hexdigest(),filename_ext.lower())
+        return "certificados/%s/%s" % (self.rut, filename)#(hash.hexdigest(),filename_ext.lower())
     
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE, default=1)     

@@ -147,6 +147,7 @@ class CompaniaUpdateForm(ModelForm):
             'pass_correo_sii',
             'correo_intercambio',
             'pass_correo_intercambio',
+            'certificado',
             'pass_certificado',
             'tasa_de_iva',
             'web'
@@ -176,20 +177,22 @@ class CompaniaUpdateForm(ModelForm):
         self.fields['numero_resolucion'].required = True
         self.fields['pass_correo_sii'].widget = PasswordInput()
         self.fields['pass_correo_sii'].widget.attrs.update({'class': 'form-control'})
-        self.fields['pass_correo_sii'].required = True
+        self.fields['pass_correo_sii'].required = False
         self.fields['correo_sii'].widget.attrs.update({'class': 'form-control'})
         self.fields['correo_sii'].required = True
         self.fields['pass_correo_intercambio'].widget = PasswordInput()
         self.fields['pass_correo_intercambio'].widget.attrs.update({'class': 'form-control'})
-        self.fields['pass_correo_intercambio'].required = True
+        self.fields['pass_correo_intercambio'].required = False
         self.fields['correo_intercambio'].widget.attrs.update({'class': 'form-control'})
         self.fields['correo_intercambio'].required = True
         self.fields['pass_certificado'].widget = PasswordInput()
         self.fields['pass_certificado'].widget.attrs.update({'class': 'form-control'})
-        self.fields['pass_certificado'].required = True
+        self.fields['pass_certificado'].required = False
         self.fields['logo'].widget.attrs.update({'class': 'form-control'})
         self.fields['tasa_de_iva'].widget.attrs.update({'class': 'form-control', 'size':'3', 'maxlength':'3'})
         self.fields['web'].widget.attrs.update({'class': 'form-control','placeholder': 'Dirección Web de la compañia'})
+        self.fields['certificado'].widget.attrs.update({'class': 'form-control'})
+        self.fields['certificado'].required = True
 
     def clean(self):        
 
@@ -197,9 +200,11 @@ class CompaniaUpdateForm(ModelForm):
 
         tasa_de_iva = cleaned_data.get('tasa_de_iva')
 
+        certificado = cleaned_data.get('certificado')
+
         if tasa_de_iva > 100 or tasa_de_iva < 0: 
 
-            raise forms.ValidationError('Tasa de iva invalida',code='tasa_mayor_a_100')
+            raise forms.ValidationError('Tasa de iva invalida',code='tasa_mayor_a_100')            
 
         return cleaned_data 
 

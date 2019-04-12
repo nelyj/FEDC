@@ -1,13 +1,17 @@
+import os
+import shutil
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.hashers import PBKDF2PasswordHasher
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import FormView
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from .forms import *
 from .models import *
 from datetime import datetime
-from django.views.generic.edit import DeleteView
+from django.views.generic.edit import DeleteView, UpdateView
 
 from certificados.models import Certificado
 from .exceptions import ContrasenaDeCertificadoIncorrecta
@@ -145,7 +149,7 @@ class CompaniaViews(LoginRequiredMixin, FormView):
         return super().form_invalid(form)
     #     return HttpResponseRedirect(self.success_url)
 
-class CompaniaUpdate(LoginRequiredMixin, FormView):
+class CompaniaUpdate(LoginRequiredMixin, UpdateView):
     form_class = CompaniaUpdateForm
     template_name = 'actualizar_compania.html'
     success_url =reverse_lazy('conectores:registrar_compania')
@@ -160,47 +164,51 @@ class CompaniaUpdate(LoginRequiredMixin, FormView):
         return context
 
     def form_valid(self,form):
+        
+        compania = get_object_or_404(self.model, pk=self.kwargs['pk'])
+        
+        print (str(form.cleaned_data['logo']), str(str(compania.logo).split('/')[2]), str(form.cleaned_data['logo'])==str(str(compania.logo).split('/')[2]))
+
+        if not str(form.cleaned_data['logo']) == str(compania.logo):
+            files = self.request.FILES
+            print (files['logo'].size)
+            ruta_archivo = settings.MEDIA_ROOT+str(compania.logo)
+            ruta = '/'.join(ruta_archivo.split('/')[:-1])
+            if os.path.exists(ruta):
+                shutil.rmtree(ruta)
+
+        if not str(form.cleaned_data['certificado']) == str(compania.certificado):
+            if form.cleaned_data['pass_certificado'] == '':
+                msg = "Necesitas ingresar la contraseña del certificado"
+                messages.error(self.request, msg)
+                return super().form_invalid(form)
+            ruta_archivo = settings.MEDIA_ROOT+str(compania.certificado)
+            ruta = '/'.join(ruta_archivo.split('/')[:-1])
+            if os.path.exists(ruta):
+                shutil.rmtree(ruta)
+
+        if form.cleaned_data['pass_certificado'] != '':
+            try:
+
+                instance = form.save(commit=False)
+                pfx = instance.certificado.read()
+                clave_privada, certificado, clave_publica  = \
+                Compania.validar_certificado(pfx, form.cleaned_data['pass_certificado'])
+
+            except ContrasenaDeCertificadoIncorrecta:
+
+                messages.error(self.request, "Contraseña del certificado incorrecta")
+                return super().form_invalid(form)
 
         try:
-
-            instance = form.save(commit=False)
-            pfx = instance.certificado.read()
-            clave_privada, certificado, clave_publica  = \
-            Compania.validar_certificado(pfx, form.cleaned_data['pass_certificado'])
-
-        except ContrasenaDeCertificadoIncorrecta:
-
-            messages.error(self.request, "Contraseña del certificado incorrecta")
-            return super().form_invalid(form)
-
-        try:
-
-            transaction = Compania.objects.update_or_create(
-                pk=self.kwargs['pk'],
-                defaults={
-                'owner': self.request.user,
-                'rut': form['rut'].value(),
-                'razon_social': form['razon_social'].value(),
-                'actividad_principal': form['actividad_principal'].value(),
-                'giro': form['giro'].value(),
-                'direccion': form['direccion'].value(),
-                'comuna': form['comuna'].value(),
-                'fecha_resolucion': datetime.strptime(form['fecha_resolucion'].value(), "%d/%m/%Y"),
-                'numero_resolucion': form['numero_resolucion'].value(),
-                'pass_correo_sii': form['pass_correo_sii'].value(),
-                'correo_sii': form['correo_sii'].value(),
-                'pass_correo_intercambio': form['pass_correo_intercambio'].value(),
-                'correo_intercambio': form['correo_intercambio'].value(),
-                'logo': form['logo'].value(),
-                'tasa_de_iva': form['tasa_de_iva'].value(),
-                'pass_certificado': form['pass_certificado'].value()
-                })
+            update_compania = form.save()
+    
             msg = "Se Actualizo la Compañia con éxito"
             messages.info(self.request, msg)
         except Exception as e:
             msg = "Ocurrio un problema al guardar la información: "+str(e)
             messages.error(self.request, msg)
-        return super().form_valid(form)
+        return super().form_invalid(form)
     
     def form_invalid(self, form):
         """!
