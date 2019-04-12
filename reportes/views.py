@@ -101,16 +101,25 @@ class ReportesCreateListView(CreateView):
 			if nota_credito_data:
 				report_context['resumen_periodos'].append(
 					nota_credito_data)
-		print(facturas_data)
-		print(nota_credito_data)
+
+
+			report_context['detalles'].extend(facturas_queryset_+nota_credito_queryset)
+			print(report_context['detalles'])
+
 
 		try: 
-			Reporte.check_reporte_len(facturas_queryset_)
+			Reporte.check_reporte_len(report_context['detalles'])
 		except Exception as e:
 
 			messages.error(self.request, e)
 			return super().form_invalid(form)
 
+		caratula = render_to_string('xml_templates/caratula_.xml', report_context)
+		report_context['caratula'] = caratula
+		envio_libro = render_to_string('xml_templates/envioLibro_.xml', report_context)
+		instance.xml_reporte = envio_libro
+
+		print(envio_libro)
 
 		instance.save()
 		return HttpResponseRedirect(reverse_lazy('reportes:crear', kwargs={'pk': compania.pk}))
@@ -119,7 +128,7 @@ class ReportesCreateListView(CreateView):
 
 		context = super().get_context_data(*args, **kwargs)
 		compania = get_object_or_404(Compania, pk=self.kwargs.get('pk'))
-		context['lista_de_reportes'] = Reporte.objects.filter(compania=compania).order_by('created')
+		context['lista_de_reportes'] = Reporte.objects.filter(compania=compania).reverse()
 		context['compania'] = compania	
 		return context
 
@@ -156,8 +165,8 @@ class ReportesCreateListView(CreateView):
 		)
 
 		return data
-		
 
+	# def generar_detalles(self, **kwargs): 
 
 class ReporteDetailView(DetailView):
 

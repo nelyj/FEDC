@@ -64,7 +64,8 @@ class Reporte(CreationModificationDateMixin):
 	folio_notificacion = models.CharField(_('Folio notificación'),max_length=50,null=True,blank=True,default='')
 	version_xml	= models.FileField(upload_to=upload_file_to, blank=True, null=True, validators=[FileExtensionValidator(['xml'])])
 	enviado = models.BooleanField(default=False)
-
+	nro_segmento = models.IntegerField(null=True, default=0)
+	xml_reporte = models.TextField(null=True, blank=True)
 
 
 	def __str__(self):

@@ -47,7 +47,7 @@ class Factura(CreationModificationDateMixin):
 	productos = models.TextField(blank=True, null=True)
 	monto_palabra = models.CharField(max_length=128, blank=True, null=True)
 	neto = models.CharField(max_length=128, blank=True, null=True)
-	excento = models.CharField(max_length=128, blank=True, null=True)
+	excento = models.CharField(max_length=128, blank=True, null=True, default=0)
 	iva = models.CharField(max_length=128, blank=True, null=True)
 	total = models.CharField(max_length=128, blank=True, null=True)
 	n_folio = models.IntegerField(null=True, default=0)
