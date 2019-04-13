@@ -71,7 +71,7 @@ class ReportesCreateListView(CreateView):
 			'detalles':[]
 		}
 
-		if tipo_de_operacion == "COMPRAS":
+		if tipo_de_operacion == "VENTAS":
 
 			facturas_queryset_ = [
 				factura 
@@ -89,11 +89,19 @@ class ReportesCreateListView(CreateView):
 					created__lte=fecha_de_culminacion
 				)
 			]
+			nota_debito_queryset = [
+				nota_debito
+				for nota_debito in notaDebito.objects.filter(
+					compania=compania,
+					created__gte=fecha_de_inicio,
+					created__lte=fecha_de_culminacion
+				)
+			]
+			
 
-			facturas_data = \
-			self.generar_resumen_periodos(facturas_queryset_)
-			nota_credito_data = \
-			self.generar_resumen_periodos(nota_credito_queryset)
+			facturas_data = self.generar_resumen_periodos(facturas_queryset_)
+			nota_credito_data = self.generar_resumen_periodos(nota_credito_queryset)
+			nota_debito_data = self.generar_resumen_periodos(nota_debito_queryset)
 
 			if facturas_data:
 				report_context['resumen_periodos'].append(
@@ -103,8 +111,13 @@ class ReportesCreateListView(CreateView):
 					nota_credito_data)
 
 
-			report_context['detalles'].extend(facturas_queryset_+nota_credito_queryset)
+			report_context['detalles'].extend(facturas_queryset_+nota_credito_queryset+nota_debito_queryset)
 			print(report_context['detalles'])
+		elif tipo_de_operacion == "COMPRAS":
+
+			messages.info(self.request, "No posee documentos de intercambio")
+			return HttpResponseRedirect(reverse_lazy('reportes:crear', kwargs={'pk': compania.pk}))
+
 
 
 		try: 
@@ -122,6 +135,7 @@ class ReportesCreateListView(CreateView):
 		print(envio_libro)
 
 		instance.save()
+		messages.info(self.request, "Reporte creado exitosamente")
 		return HttpResponseRedirect(reverse_lazy('reportes:crear', kwargs={'pk': compania.pk}))
 
 	def get_context_data(self, *args, **kwargs):
@@ -157,11 +171,11 @@ class ReportesCreateListView(CreateView):
 		data = dict(
 			tpo_doc=queryset[0].TIPO_DE_DOCUMENTO,
 			tot_doc=len(queryset),
-			tot_mnt_exe=tot_mnt_exe,
-			tot_mnt_neto=tot_mnt_neto,
-			tot_op_iva_rec=tot_op_iva_rec,
-			tot_mnt_iva=tot_mnt_iva,
-			tot_mnt_total=tot_mnt_total
+			tot_mnt_exe=int(tot_mnt_exe),
+			tot_mnt_neto=int(tot_mnt_neto),
+			tot_op_iva_rec=int(tot_op_iva_rec),
+			tot_mnt_iva=int(tot_mnt_iva),
+			tot_mnt_total=int(tot_mnt_total)
 		)
 
 		return data
