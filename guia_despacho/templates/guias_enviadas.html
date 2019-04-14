@@ -29,7 +29,8 @@
             <td>{{factura.compania.razon_social}}</td>
             <td>{{ factura.n_folio }}</td>
             <td>
-                <a  id="edit_foo" href="{% url 'facturas:imprimir_factura' factura.compania.pk factura.numero_factura 'GUIA_DES_ELEC' %}" target="_blank" class="btn btn-info">Imprimir</a>
+                <a href="{% url 'guia_despacho:ver_estado_guia' factura.compania.pk factura.numero_factura %}"  class="btn btn-success">Ver Estado</a>
+                <a  id="edit_foo" href="{% url 'guia_despacho:imprimir_guia' factura.compania.pk factura.numero_factura 'GUIA_DES_ELEC' %}" target="_blank" class="btn btn-info">Imprimir</a>
             </td>
         </tr>
         {%endfor%}

@@ -7,18 +7,21 @@ from django.template.loader import render_to_string
 
 from conectores.constantes import (COMUNAS, ACTIVIDADES)
 from conectores.models import Compania
-from facturas.models import Factura
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres
 from mixins.models import CreationModificationDateMixin
-from utils.SIISdk import SII_SDK
-
+from certificados.models import Certificado
+from facturas.utils import extraer_modulo_y_exponente, generar_firma_con_certificado
 from bs4 import BeautifulSoup
 from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA
 from Crypto.Signature import PKCS1_v1_5
+from utils.SIISdk import SII_SDK
+from facturas.models import *
 from collections import defaultdict
-
+from django.conf import settings
+from pdf417gen import encode, render_image
+import codecs, dicttoxml, json, os, requests
 
 class notaCredito(CreationModificationDateMixin):
 	"""!
@@ -78,7 +81,6 @@ class notaCredito(CreationModificationDateMixin):
 		productos=data.get('productos')
 		primero=productos[0].get('item_name')
 		data['primero']=primero
-
 		# Ajustados montos y rut para el xml
 		if('k' in folio.rut):
 			folio.rut = folio.rut.replace('k','K')
@@ -86,7 +88,6 @@ class notaCredito(CreationModificationDateMixin):
 			data['rut'] = data['rut'].replace('k','K')
 		if('.' in data['rut']):
 			data['rut'] = data['rut'].replace('.','')
-
 		data['neto']=str(round(float(data['neto'])))
 		data['total']=str(round(abs(float(data['total']))))
 
@@ -99,6 +100,17 @@ class notaCredito(CreationModificationDateMixin):
 		sign = private_signer.sign(digest)
 		firma = '<FRMT algoritmo="SHA1withRSA">{}</FRMT>'.format(b64encode(sign).decode())
 		sin_aplanar += firma
+		carpeta=data['numero_factura'].replace('º','')
+
+		try:
+			xml_dir = settings.MEDIA_ROOT +'notas_de_credito'+'/'+carpeta
+			if(not os.path.isdir(xml_dir)):
+				os.makedirs(settings.MEDIA_ROOT +'notas_de_credito'+'/'+carpeta)
+			codes = encode(sin_aplanar,columns=10, security_level=5)
+			image = render_image(codes,scale=1, ratio=1)
+			image.save(xml_dir+'/timbre'+'.jpg')
+		except Exception as e:
+			print(e)
 		return sin_aplanar
 
 	

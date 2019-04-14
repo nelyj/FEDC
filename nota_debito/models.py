@@ -14,14 +14,18 @@ from facturas.models import Factura
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres
 from mixins.models import CreationModificationDateMixin
-
+from certificados.models import Certificado
+from facturas.utils import extraer_modulo_y_exponente, generar_firma_con_certificado
 from bs4 import BeautifulSoup
 from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA
 from Crypto.Signature import PKCS1_v1_5
-from collections import defaultdict
-
 from utils.SIISdk import SII_SDK
+from facturas.models import *
+from collections import defaultdict
+from django.conf import settings
+from pdf417gen import encode, render_image
+import codecs, dicttoxml, json, os, requests
 
 class notaDebito(CreationModificationDateMixin):
 	"""!
@@ -89,6 +93,8 @@ class notaDebito(CreationModificationDateMixin):
 			data['rut'] = data['rut'].replace('k','K')
 		if('.' in data['rut']):
 			data['rut'] = data['rut'].replace('.','')
+		data['neto']=str(round(float(data['neto'])))
+		data['total']=str(round(abs(float(data['total']))))
 
 		sin_aplanar = render_to_string('snippets/DD_tag.xml', {'data':data,'folio':folio, 'instance':instance, 'timestamp':timestamp})
 		digest_string = sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
@@ -99,6 +105,17 @@ class notaDebito(CreationModificationDateMixin):
 		sign = private_signer.sign(digest)
 		firma = '<FRMT algoritmo="SHA1withRSA">{}</FRMT>'.format(b64encode(sign).decode())
 		sin_aplanar += firma
+		carpeta=data['numero_factura'].replace('º','')
+
+		try:
+			xml_dir = settings.MEDIA_ROOT +'notas_de_debito'+'/'+carpeta
+			if(not os.path.isdir(xml_dir)):
+				os.makedirs(settings.MEDIA_ROOT +'notas_de_credito'+'/'+carpeta)
+			codes = encode(sin_aplanar,columns=10, security_level=5)
+			image = render_image(codes,scale=1, ratio=1)
+			image.save(xml_dir+'/timbre'+'.jpg')
+		except Exception as e:
+			print(e)
 		return sin_aplanar
 
 		
@@ -126,9 +143,9 @@ class notaDebito(CreationModificationDateMixin):
 
 		# Ajustados los montos de productos para el xml
 		for producto in datos['productos']:
-			producto['qty'] = str(producto['qty'])
+			producto['qty'] = str(abs(producto['qty']))
 			producto['base_net_rate'] = str(producto['base_net_rate'])
-			producto['amount'] = round(producto['amount'])
+			producto['amount'] = round(abs(producto['amount']))
 
 		# Ajustados valores para el xml
 		if('k' in folio.rut):
@@ -138,8 +155,8 @@ class notaDebito(CreationModificationDateMixin):
 		if('k' in datos['rut']):
 			datos['rut'] = datos['rut'].replace('k','K')
 		datos['numero_factura'] = datos['numero_factura'].replace('º','')
-		datos['neto']=str(round(float(datos['neto'])))
-		datos['total']=str(round(float(datos['total'])))
+		datos['neto']=str(round(abs(float(datos['neto']))))
+		datos['total']=str(round(abs(float(datos['total']))))
 
 		# Llena los datos de la plantilla Documento_tag.xml con la informacion pertinente
 		documento_sin_aplanar = render_to_string(
