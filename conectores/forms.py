@@ -68,7 +68,8 @@ class FormCompania(ModelForm):
             'pass_correo_intercambio',
             'certificado',
             'pass_certificado',
-            'tasa_de_iva'
+            'tasa_de_iva',
+            'web'
         ]
 
 
@@ -109,6 +110,7 @@ class FormCompania(ModelForm):
         self.fields['pass_certificado'].widget.attrs.update({'class': 'form-control'})
         self.fields['pass_certificado'].required = True
         self.fields['tasa_de_iva'].widget.attrs.update({'class': 'form-control', 'size':'3', 'maxlength':'3'})
+        self.fields['web'].widget.attrs.update({'class': 'form-control','placeholder': 'Dirección Web de la compañia'})
 
     def clean(self):        
 
@@ -145,7 +147,9 @@ class CompaniaUpdateForm(ModelForm):
             'pass_correo_sii',
             'correo_intercambio',
             'pass_correo_intercambio',
-            'tasa_de_iva'
+            'pass_certificado',
+            'tasa_de_iva',
+            'web'
         ]
 
 
@@ -180,8 +184,12 @@ class CompaniaUpdateForm(ModelForm):
         self.fields['pass_correo_intercambio'].required = True
         self.fields['correo_intercambio'].widget.attrs.update({'class': 'form-control'})
         self.fields['correo_intercambio'].required = True
+        self.fields['pass_certificado'].widget = PasswordInput()
+        self.fields['pass_certificado'].widget.attrs.update({'class': 'form-control'})
+        self.fields['pass_certificado'].required = True
         self.fields['logo'].widget.attrs.update({'class': 'form-control'})
         self.fields['tasa_de_iva'].widget.attrs.update({'class': 'form-control', 'size':'3', 'maxlength':'3'})
+        self.fields['web'].widget.attrs.update({'class': 'form-control','placeholder': 'Dirección Web de la compañia'})
 
     def clean(self):        
 

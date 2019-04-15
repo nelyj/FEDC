@@ -29,7 +29,7 @@
             <td>{{factura.compania.razon_social}}</td>
             <td>{{ factura.n_folio }}</td>
             <td>
-                <a  id="edit_foo" href="#" class="btn btn-info">Imprimir</a>
+                <a  id="edit_foo" href="{% url 'facturas:imprimir_factura' factura.compania.pk factura.numero_factura 'NOTA_CRE_ELEC' %}" target="_blank" class="btn btn-info">Imprimir</a>
             </td>
         </tr>
         {%endfor%}

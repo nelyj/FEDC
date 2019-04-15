@@ -10,14 +10,14 @@
         <div class="contenedor">
             <div class="cabecera">
                 <div class="logotipo">
-                    <img src="{% static 'factura.compania.logo' %}">
+                    <img src="{{MEDIA_URL}}{{factura.compania.logo}}">
                 </div>
                 <div class="descripcion">
                     <h3>{{factura.compania.razon_social}}</h3>
                     <p><b>{{factura.compania.actividad_principal}}</b></p>
                     <p><b>Casa Matriz: </b>{{factura.compania.direccion}} {{factura.compania.comuna|upper}}</p>
                     <p><b>Casa Matriz: </b></p>
-                    <p class="base-compania"><b>Telefono: Email: {{factura.compania.correo_intercambio}}  Web:</b></p>
+                    <p class="base-compania"><b>Telefono: Email: {{factura.compania.correo_intercambio}}  Web: {{factura.compania.web}}</b></p>
                 </div>
                 <div class="document">
                     <p>R.U.T: {{factura.compania.rut}}</p>
@@ -115,7 +115,7 @@
                             Transporte:
                         </td>
                         <td>
-                            {{factura.region|default_if_none:""|upper}}
+                            {{factura.transporte|default_if_none:""|upper}}
                         </td>
                         <td>
                             Vendedor:
@@ -231,7 +231,7 @@
                 </table>
             </div>
             <div class="timbre">
-                <img src="{% static 'factura.timbre' %}">
+                <img src="{{ruta}}">
                 <p>Timbre Electrónico SII</p>
                 <p>Res. 80 de 2014 Verifique documento: www.sii.cl</p>
             </div>
