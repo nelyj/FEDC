@@ -97,8 +97,6 @@ class ReportesCreateListView(CreateView):
 					created__lte=fecha_de_culminacion
 				)
 			]
-			
-
 			facturas_data = self.generar_resumen_periodos(facturas_queryset_)
 			nota_credito_data = self.generar_resumen_periodos(nota_credito_queryset)
 			nota_debito_data = self.generar_resumen_periodos(nota_debito_queryset)
