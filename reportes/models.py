@@ -61,8 +61,11 @@ class Reporte(CreationModificationDateMixin):
 	tipo_de_libro = models.CharField(_('Tipo de libro'),max_length=10,choices=[x.value for x in TIPO_DE_LIBRO],null=False,blank=False,default='')
 	fecha_de_inicio = models.DateField(_('Fecha de inicio'),null=False)
 	fecha_de_culminacion = models.DateField(_('Fecha de culminación'),null=False)
+	folio_notificacion = models.CharField(_('Folio notificación'),max_length=50,null=True,blank=True,default='')
 	version_xml	= models.FileField(upload_to=upload_file_to, blank=True, null=True, validators=[FileExtensionValidator(['xml'])])
 	enviado = models.BooleanField(default=False)
+	nro_segmento = models.IntegerField(null=True, default=0)
+	xml_reporte = models.TextField(null=True, blank=True)
 
 
 	def __str__(self):

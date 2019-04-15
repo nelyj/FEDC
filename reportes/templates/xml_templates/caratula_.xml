@@ -1,0 +1,13 @@
+ <Caratula>
+	<RutEmisorLibro>{{compania.rut}}</RutEmisorLibro>
+	<RutEnvia>{{compania.rut}}</RutEnvia>
+	<PeriodoTributario>{{ periodo_tributario }}</PeriodoTributario> 
+	<FchResol>{{compania.fecha_resolucion|date:"Y-m-d"}}</FchResol> 
+	<NroResol>{{compania.numero_resolucion}}</NroResol>
+	<TipoOperacion>{{reporte.tipo_de_operacion}}</TipoOperacion>
+	<TipoLibro>{{reporte.tipo_de_libro}}</TipoLibro> 
+	<TipoEnvio>{{reporte.tipo_de_envio}}</TipoEnvio>{% if reporte.tipo_libro == 'ESPECIAL' %}
+	<FolioNotificacion>{{reporte.folio_notificacion}}</FolioNotificacion>
+	{% endif %}{% if reporte.tipo_de_envio == 'PARCIAL' %}
+	<NroSegmento>reporte.nro_segmento</NroSegmento>{% endif %}
+</Caratula>

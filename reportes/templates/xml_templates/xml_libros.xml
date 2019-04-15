@@ -14,7 +14,7 @@
         </Caratula>
         <ResumenPeriodo>
             <TotalesPeriodo>
-                <TpoDoc>30</TpoDoc>
+                <TpoDoc>33</TpoDoc>
                 <TotDoc>1</TotDoc>
                 <TotMntExe>0</TotMntExe>
                 <TotMntNeto>100</TotMntNeto>
@@ -23,7 +23,7 @@
                 <TotMntTotal>119</TotMntTotal>
             </TotalesPeriodo>
             <TotalesPeriodo>
-                <TpoDoc>32</TpoDoc>
+                <TpoDoc>56</TpoDoc>
                 <TotDoc>1</TotDoc>
                 <TotOpExe>1</TotOpExe>
                 <TotMntExe>200</TotMntExe>
