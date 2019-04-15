@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 from django.views.static import serve
 from django.conf.urls.static import static
+from .router import router
 
 from users.forms import SetPasswordForm
 from users.views import ResetPassConfirm, ResetPassSuccess
@@ -48,6 +49,7 @@ urlpatterns = [
     path('', include('nota_debito.urls',namespace="notaDebito")),
     path('', include('reportes.urls',namespace="reportes")),
     path('', include('intercambios.urls',namespace="intercambios")),
+    path('api/', include(router.urls)),
 ]
 
 if settings.DEBUG:
