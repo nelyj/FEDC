@@ -3,6 +3,7 @@ import codecs, dicttoxml, json, os, requests
 from requests import Request, Session
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect
 from django.http import HttpResponse
 from django.urls import reverse_lazy
@@ -21,11 +22,12 @@ from conectores.models import *
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
 from utils.SIISdk import SII_SDK
+from utils.utils import validarModelPorDoc
 from .forms import *
 from .models import guiaDespacho
-from facturas.constants import NOMB_DOC
+from facturas.constants import NOMB_DOC, LIST_DOC
 
-class SeleccionarEmpresaView(TemplateView):
+class SeleccionarEmpresaView(LoginRequiredMixin,TemplateView):
     template_name = 'seleccionar_empresa_guias.html'
 
     def get_context_data(self, *args, **kwargs): 
@@ -52,7 +54,7 @@ class SeleccionarEmpresaView(TemplateView):
         else:
             return HttpResponseRedirect('/')
 
-class ListaGuiasViews(TemplateView):
+class ListaGuiasViews(LoginRequiredMixin,TemplateView):
     template_name = 'lista_guias.html'
 
     def dispatch(self, *args, **kwargs):
@@ -105,7 +107,7 @@ class ListaGuiasViews(TemplateView):
         session.close()
         return context
 
-class DetailGuia(TemplateView):
+class DetailGuia(LoginRequiredMixin,TemplateView):
     template_name = 'detail_guia.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -126,7 +128,7 @@ class DetailGuia(TemplateView):
         context['values'] = list(aux['data'].values())
         return context
 
-class SendInvoice(FormView):
+class SendInvoice(LoginRequiredMixin,FormView):
     template_name = 'envio_sii_guia.html'
     form_class = FormGuia
 
@@ -429,13 +431,13 @@ class SendInvoice(FormView):
             print(e)
             return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
 
-class GuiasEnviadasView(ListView):
+class GuiasEnviadasView(LoginRequiredMixin,ListView):
     template_name = 'guias_enviadas.html'
     def get_queryset(self):
         compania = self.kwargs.get('pk')
         return guiaDespacho.objects.filter(compania=compania).order_by('-created')
 
-class ImprimirGuia(TemplateView,WeasyTemplateResponseMixin):
+class ImprimirGuia(LoginRequiredMixin, TemplateView,WeasyTemplateResponseMixin):
     """!
     Class para imprimir la guia en PDF
 
@@ -444,23 +446,29 @@ class ImprimirGuia(TemplateView,WeasyTemplateResponseMixin):
     @date 01-04-2019
     @version 1.0.0
     """
-    template_name = "pdf/guia.pdf.html"
+    template_name = "pdf/factura.pdf.html"
     model = guiaDespacho
 
     def dispatch(self, request, *args, **kwargs):
         num_factura = self.kwargs['slug']
         compania = self.kwargs['pk']
-        try:
-            factura = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
-            return super().dispatch(request, *args, **kwargs)
-        except Exception as e:
-            factura = self.model.objects.select_related().filter(numero_factura=num_factura, compania=compania)
-            if len(factura) > 1:
-                messages.error(self.request, 'Existe mas de un registro con el mismo numero de guia: {0}'.format(num_factura))
-                return redirect(reverse_lazy('guiaDespacho:lista-guias-enviadas', kwargs={'pk': compania}))
-            else:
-                messages.error(self.request, "No se encuentra registrada esta guia: {0}".format(str(num_factura)))
-                return redirect(reverse_lazy('guiaDespacho:lista-guias-enviadas', kwargs={'pk': compania}))
+        tipo_doc = self.kwargs['doc']
+        if tipo_doc in LIST_DOC:
+            self.model = validarModelPorDoc(tipo_doc) 
+            try:
+                factura = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
+                return super().dispatch(request, *args, **kwargs)
+            except Exception as e:
+                factura = self.model.objects.select_related().filter(numero_factura=num_factura, compania=compania)
+                if len(factura) > 1:
+                    messages.error(self.request, 'Existe mas de un registro con el mismo numero de guia: {0}'.format(num_factura))
+                    return redirect(reverse_lazy('guia_despacho:lista-guias-enviadas', kwargs={'pk': compania}))
+                else:
+                    messages.error(self.request, "No se encuentra registrada esta guia: {0}".format(str(num_factura)))
+                    return redirect(reverse_lazy('guia_despacho:lista-guias-enviadas', kwargs={'pk': compania}))
+        else:
+            messages.error(self.request, "No existe este tipo de documento: {0}".format(str(tipo_doc)))
+            return redirect(reverse_lazy('guia_despacho:lista-guias-enviadas', kwargs={'pk': compania}))
 
     def get_context_data(self, *args, **kwargs):
         """!
@@ -472,10 +480,77 @@ class ImprimirGuia(TemplateView,WeasyTemplateResponseMixin):
         context = super().get_context_data(*args, **kwargs)
         num_factura = self.kwargs['slug']
         compania = self.kwargs['pk']
+        tipo_doc = self.kwargs['doc']
         
         context['factura'] = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
-        context['nombre_documento'] = NOMB_DOC['GUIA_DES_ELEC']
+        context['nombre_documento'] = NOMB_DOC[tipo_doc]
+        etiqueta=self.kwargs['slug'].replace('º','')
+        context['etiqueta'] = etiqueta
         prod = context['factura'].productos.replace('\'{','{').replace('}\'','}').replace('\'',"\"")
         productos = json.loads(prod)
         context['productos'] = productos
+        ruta = settings.STATIC_URL +'guia'+'/'+etiqueta+'/timbre.jpg'
+        context['ruta']=ruta
         return context
+
+class VerEstadoGuia(LoginRequiredMixin, TemplateView):
+    """!
+    Clase para ver el estado de envio de una factura
+
+    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @date 04-04-2019
+    @version 1.0.0
+    """
+    template_name = "estado_guia.html"
+    model = guiaDespacho
+
+    def get_context_data(self, *args, **kwargs):
+        """!
+        Method to handle data on get
+
+        @date 04-04-2019
+        @return Returns dict with data
+        """
+        context = super().get_context_data(*args, **kwargs)
+        num_factura = self.kwargs['slug']
+        compania = self.kwargs['pk']
+
+        factura = self.model.objects.get(numero_factura=num_factura, compania=compania)
+        context['factura'] = factura
+        
+        estado = self.get_invoice_status(factura,factura.compania,)
+
+        if(not estado['estado']):
+            messages.error(self.request, estado['msg'])
+        else:
+            context['estado'] = estado['status']
+            context['glosa'] = estado['glosa']
+
+        return context
+
+    def get_invoice_status(self,factura,compania):
+        """
+        Método para enviar la factura al sii
+        @param factura recibe el objeto de la factura
+        @param compania recibe el objeto compañia
+        @return dict con la respuesta
+        """
+        try:
+            sii_sdk = SII_SDK()
+            seed = sii_sdk.getSeed()
+            try:
+                sign = sii_sdk.signXml(seed, compania, compania.pass_certificado)
+                token = sii_sdk.getAuthToken(sign)
+                if(token):
+                    print(token)
+                    estado = sii_sdk.checkDTEstatus(compania.rut,factura.track_id,token)
+                    return {'estado':True,'status':estado['estado'],'glosa':estado['glosa']} 
+                else:
+                    return {'estado':False,'msg':'No se pudo obtener el token del sii'}
+            except Exception as e:
+                print(e)
+                return {'estado':False,'msg':'Ocurrió un error al firmar el documento'}
+            return {'estado':True}
+        except Exception as e:
+            print(e)
+            return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}

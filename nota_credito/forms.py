@@ -1,8 +1,12 @@
+import OpenSSL.crypto
+
 from django import forms
+from django.conf import settings
 from django.forms import ModelForm
 from django.forms.fields import CharField
 from django.forms.widgets import PasswordInput
 from .models import *
+from conectores.models import Compania
 
 
 class FormNotaCredito(ModelForm):
@@ -13,7 +17,7 @@ class FormNotaCredito(ModelForm):
         model = notaCredito
         fields = ['status','compania','ref_factura','numero_factura','senores','direccion','transporte','despachar','observaciones',
                     'giro','condicion_venta','vencimiento','vendedor','rut','fecha','guia','orden_compra','nota_venta',
-                    'productos','monto_palabra','neto','excento','iva','total']
+                    'productos','monto_palabra','neto','excento','iva','total','track_id']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -89,3 +93,5 @@ class FormNotaCredito(ModelForm):
         self.fields['total'].widget.attrs.update({'class': 'form-control'})
         self.fields['total'].required = False
         self.fields['total'].disabled = True
+        self.fields['track_id'].required = False
+
