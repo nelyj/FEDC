@@ -25,13 +25,14 @@ class FacturaViewSet(viewsets.ViewSet):
   """
 
   def create(self, request, pk, slug):
+    value = True
     factura = dict(zip(request.data['data'].keys(), request.data['data'].values()))
     try:
       usuario = Conector.objects.filter(t_documento='33',empresa=pk).first()
       compania = Compania.objects.filter(pk=pk).get()
     except Exception as e:
       print(e)
-      return False
+      value = False
 
     productos = eval(request.data['productos'])
 
@@ -43,12 +44,12 @@ class FacturaViewSet(viewsets.ViewSet):
 
     except Folio.DoesNotExist:  
       messages.error(self.request, "No posee folios para asignacion de timbre")
-      return False
+      value = False
     try:
       folio.verificar_vencimiento()
     except ElCAFSenEncuentraVencido:
       messages.error(self.request, "El CAF se encuentra vencido")
-      return False
+      value = False
 
     try:
       response_dd = Factura._firmar_dd(data, folio, form)
@@ -57,7 +58,7 @@ class FacturaViewSet(viewsets.ViewSet):
       caratula_firmada = Factura.generar_documento_final(compania,documento_final_firmado,pass_certificado)
       form.dte_xml = caratula_firmada
     except Exception as e:
-      return False
+      value = False
 
     etiqueta = slug.replace('º','')
     try:
@@ -68,6 +69,6 @@ class FacturaViewSet(viewsets.ViewSet):
       f.write(caratula_firmada)
       f.close()
     except Exception as e:
-      return False
+      value = False
 
-    return Response("hello")
+    return Response({"response":value})
