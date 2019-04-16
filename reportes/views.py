@@ -1,25 +1,24 @@
 import datetime
 
-from django.shortcuts import render
-from django.views.generic import CreateView, DetailView, TemplateView, RedirectView, DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
-from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, DetailView, TemplateView, RedirectView, DeleteView
 # from django.views.generic.edit import DeleteView
-from .forms import ReporteCreateForm
+from boletas.models import Boleta
+from conectores.models import Compania
 from facturas.models import Factura
 from nota_credito.models import notaCredito
 from nota_debito.models import notaDebito
-from boletas.models import Boleta
-from conectores.models import Compania
+from utils.SIISdk import SII_SDK
+from .forms import ReporteCreateForm
 from .models import Reporte
 
 
-
-class SeleccionarEmpresaView(TemplateView):
+class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
     template_name = 'reportes_seleccionar_empresa.html'
 
     def get_context_data(self, *args, **kwargs): 
@@ -46,7 +45,7 @@ class SeleccionarEmpresaView(TemplateView):
         else:
             return HttpResponseRedirect('/')
 
-class ReportesCreateListView(CreateView):
+class ReportesCreateListView(LoginRequiredMixin, CreateView):
 
 
 	template_name = "reporte_create_list.html"
@@ -139,9 +138,12 @@ class ReportesCreateListView(CreateView):
 		caratula = render_to_string('xml_templates/caratula_.xml', report_context)
 		report_context['caratula'] = caratula
 		envio_libro = render_to_string('xml_templates/envioLibro_.xml', report_context)
-		instance.xml_reporte = envio_libro
+		# Agregada la firma
+		sii_sdk = SII_SDK()
+		libro_firmado = sii_sdk.generalSign(compania,envio_libro,compania.pass_certificado)
+		instance.xml_reporte = '<?xml version="1.0" encoding="ISO-8859-1"?>\n'+libro_firmado
 
-		print(envio_libro)
+		print(libro_firmado)
 
 		instance.save()
 		messages.info(self.request, "Reporte creado exitosamente")
@@ -191,7 +193,7 @@ class ReportesCreateListView(CreateView):
 
 	# def generar_detalles(self, **kwargs): 
 
-class ReporteDetailView(DetailView):
+class ReporteDetailView(LoginRequiredMixin, DetailView):
 
 
 	template_name="reportes_detail.html"
