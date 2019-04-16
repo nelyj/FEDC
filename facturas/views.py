@@ -17,7 +17,6 @@ from django.views.generic.base import TemplateView, View
 from django.views.generic import ListView
 from django.template.loader import render_to_string
 from django_weasyprint import WeasyTemplateResponseMixin
-from conectores.models import *
 from conectores.forms import FormCompania
 from conectores.models import *
 from folios.models import Folio
