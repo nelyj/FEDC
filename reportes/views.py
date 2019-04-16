@@ -110,7 +110,6 @@ class ReportesCreateListView(CreateView):
 
 
 			report_context['detalles'].extend(facturas_queryset_+nota_credito_queryset+nota_debito_queryset)
-			print(report_context['detalles'])
 		elif tipo_de_operacion == "COMPRAS":
 
 			messages.info(self.request, "No posee documentos de intercambio")
@@ -124,6 +123,18 @@ class ReportesCreateListView(CreateView):
 
 			messages.error(self.request, e)
 			return super().form_invalid(form)
+
+		for report in report_context['resumen_periodos']:
+			report['tot_mnt_total'] = abs(report['tot_mnt_total'])
+			report['tot_mnt_neto'] = round(abs(report['tot_mnt_neto']))
+
+		for report in report_context['detalles']:
+			report.neto = round(abs(float(report.neto)))
+			report.total = round(abs(float(report.total)))
+			report.numero_factura = report.numero_factura.replace('º','')
+			if 'k' in report.rut:
+				report.rut = report.rut.replace('k','K')
+			report.rut = report.rut.replace('.','')
 
 		caratula = render_to_string('xml_templates/caratula_.xml', report_context)
 		report_context['caratula'] = caratula
