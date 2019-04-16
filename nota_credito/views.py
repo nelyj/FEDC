@@ -1,28 +1,31 @@
-import requests
-import dicttoxml
-import json
-import codecs
-import os
+import OpenSSL.crypto
+import codecs, dicttoxml, json, os, requests
 from requests import Request, Session
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse, HttpResponseRedirect, FileResponse
-from django.shortcuts import render
-from django.template.loader import render_to_string
+from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 from django.urls import reverse_lazy
-from django.views.generic import ListView
-from django.views.generic.base import TemplateView, View
+from django.http import FileResponse
 from django.views.generic.edit import FormView
+from django.shortcuts import (
+    render, redirect
+    )
+from django.views.generic.base import TemplateView, View
+from django.views.generic import ListView
+from django.template.loader import render_to_string
+from django_weasyprint import WeasyTemplateResponseMixin
 from conectores.models import *
 from conectores.forms import FormCompania
 from conectores.models import *
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
-from facturas.models import Factura
 from utils.SIISdk import SII_SDK
+from utils.utils import validarModelPorDoc
 from .models import notaCredito
 from .forms import *
+from facturas.constants import NOMB_DOC, LIST_DOC
 
 class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
     template_name = 'seleccionar_empresa_NC.html'
@@ -290,7 +293,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
         # pass_certificado = form.cleaned_data['pass_certificado']
         # if form.cleaned_data['status'] == 'En proceso':
         data = form.clean()
-        
+        print(data)
         try:
             compania = Compania.objects.get(pk=compania_id)
         except Compania.DoesNotExist:
@@ -302,7 +305,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
 
         form = form.save(commit=False)
         try:
-            folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=61).order_by('fecha_de_autorizacion').first()
+            folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=33).order_by('fecha_de_autorizacion').first()
 
             if not folio:
                 raise Folio.DoesNotExist
@@ -326,7 +329,6 @@ class SendInvoice(LoginRequiredMixin, FormView):
         # Si queda uno, cambia la estructura de la oracion a singular. 
         disponibles = folio.get_folios_disponibles()
 
-        print("/////////////////// Disponibles ", disponibles)
         if disponibles == 1:
             messages.success(self.request, "Nota de crédito enviada exitosamente")
             messages.info(self.request, str('Queda ')+str(disponibles)+str('folio disponible'))
@@ -345,13 +347,9 @@ class SendInvoice(LoginRequiredMixin, FormView):
             caratula_firmada = notaCredito.generar_documento_final(compania,documento_final_firmado,pass_certificado)
             form.dte_xml = caratula_firmada
         except Exception as e:
+            print(e)
             messages.error(self.request, "Ocurrió un error al firmar el documento")
             return super().form_valid(form)
-        #form.save()
-        # documento_final_firmado = Factura.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
-        # caratula_firmada = Factura.generar_documento_final(compania,documento_final_firmado,pass_certificado)
-        # form.dte_xml = caratula_firmada
-        # print(response_dd)
 
         try:
             xml_dir = settings.MEDIA_ROOT +'notas_de_credito'+'/'+self.kwargs['slug']
@@ -431,5 +429,121 @@ class NotaCreditoEnviadasView(LoginRequiredMixin, ListView):
     def get_queryset(self):
 
         compania = self.kwargs.get('pk')
-        print(notaCredito.objects.filter(compania=compania).order_by('-created'))
         return notaCredito.objects.filter(compania=compania).order_by('-created')
+
+class ImprimirNC(LoginRequiredMixin, TemplateView,WeasyTemplateResponseMixin):
+    """!
+    Class para imprimir la factura en PDF
+
+    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @date 21-03-2019
+    @version 1.0.0
+    """
+    template_name = "pdf/factura.pdf.html"
+    model = notaCredito
+
+    def dispatch(self, request, *args, **kwargs):
+        num_factura = self.kwargs['slug']
+        compania = self.kwargs['pk']
+        tipo_doc = self.kwargs['doc']
+        if tipo_doc in LIST_DOC:
+            self.model = validarModelPorDoc(tipo_doc) 
+            try:
+                factura = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
+                return super().dispatch(request, *args, **kwargs)
+            except Exception as e:
+                factura = self.model.objects.select_related().filter(numero_factura=num_factura, compania=compania)
+                if len(factura) > 1:
+                    messages.error(self.request, 'Existe mas de un registro con el mismo numero de factura: {0}'.format(num_factura))
+                    return redirect(reverse_lazy('nota_credito:lista-enviadas', kwargs={'pk': compania}))
+                else:
+                    messages.error(self.request, "No se encuentra registrada esta factura: {0}".format(str(num_factura)))
+                    return redirect(reverse_lazy('nota_credito:lista-enviadas', kwargs={'pk': compania}))
+        else:
+            messages.error(self.request, "No existe este tipo de documento: {0}".format(str(tipo_doc)))
+            return redirect(reverse_lazy('nota_credito:lista-enviadas', kwargs={'pk': compania}))
+
+    def get_context_data(self, *args, **kwargs):
+        """!
+        Method to handle data on get
+
+        @date 21-03-2019
+        @return Returns dict with data
+        """
+        context = super().get_context_data(*args, **kwargs)
+        num_factura = self.kwargs['slug']
+        compania = self.kwargs['pk']
+        tipo_doc = self.kwargs['doc']
+        
+        context['factura'] = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
+        context['nombre_documento'] = NOMB_DOC[tipo_doc]
+        etiqueta=self.kwargs['slug'].replace('º','')
+        context['etiqueta'] = etiqueta
+        prod = context['factura'].productos.replace('\'{','{').replace('}\'','}').replace('\'',"\"")
+        productos = json.loads(prod)
+        context['productos'] = productos
+        ruta = settings.STATIC_URL +'notas_de_credito'+'/'+etiqueta+'/timbre.jpg'
+        context['ruta']=ruta
+        return context
+
+class VerEstadoNC(LoginRequiredMixin, TemplateView):
+    """!
+    Clase para ver el estado de envio de una factura
+
+    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @date 04-04-2019
+    @version 1.0.0
+    """
+    template_name = "estado_factura.html"
+    model = notaCredito
+
+    def get_context_data(self, *args, **kwargs):
+        """!
+        Method to handle data on get
+
+        @date 04-04-2019
+        @return Returns dict with data
+        """
+        context = super().get_context_data(*args, **kwargs)
+        num_factura = self.kwargs['slug']
+        compania = self.kwargs['pk']
+
+        factura = self.model.objects.get(numero_factura=num_factura, compania=compania)
+        context['factura'] = factura
+        
+        estado = self.get_invoice_status(factura,factura.compania,)
+
+        if(not estado['estado']):
+            messages.error(self.request, estado['msg'])
+        else:
+            context['estado'] = estado['status']
+            context['glosa'] = estado['glosa']
+
+        return context
+
+    def get_invoice_status(self,factura,compania):
+        """
+        Método para enviar la factura al sii
+        @param factura recibe el objeto de la factura
+        @param compania recibe el objeto compañia
+        @return dict con la respuesta
+        """
+        try:
+            sii_sdk = SII_SDK()
+            seed = sii_sdk.getSeed()
+            try:
+                sign = sii_sdk.signXml(seed, compania, compania.pass_certificado)
+                token = sii_sdk.getAuthToken(sign)
+                if(token):
+                    print(token)
+                    estado = sii_sdk.checkDTEstatus(compania.rut,factura.track_id,token)
+                    return {'estado':True,'status':estado['estado'],'glosa':estado['glosa']} 
+                else:
+                    return {'estado':False,'msg':'No se pudo obtener el token del sii'}
+            except Exception as e:
+                print(e)
+                return {'estado':False,'msg':'Ocurrió un error al firmar el documento'}
+            return {'estado':True}
+        except Exception as e:
+            print(e)
+            return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}

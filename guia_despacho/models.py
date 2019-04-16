@@ -18,6 +18,14 @@ from Crypto.Hash import SHA
 from Crypto.Signature import PKCS1_v1_5
 from utils.SIISdk import SII_SDK
 from collections import defaultdict
+from django.conf import settings
+from pdf417gen import encode, render_image
+from django.conf import settings
+import codecs, dicttoxml, json, os, requests
+
+
+
+
 
 class guiaDespacho(CreationModificationDateMixin):
 	"""!
@@ -139,8 +147,17 @@ class guiaDespacho(CreationModificationDateMixin):
 
 		# Incorpora la firma al final de la plantilla DD_tag.xml
 		sin_aplanar += firma
+		carpeta=data['numero_factura'].replace('º','')
 
-
+		try:
+			xml_dir = settings.MEDIA_ROOT +'guia'+'/'+carpeta
+			if(not os.path.isdir(xml_dir)):
+				os.makedirs(settings.MEDIA_ROOT +'guia'+'/'+carpeta)
+			codes = encode(sin_aplanar,columns=10, security_level=5)
+			image = render_image(codes,scale=1, ratio=1)
+			image.save(xml_dir+'/timbre'+'.jpg')
+		except Exception as e:
+			print(e)
 		return sin_aplanar
 
 	def firmar_documento(etiqueta_DD, datos, folio, compania, instance,pass_certificado):

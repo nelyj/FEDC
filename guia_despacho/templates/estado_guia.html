@@ -1,0 +1,16 @@
+{% extends "utils_start.html" %}
+{% block titulo %}Estado de envío de Factura{% endblock titulo %}
+{% load staticfiles %}
+{% block content_center %}
+<a class="glyphicon glyphicon-list" id="menu-toggle"></a>
+<div class="panel panel-primary">
+  <div class="panel-heading">Guia: {{factura.numero_factura}}</div>
+  <div class="panel-body">
+    <h4>Estado de Envío</h4>
+    <ul>
+      <li><b>Estado:</b> {{estado}}</li>
+      <li><b>Glosa:</b> {{glosa}}</li>
+    </ul>
+  </div>
+</div>
+{% endblock content_center %}
