@@ -32,7 +32,7 @@
             <td>#</td>
             <td>
                 <!-- Trigger the modal with a button -->
-                <a  id="edit_foo" href="#" class="btn btn-info"><i class="fa fa-search"></i></a>
+                <a  id="edit_foo" href="{% url 'intercambios:detalle' view.kwargs.pk mail.pk %}" class="btn btn-info"><i class="fa fa-search"></i></a>
                 <a  id="edit_foo" href="#" class="btn btn-info"><i class="fa fa-edit"></i></a>
             </td>
         </tr>

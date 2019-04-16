@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<LibroCompraVenta xmlns="http://www.sii.cl/SiiDte" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sii.cl/SiiDte LibroCVS_v10.xsd" version="1.0">
+<EnvioLibro ID="ID2005-01"> <!-- Chequear las caracteristicas que debe tener esta ID -->
+        {{ caratula }}{% if not reporte.tipo_de_envio == 'PARCIAL' %}
+        <ResumenPeriodo>{% for doc in resumen_periodos %}
+            <TotalesPeriodo>
+                <TpoDoc>{{doc.tpo_doc}}</TpoDoc>
+                <TotDoc>{{doc.tot_doc}}</TotDoc>
+                <TotMntExe>{{doc.tot_mnt_exe}}</TotMntExe>
+                <TotMntNeto>{{doc.tot_mnt_neto}}</TotMntNeto>
+                <TotOpIVARec>{{doc.tot_op_iva_rec}}</TotOpIVARec>
+                <TotMntIVA>{{doc.tot_mnt_iva}}</TotMntIVA>
+                <TotMntTotal>{{doc.tot_mnt_total}}</TotMntTotal>
+            </TotalesPeriodo>{% endfor %}
+        </ResumenPeriodo>{% else %}
+        <ResumenSegmento>{% for doc in resumen_periodos %}
+            <TotalesPeriodo>
+                <TpoDoc>{{doc.tpo_doc}}<TpoDoc>
+                <TotDoc>{{doc.tot_doc}}<TotDoc>
+                <TotMntExe>{{doc.tot_mnt_exe}}<TotMntExe>
+                <TotMntNeto>{{doc.tot_op_iva_rec}}<TotMntNeto>
+                <TotMntIVA>{{doc.tot_mnt_iva}}<TotMntIVA>
+            </TotalesPeriodo>{% endfor %}
+        </ResumenSegmento>{% endif %}{% if not reporte.tipo_de_envio == 'FINAL' %}{% for doc in detalles %}
+            <Detalle>
+                <TpoDoc>{{doc.TIPO_DE_DOCUMENTO}}</TpoDoc> 
+                <NroDoc>{{doc.numero_factura}}</NroDoc>
+                <TasaImp>{{compania.tasa_de_iva}}</TasaImp>
+                <FchDoc>{{doc.created|date:"Y-m-d"}}</FchDoc>
+                <RUTDoc>{{doc.rut}}</RUTDoc>
+                <RznSoc>{{doc.senores}}</RznSoc>{% if doc.excento == None %}
+                <MntExe>0</MntExe>{% else %}
+                <MntExe>{{doc.excento|floatformat}}</MntExe>{% endif %}
+                <MntNeto>{{doc.neto|floatformat}}</MntNeto>
+                <MntIVA>{{doc.iva|floatformat}}</MntIVA>{% if doc.otros_impuestos %}
+                <OtrosImp>
+                    <CodImp>{{doc.14}}</CodImp>
+                    <TasaImp>{{doc.19.0}}</TasaImp>
+                    <MntImp>{{doc.133}}</MntImp>
+                </OtrosImp>{% endif %}
+                <MntTotal>{{doc.total|floatformat}}</MntTotal>
+            </Detalle>{% endfor %}{% endif %}
+        <TmstFirma></TmstFirma>
+    </EnvioLibro>
+</LibroCompraVenta>

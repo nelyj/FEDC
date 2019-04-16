@@ -283,7 +283,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
 
         id_ = self.kwargs.get('pk')
 
-        return reverse_lazy('facturas:send-invoice', kwargs={'pk':id_,'slug':self.kwargs['slug']})
+        return reverse_lazy('facturas:lista_facturas', kwargs={'pk':id_})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -384,6 +384,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
             return super().form_valid(form)
 
         etiqueta=self.kwargs['slug'].replace('º','')
+
         try:
             xml_dir = settings.MEDIA_ROOT +'facturas'+'/'+etiqueta
             if(not os.path.isdir(xml_dir)):
@@ -395,32 +396,29 @@ class SendInvoice(LoginRequiredMixin, FormView):
             messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
             return super().form_valid(form)
 
-        send_sii = self.send_invoice_sii(compania,caratula_firmada,pass_certificado)
-        if(not send_sii['estado']):
-            messages.error(self.request, send_sii['msg'])
-            return super().form_valid(form)
-        else:
-            form.track_id = send_sii['track_id']
-            form.save()
-
-        # print(response_dd)
-
-
+        # send_sii = self.send_invoice_sii(compania,caratula_firmada,pass_certificado)
+        # if(not send_sii['estado']):
+        #     messages.error(self.request, send_sii['msg'])
+        #     return super().form_valid(form)
+        # else:
+        #     form.track_id = send_sii['track_id']
+        
+        form.save()
         msg = "Se guardo en Base de Datos la factura con éxito"
-        session = requests.Session()
-        try:
-            usuario = Conector.objects.filter(pk=1).first()
-        except Exception as e:
-            print(e)
+        # session = requests.Session()
+        # try:
+        #     usuario = Conector.objects.filter(pk=1).first()
+        # except Exception as e:
+        #     print(e)
 
-        payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
-        headers = {'content-type': "application/json"}
-        response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
-        url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+self.kwargs['slug']
+        # payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
+        # headers = {'content-type': "application/json"}
+        # response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
+        # url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+self.kwargs['slug']
 
-        aux=session.put(url,json={'status_sii':'Aprobado'})
+        # aux=session.put(url,json={'status_sii':'Aprobado'})
 
-        session.close()
+        # session.close()
         # else:
         #     msg = "La factura %s ya se encuentra almacenada en la base de datos del Faturador" % (self.kwargs['slug'])
         return super().form_valid(form)
@@ -429,38 +427,38 @@ class SendInvoice(LoginRequiredMixin, FormView):
         messages.error(self.request, form.errors)
         return super().form_invalid(form)
 
-    def send_invoice_sii(self,compania,invoice, pass_certificado):
-        """
-        Método para enviar la factura al sii
-        @param compania recibe el objeto compañia
-        @param invoice recibe el xml de la factura
-        @param pass_certificado recibe la contraseña del certificado
-        @return dict con la respuesta
-        """
-        try:
-            sii_sdk = SII_SDK()
-            seed = sii_sdk.getSeed()
-            try:
-                sign = sii_sdk.signXml(seed, compania, pass_certificado)
-                token = sii_sdk.getAuthToken(sign)
-                if(token):
-                    print(token)
-                    try:
-                        invoice_reponse = sii_sdk.sendInvoice(token,invoice,compania.rut,'60803000-K')
-                        return {'estado':invoice_reponse['success'],'msg':invoice_reponse['message'],
-                        'track_id':invoice_reponse['track_id']}
-                    except Exception as e:
-                        print(e)
-                        return {'estado':False,'msg':'No se pudo enviar la factura'}    
-                else:
-                    return {'estado':False,'msg':'No se pudo obtener el token del sii'}
-            except Exception as e:
-                print(e)
-                return {'estado':False,'msg':'Ocurrió un error al firmar el documento'}
-            return {'estado':True}
-        except Exception as e:
-            print(e)
-            return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
+    # def send_invoice_sii(self,compania,invoice, pass_certificado):
+    #     """
+    #     Método para enviar la factura al sii
+    #     @param compania recibe el objeto compañia
+    #     @param invoice recibe el xml de la factura
+    #     @param pass_certificado recibe la contraseña del certificado
+    #     @return dict con la respuesta
+    #     """
+    #     try:
+    #         sii_sdk = SII_SDK()
+    #         seed = sii_sdk.getSeed()
+    #         try:
+    #             sign = sii_sdk.signXml(seed, compania, pass_certificado)
+    #             token = sii_sdk.getAuthToken(sign)
+    #             if(token):
+    #                 print(token)
+    #                 try:
+    #                     invoice_reponse = sii_sdk.sendInvoice(token,invoice,compania.rut,'60803000-K')
+    #                     return {'estado':invoice_reponse['success'],'msg':invoice_reponse['message'],
+    #                     'track_id':invoice_reponse['track_id']}
+    #                 except Exception as e:
+    #                     print(e)
+    #                     return {'estado':False,'msg':'No se pudo enviar la factura'}    
+    #             else:
+    #                 return {'estado':False,'msg':'No se pudo obtener el token del sii'}
+    #         except Exception as e:
+    #             print(e)
+    #             return {'estado':False,'msg':'Ocurrió un error al firmar el documento'}
+    #         return {'estado':True}
+    #     except Exception as e:
+    #         print(e)
+    #         return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
 
 
 class FacturasEnviadasView(LoginRequiredMixin, ListView):

@@ -16,7 +16,8 @@ class ReporteCreateForm(forms.ModelForm):
             'tipo_de_envio',
             'tipo_de_libro',
             'fecha_de_inicio', 
-            'fecha_de_culminacion'
+            'fecha_de_culminacion',
+            'folio_notificacion'
 
         ]
 
@@ -27,7 +28,8 @@ class ReporteCreateForm(forms.ModelForm):
 
         self.fields['tipo_de_operacion'].widget.attrs.update({'class': 'form-control'})
         self.fields['tipo_de_envio'].widget.attrs.update({'class': 'form-control'})
-        self.fields['tipo_de_libro'].widget.attrs.update({'class': 'form-control'})
+        self.fields['tipo_de_libro'].widget.attrs.update({'class': 'form-control'}) 
+        self.fields['folio_notificacion'].widget.attrs.update({'class': 'form-control'})
         self.fields['fecha_de_inicio'].widget.attrs.update({'autocomplete':'off','class': 'form-control datepicker', 'data-provide': 'datepicker','placeholder':'DD/MM/YYYY'})
         self.fields['fecha_de_culminacion'].widget.attrs.update({'autocomplete':'off','class': 'form-control datepicker', 'data-provide': 'datepicker','placeholder':'DD/MM/YYYY'})
 
