@@ -6,6 +6,7 @@ Router del api de Rest Framework
 @copyright TIMG
 @version 1.0
 """
+import os
 from django.conf import settings
 from rest_framework import viewsets
 from rest_framework.response import Response
