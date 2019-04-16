@@ -34,7 +34,7 @@
                 <div class="carousel-inner">
                     <div class="item active">
                         <div class="login-form-1">
-                            <form class="text-left" method="post">
+                            <form class="text-left" method="post" action="{% url 'users:login' %}">
                             {% csrf_token %}
                                 <div class="login-form-main-message"></div>
                                 <div class="main-login-form" id ="first_login">
