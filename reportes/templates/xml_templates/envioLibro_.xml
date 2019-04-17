@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <LibroCompraVenta xmlns="http://www.sii.cl/SiiDte" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sii.cl/SiiDte LibroCVS_v10.xsd" version="1.0">
-<EnvioLibro ID="ID2005-01"> <!-- Chequear las caracteristicas que debe tener esta ID -->
+    <EnvioLibro ID="ID2005-01">
         {{ caratula }}{% if not reporte.tipo_de_envio == 'PARCIAL' %}
         <ResumenPeriodo>{% for doc in resumen_periodos %}
             <TotalesPeriodo>
@@ -31,15 +30,40 @@
                 <RznSoc>{{doc.senores}}</RznSoc>{% if doc.excento == None %}
                 <MntExe>0</MntExe>{% else %}
                 <MntExe>{{doc.excento|floatformat}}</MntExe>{% endif %}
-                <MntNeto>{{doc.neto|floatformat}}</MntNeto>
+                <MntNeto>{{doc.neto}}</MntNeto>
                 <MntIVA>{{doc.iva|floatformat}}</MntIVA>{% if doc.otros_impuestos %}
                 <OtrosImp>
                     <CodImp>{{doc.14}}</CodImp>
                     <TasaImp>{{doc.19.0}}</TasaImp>
                     <MntImp>{{doc.133}}</MntImp>
                 </OtrosImp>{% endif %}
-                <MntTotal>{{doc.total|floatformat}}</MntTotal>
+                <MntTotal>{{doc.total}}</MntTotal>
             </Detalle>{% endfor %}{% endif %}
         <TmstFirma></TmstFirma>
+        <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+            <SignedInfo>
+                <CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+                <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+                <Reference URI="">
+                <Transforms>
+                <Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+                </Transforms>
+                <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+                <DigestValue></DigestValue>
+                </Reference>
+            </SignedInfo>
+            <SignatureValue></SignatureValue>
+            <KeyInfo>
+                <KeyValue>
+                    <RSAKeyValue>
+                    <Modulus></Modulus>
+                    <Exponent></Exponent>
+                    </RSAKeyValue>
+                </KeyValue>
+                <X509Data>
+                <X509Certificate></X509Certificate>
+                </X509Data>
+            </KeyInfo>
+        </Signature>
     </EnvioLibro>
 </LibroCompraVenta>

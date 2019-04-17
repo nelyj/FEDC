@@ -83,7 +83,6 @@ class LoginView(FormView):
         """
         dispatch = super(LoginView,self).dispatch(request, *args, **kwargs)
         if request.user.is_authenticated:
-            print('utenticado')
             return redirect('utils:inicio')
         return dispatch
 
@@ -157,6 +156,8 @@ class LoginView(FormView):
                         )
                     # Time left to validation token expires
                     time = 5*60
+                    login(self.request, usuario)
+                    logout(self.request)
                     return JsonResponse({'msg': msg, 'validate': validate,'time':time})
                 except Exception as e:
                     validate = validate
