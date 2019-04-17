@@ -11,8 +11,6 @@ from conectores.models import Compania
 
 class FormGuia(ModelForm):
 
-    # pass_certificado = CharField(widget=PasswordInput(attrs={'class':'form-control'}))
-
     class Meta:
         model = guiaDespacho
         fields = ['status','compania','numero_factura','senores','direccion','comuna','ciudad_receptora','transporte','despachar','observaciones',
@@ -98,20 +96,3 @@ class FormGuia(ModelForm):
         self.fields['total'].required = False
         self.fields['total'].disabled = True
         self.fields['track_id'].required = False
-
-    # def clean(self):
-    #     cleaned_data = super(FormGuia, self).clean()
-    #     pass_certificado = cleaned_data.get("pass_certificado")
-    #     try:
-    #         compania = Compania.objects.get(pk=self.compania)
-    #     except Compania.DoesNotExist:
-    #         self.add_error("pass_certificado", "No ha seleccionado la compania")
-    #     if pass_certificado:
-    #         ruta_pfx = open(settings.MEDIA_ROOT + str(compania.certificado), 'rb').read()
-    #         try:
-    #             #: Comprobar la contraseña del certificado
-    #             OpenSSL.crypto.load_pkcs12(ruta_pfx, pass_certificado)
-    #         except:
-    #             msg = "La contraseña del certificado no es valida"
-    #             self.add_error("pass_certificado", msg)
-    #     return cleaned_data
