@@ -46,7 +46,7 @@ def sendToSii(compania,invoice, pass_certificado):
                     'track_id':invoice_reponse['track_id']}
                 except Exception as e:
                     print(e)
-                    return {'estado':False,'msg':'No se pudo enviar la factura'}    
+                    return {'estado':False,'msg':'No se pudo enviar el documento'}    
             else:
                 return {'estado':False,'msg':'No se pudo obtener el token del sii'}
         except Exception as e:

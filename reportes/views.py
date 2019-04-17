@@ -3,7 +3,7 @@ import datetime
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views import View
@@ -15,6 +15,7 @@ from facturas.models import Factura
 from nota_credito.models import notaCredito
 from nota_debito.models import notaDebito
 from utils.SIISdk import SII_SDK
+from utils.utils import sendToSii
 from .forms import ReporteCreateForm
 from .models import Reporte
 
@@ -71,7 +72,7 @@ class ReportesCreateListView(LoginRequiredMixin, CreateView):
 			'detalles':[]
 		}
 
-		if tipo_de_operacion == "VENTAS":
+		if tipo_de_operacion == "VENTA":
 
 			facturas_queryset_ = [
 				factura 
@@ -115,12 +116,10 @@ class ReportesCreateListView(LoginRequiredMixin, CreateView):
 			if(len(nota_debito_queryset)>0):
 				report_context['detalles'].extend(nota_debito_queryset)
 
-		elif tipo_de_operacion == "COMPRAS":
+		elif tipo_de_operacion == "COMPRA":
 
 			messages.info(self.request, "No posee documentos de intercambio")
 			return HttpResponseRedirect(reverse_lazy('reportes:crear', kwargs={'pk': compania.pk}))
-
-
 
 		try: 
 			Reporte.check_reporte_len(report_context['detalles'])
@@ -143,6 +142,7 @@ class ReportesCreateListView(LoginRequiredMixin, CreateView):
 
 		caratula = render_to_string('xml_templates/caratula_.xml', report_context)
 		report_context['caratula'] = caratula
+		report_context['timestamp'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 		envio_libro = render_to_string('xml_templates/envioLibro_.xml', report_context)
 		# Agregada la firma
 		sii_sdk = SII_SDK()
@@ -176,7 +176,8 @@ class ReportesCreateListView(LoginRequiredMixin, CreateView):
 		tot_mnt_total=0
 
 		for item in queryset: 
-
+			tot_op_iva_rec = float(item.iva)
+			tot_mnt_iva = float(item.iva)
 			if item.excento:
 				tot_mnt_exe += float(item.excento)
 			if item.neto:
@@ -295,3 +296,27 @@ class ReporteXMLView(LoginRequiredMixin,View):
 		response['Content-Disposition'] = 'attachment; filename='+filename
 		return response
 
+class ReporteSendToSiiView(LoginRequiredMixin,View):
+	"""
+	Clase para envíar el reporte al sii
+	@author Rodrigo Boet (rodrigoale.b at timg.cl)
+	@copyright TIMG
+	@date 17-04-19 (dd-mm-YY)
+	@version 1.0
+	"""
+
+	def get(self, request, **kwargs):
+		"""!
+		Método para obtener el xml del libo
+		@param request Objeto con la petición
+		@param kwargs Argumentos de la vista
+		@return redirect a la vista normal
+		"""
+		reporte = Reporte.objects.get(pk=self.kwargs['pk'])
+		compania = Compania.objects.get(pk=self.kwargs['compania'])
+		send_sii = sendToSii(compania,reporte.xml_reporte,compania.pass_certificado)
+		if(not send_sii['estado']):
+				messages.error(self.request, send_sii['msg'])
+		else:
+			messages.success(request, "Se envío el libro correctamente")
+		return redirect(reverse_lazy('reportes:crear', kwargs={'pk': self.kwargs['compania']}))

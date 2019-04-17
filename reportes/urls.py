@@ -10,5 +10,6 @@ urlpatterns = [
   re_path(r'^reportes/(?P<pk>\d+)/delete/(?P<reporte_pk>\d+)$', ReportesDeleteView.as_view(), name='borrar'),
   path('reportes/empresa/', SeleccionarEmpresaView.as_view(),name='seleccionar-empresa'),
   path('reportes/descargar/<int:pk>/', ReporteXMLView.as_view(),name='descargar'),
+  path('reportes-enviar/<int:compania>/<int:pk>/', ReporteSendToSiiView.as_view(),name='enviar'),
 
 ]
