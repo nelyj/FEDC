@@ -25,7 +25,7 @@ class FacturaViewSet(viewsets.ViewSet):
   @version 1.0
   """
 
-  def create(self, request, pk, slug):
+  def create(self, request, rut, slug):
     value = True
     fact_obj = Factura()
     factura = dict(zip(request.data['data'].keys(), request.data['data'].values()))
@@ -113,7 +113,7 @@ class FacturaViewSet(viewsets.ViewSet):
         fact_obj.total = ""
 
     try:
-      compania = Compania.objects.get(pk=pk)
+      compania = Compania.objects.get(rut=rut)
     except Exception as e:
       print(e)
       value = False
