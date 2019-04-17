@@ -113,7 +113,7 @@ class FacturaViewSet(viewsets.ViewSet):
         fact_obj.total = ""
 
     try:
-      compania = Compania.objects.get(rut=rut)
+      compania = Compania.objects.get(razon_social=rut)
     except Exception as e:
       print(e)
       value = False

@@ -10,4 +10,4 @@ from rest_framework import routers
 from facturas.viewset import *
 
 router = routers.DefaultRouter()
-router.register(r'facturas/(?P<rut>[-\w]+)/(?P<slug>[-\w]+)', FacturaViewSet, basename='facturas')
+router.register(r'facturas/(?P<rut>[-\w\s]+)/(?P<slug>[-\w]+)', FacturaViewSet, basename='facturas')
