@@ -2,10 +2,11 @@ import datetime
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import CreateView, DetailView, TemplateView, RedirectView, DeleteView
 # from django.views.generic.edit import DeleteView
 from boletas.models import Boleta
@@ -107,8 +108,13 @@ class ReportesCreateListView(LoginRequiredMixin, CreateView):
 				report_context['resumen_periodos'].append(
 					nota_credito_data)
 
+			if(len(facturas_queryset_)>0):
+				report_context['detalles'].extend(facturas_queryset_)
+			if(len(nota_credito_queryset)>0):
+				report_context['detalles'].extend(nota_credito_queryset)
+			if(len(nota_debito_queryset)>0):
+				report_context['detalles'].extend(nota_debito_queryset)
 
-			report_context['detalles'].extend(facturas_queryset_+nota_credito_queryset+nota_debito_queryset)
 		elif tipo_de_operacion == "COMPRAS":
 
 			messages.info(self.request, "No posee documentos de intercambio")
@@ -119,7 +125,6 @@ class ReportesCreateListView(LoginRequiredMixin, CreateView):
 		try: 
 			Reporte.check_reporte_len(report_context['detalles'])
 		except Exception as e:
-
 			messages.error(self.request, e)
 			return super().form_invalid(form)
 
@@ -128,6 +133,7 @@ class ReportesCreateListView(LoginRequiredMixin, CreateView):
 			report['tot_mnt_neto'] = round(abs(report['tot_mnt_neto']))
 
 		for report in report_context['detalles']:
+
 			report.neto = round(abs(float(report.neto)))
 			report.total = round(abs(float(report.total)))
 			report.numero_factura = report.numero_factura.replace('º','')
@@ -202,13 +208,10 @@ class ReporteDetailView(LoginRequiredMixin, DetailView):
 
 		context = super().get_context_data(*args, **kwargs)
 		reporte = self.get_object()
-		print(reporte)
 		context['facturas_del_reporte'] = Factura.objects.filter(
 			created__gte=reporte.fecha_de_inicio, 
 			created__lte=reporte.fecha_de_culminacion
 			)
-		print(context['facturas_del_reporte'])
-
 		return context
 
 	def get_object(self):
@@ -270,4 +273,19 @@ class EnviarReporteRedirectView(LoginRequiredMixin,RedirectView):
 
 		return context
 
+class ReporteXMLView(LoginRequiredMixin,View):
+	"""
+	Clase para generar el xml para descargar
+	@author Rodrigo Boet (rodrigoale.b at timg.cl)
+	@copyright TIMG
+	@date 17-04-19 (dd-mm-YY)
+	@version 1.0
+	"""
+
+	def get(self, request, **kwargs):
+		reporte = Reporte.objects.get(pk=self.kwargs['pk'])
+		filename = 'libro.xml'
+		response = HttpResponse(reporte.xml_reporte, content_type='application/xml')
+		response['Content-Disposition'] = 'attachment; filename='+filename
+		return response
 

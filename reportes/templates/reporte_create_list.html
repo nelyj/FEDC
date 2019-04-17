@@ -45,6 +45,7 @@
             <td>
                 <!-- Trigger the modal with a button -->
                 <a  id="edit_foo" href="{% url 'reportes:detalle' reporte.pk %}" class="btn btn-info">Ver</a>
+                <a  id="edit_foo" href="{% url 'reportes:descargar' reporte.pk %}" target="_blank" class="btn btn-info">Descargar xml</a>
                 <a  id="edit_foo" href="#" class="btn btn-info">Enviar</a>
                 <a  id="edit_foo" href="{% url 'reportes:borrar' compania.pk reporte.pk %}" class="btn btn-info">Eliminar</a>
 
