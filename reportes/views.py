@@ -20,31 +20,31 @@ from .models import Reporte
 
 
 class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
-    template_name = 'reportes_seleccionar_empresa.html'
+		template_name = 'reportes_seleccionar_empresa.html'
 
-    def get_context_data(self, *args, **kwargs): 
+		def get_context_data(self, *args, **kwargs): 
 
-        context = super().get_context_data(*args, **kwargs)
-        context['empresas'] = Compania.objects.filter(owner=self.request.user)
-        if Compania.objects.filter(owner=self.request.user).exists():
-            context['tiene_empresa'] = True
-        else:
-            messages.info(self.request, "Registre una empresa para continuar")
-            context['tiene_empresa'] = False
-        return context
+				context = super().get_context_data(*args, **kwargs)
+				context['empresas'] = Compania.objects.filter(owner=self.request.user)
+				if Compania.objects.filter(owner=self.request.user).exists():
+						context['tiene_empresa'] = True
+				else:
+						messages.info(self.request, "Registre una empresa para continuar")
+						context['tiene_empresa'] = False
+				return context
 
-    def post(self, request):
+		def post(self, request):
 
-        enviadas = self.request.POST.get('enviadas', None)
-        empresa = int(request.POST.get('empresa'))
-        if not empresa:
-            return HttpResponseRedirect('/')
-        empresa_obj = Compania.objects.get(pk=empresa)
-        if empresa_obj and self.request.user == empresa_obj.owner:
+				enviadas = self.request.POST.get('enviadas', None)
+				empresa = int(request.POST.get('empresa'))
+				if not empresa:
+						return HttpResponseRedirect('/')
+				empresa_obj = Compania.objects.get(pk=empresa)
+				if empresa_obj and self.request.user == empresa_obj.owner:
 
-            return HttpResponseRedirect(reverse_lazy('reportes:crear', kwargs={'pk':empresa}))
-        else:
-            return HttpResponseRedirect('/')
+						return HttpResponseRedirect(reverse_lazy('reportes:crear', kwargs={'pk':empresa}))
+				else:
+						return HttpResponseRedirect('/')
 
 class ReportesCreateListView(LoginRequiredMixin, CreateView):
 
@@ -240,11 +240,11 @@ class ReportesDeleteView(LoginRequiredMixin,DeleteView):
 
 	def delete(self, request, *args, **kwargs):
 
-	    self.object = self.get_object()
-	    success_url = self.get_success_url()
-	    self.object.delete()
-	    messages.success(self.request, "Reporte borrado exitosamente")
-	    return HttpResponseRedirect(success_url)
+			self.object = self.get_object()
+			success_url = self.get_success_url()
+			self.object.delete()
+			messages.success(self.request, "Reporte borrado exitosamente")
+			return HttpResponseRedirect(success_url)
 
 
 	def get_success_url(self):
@@ -283,6 +283,12 @@ class ReporteXMLView(LoginRequiredMixin,View):
 	"""
 
 	def get(self, request, **kwargs):
+		"""!
+		Método para obtener el xml del libo
+		@param request Objeto con la petición
+		@param kwargs Argumentos de la vista
+		@return HttpResponse con el adjunto
+		"""
 		reporte = Reporte.objects.get(pk=self.kwargs['pk'])
 		filename = 'libro.xml'
 		response = HttpResponse(reporte.xml_reporte, content_type='application/xml')

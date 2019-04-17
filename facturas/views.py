@@ -22,7 +22,7 @@ from conectores.models import *
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
 from utils.SIISdk import SII_SDK
-from utils.utils import validarModelPorDoc
+from utils.utils import validarModelPorDoc, sendToSii
 from .forms import *
 from .models import Factura
 from .constants import NOMB_DOC, LIST_DOC
@@ -396,14 +396,13 @@ class SendInvoice(LoginRequiredMixin, FormView):
             messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
             return super().form_valid(form)
 
-        # send_sii = self.send_invoice_sii(compania,caratula_firmada,pass_certificado)
-        # if(not send_sii['estado']):
-        #     messages.error(self.request, send_sii['msg'])
-        #     return super().form_valid(form)
-        # else:
-        #     form.track_id = send_sii['track_id']
-        
-        form.save()
+        send_sii = sendToSii(compania,caratula_firmada,pass_certificado)
+        if(not send_sii['estado']):
+            messages.error(self.request, send_sii['msg'])
+            return super().form_valid(form)
+        else:
+            form.track_id = send_sii['track_id']
+            form.save()
         msg = "Se guardo en Base de Datos la factura con éxito"
         # session = requests.Session()
         # try:
@@ -426,40 +425,6 @@ class SendInvoice(LoginRequiredMixin, FormView):
     def form_invalid(self, form):
         messages.error(self.request, form.errors)
         return super().form_invalid(form)
-
-    # def send_invoice_sii(self,compania,invoice, pass_certificado):
-    #     """
-    #     Método para enviar la factura al sii
-    #     @param compania recibe el objeto compañia
-    #     @param invoice recibe el xml de la factura
-    #     @param pass_certificado recibe la contraseña del certificado
-    #     @return dict con la respuesta
-    #     """
-    #     try:
-    #         sii_sdk = SII_SDK()
-    #         seed = sii_sdk.getSeed()
-    #         try:
-    #             sign = sii_sdk.signXml(seed, compania, pass_certificado)
-    #             token = sii_sdk.getAuthToken(sign)
-    #             if(token):
-    #                 print(token)
-    #                 try:
-    #                     invoice_reponse = sii_sdk.sendInvoice(token,invoice,compania.rut,'60803000-K')
-    #                     return {'estado':invoice_reponse['success'],'msg':invoice_reponse['message'],
-    #                     'track_id':invoice_reponse['track_id']}
-    #                 except Exception as e:
-    #                     print(e)
-    #                     return {'estado':False,'msg':'No se pudo enviar la factura'}    
-    #             else:
-    #                 return {'estado':False,'msg':'No se pudo obtener el token del sii'}
-    #         except Exception as e:
-    #             print(e)
-    #             return {'estado':False,'msg':'Ocurrió un error al firmar el documento'}
-    #         return {'estado':True}
-    #     except Exception as e:
-    #         print(e)
-    #         return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
-
 
 class FacturasEnviadasView(LoginRequiredMixin, ListView):
     template_name = 'facturas_enviadas.html'
