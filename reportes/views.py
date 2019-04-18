@@ -21,34 +21,47 @@ from .models import Reporte
 
 
 class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
-		template_name = 'reportes_seleccionar_empresa.html'
+	"""
+	Clase para seleccionar la empresa
+	@author Alberto Rincones ( at timg.cl)
+	@copyright TIMG
+	@date 11-04-19 (dd-mm-YY)
+	@version 1.0
+	"""
+	template_name = 'reportes_seleccionar_empresa.html'
 
-		def get_context_data(self, *args, **kwargs): 
+	def get_context_data(self, *args, **kwargs): 
 
-				context = super().get_context_data(*args, **kwargs)
-				context['empresas'] = Compania.objects.filter(owner=self.request.user)
-				if Compania.objects.filter(owner=self.request.user).exists():
-						context['tiene_empresa'] = True
-				else:
-						messages.info(self.request, "Registre una empresa para continuar")
-						context['tiene_empresa'] = False
-				return context
+		context = super().get_context_data(*args, **kwargs)
+		context['empresas'] = Compania.objects.filter(owner=self.request.user)
+		if Compania.objects.filter(owner=self.request.user).exists():
+				context['tiene_empresa'] = True
+		else:
+				messages.info(self.request, "Registre una empresa para continuar")
+				context['tiene_empresa'] = False
+		return context
 
-		def post(self, request):
+	def post(self, request):
 
-				enviadas = self.request.POST.get('enviadas', None)
-				empresa = int(request.POST.get('empresa'))
-				if not empresa:
-						return HttpResponseRedirect('/')
-				empresa_obj = Compania.objects.get(pk=empresa)
-				if empresa_obj and self.request.user == empresa_obj.owner:
+		enviadas = self.request.POST.get('enviadas', None)
+		empresa = int(request.POST.get('empresa'))
+		if not empresa:
+				return HttpResponseRedirect('/')
+		empresa_obj = Compania.objects.get(pk=empresa)
+		if empresa_obj and self.request.user == empresa_obj.owner:
 
-						return HttpResponseRedirect(reverse_lazy('reportes:crear', kwargs={'pk':empresa}))
-				else:
-						return HttpResponseRedirect('/')
+				return HttpResponseRedirect(reverse_lazy('reportes:crear', kwargs={'pk':empresa}))
+		else:
+				return HttpResponseRedirect('/')
 
 class ReportesCreateListView(LoginRequiredMixin, CreateView):
-
+	"""
+	Clase para crear y listar los reportes
+	@author Alberto Rincones ( at timg.cl)
+	@copyright TIMG
+	@date 11-04-19 (dd-mm-YY)
+	@version 1.0
+	"""
 
 	template_name = "reporte_create_list.html"
 	form_class = ReporteCreateForm
@@ -145,11 +158,12 @@ class ReportesCreateListView(LoginRequiredMixin, CreateView):
 		report_context['timestamp'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 		envio_libro = render_to_string('xml_templates/envioLibro_.xml', report_context)
 		# Agregada la firma
-		sii_sdk = SII_SDK()
-		libro_firmado = sii_sdk.generalSign(compania,envio_libro,compania.pass_certificado)
-		instance.xml_reporte = '<?xml version="1.0" encoding="ISO-8859-1"?>\n'+libro_firmado
+		#sii_sdk = SII_SDK()
+		#libro_firmado = sii_sdk.generalSign(compania,envio_libro,compania.pass_certificado)
+		#instance.xml_reporte = '<?xml version="1.0" encoding="ISO-8859-1"?>\n'+libro_firmado
+		instance.xml_reporte = '<?xml version="1.0" encoding="ISO-8859-1"?>\n'+envio_libro
 
-		print(libro_firmado)
+		#print(libro_firmado)
 
 		instance.save()
 		messages.info(self.request, "Reporte creado exitosamente")
@@ -175,11 +189,12 @@ class ReportesCreateListView(LoginRequiredMixin, CreateView):
 		tot_mnt_iva=0
 		tot_mnt_total=0
 
-		for item in queryset: 
-			tot_op_iva_rec = float(item.iva)
-			tot_mnt_iva = float(item.iva)
+		for item in queryset:
 			if item.excento:
 				tot_mnt_exe += float(item.excento)
+			if item.iva: 
+				tot_op_iva_rec += 1
+				tot_mnt_iva += float(item.iva)
 			if item.neto:
 				tot_mnt_neto += float(item.neto)
 			if item.total:
@@ -201,7 +216,13 @@ class ReportesCreateListView(LoginRequiredMixin, CreateView):
 	# def generar_detalles(self, **kwargs): 
 
 class ReporteDetailView(LoginRequiredMixin, DetailView):
-
+	"""
+	Clase para ver el detalle de un reporte
+	@author Alberto Rincones ( at timg.cl)
+	@copyright TIMG
+	@date 11-04-19 (dd-mm-YY)
+	@version 1.0
+	"""
 
 	template_name="reportes_detail.html"
 
@@ -222,7 +243,13 @@ class ReporteDetailView(LoginRequiredMixin, DetailView):
 
 
 class ReportesDeleteView(LoginRequiredMixin,DeleteView):
-
+	"""
+	Clase para eliminar un reporte
+	@author Alberto Rincones ( at timg.cl)
+	@copyright TIMG
+	@date 11-04-19 (dd-mm-YY)
+	@version 1.0
+	"""
 
 	template_name="reportes_delete.html"
 	# model = Reporte
@@ -253,26 +280,6 @@ class ReportesDeleteView(LoginRequiredMixin,DeleteView):
 		compania_pk = self.kwargs.get("pk")
 
 		return reverse_lazy('reportes:crear', kwargs={'pk':compania_pk})
-
-class EnviarReporteRedirectView(LoginRequiredMixin,RedirectView):
-
-
-	def get(self, *args, **kwargs):
-
-		reporte = get_object_or_404(Reporte, pk=self.kwargs.get('pk'))
-		compania = get_object_or_404(Compania, pk=self.kwargs.get('compania_pk'))
-
-
-		documentos_del_reporte = Factura.objects.filter(created__gte=reporte.fecha_de_inicio, created__lte=reporte.fecha_de_culminacion)
-
-		context = {
-			'documentos_del_reporte': documentos_del_reporte,
-			'compania': compania
-		}
-
-		signature_tag = render_to_string('snippets/signature.xml', {'signature':firma_electronica})
-
-		return context
 
 class ReporteXMLView(LoginRequiredMixin,View):
 	"""
@@ -314,9 +321,15 @@ class ReporteSendToSiiView(LoginRequiredMixin,View):
 		"""
 		reporte = Reporte.objects.get(pk=self.kwargs['pk'])
 		compania = Compania.objects.get(pk=self.kwargs['compania'])
-		send_sii = sendToSii(compania,reporte.xml_reporte,compania.pass_certificado)
-		if(not send_sii['estado']):
-				messages.error(self.request, send_sii['msg'])
+		if(not reporte.enviado):
+			send_sii = sendToSii(compania,reporte.xml_reporte,compania.pass_certificado)
+			if(not send_sii['estado']):
+					messages.error(self.request, send_sii['msg'])
+			else:
+				reporte.track_id = send_sii['track_id']
+				reporte.enviado = True
+				reporte.save()
+				messages.success(request, "Se envío el libro correctamente")
 		else:
-			messages.success(request, "Se envío el libro correctamente")
+			messages.info(request, "Éste libro ya fue envíado al sii")
 		return redirect(reverse_lazy('reportes:crear', kwargs={'pk': self.kwargs['compania']}))

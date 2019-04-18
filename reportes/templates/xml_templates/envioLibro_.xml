@@ -4,7 +4,6 @@
         <ResumenPeriodo>{% for doc in resumen_periodos %}
             <TotalesPeriodo>
                 <TpoDoc>{{doc.tpo_doc}}</TpoDoc>
-                <TotDoc>{{doc.tot_doc}}</TotDoc>
                 <TotMntExe>{{doc.tot_mnt_exe}}</TotMntExe>
                 <TotMntNeto>{{doc.tot_mnt_neto}}</TotMntNeto>
                 <TotOpIVARec>{{doc.tot_op_iva_rec}}</TotOpIVARec>
@@ -41,29 +40,4 @@
             </Detalle>{% endfor %}{% endif %}
         <TmstFirma>{{timestamp}}</TmstFirma>
     </EnvioLibro>
-    <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
-        <SignedInfo>
-            <CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
-            <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
-            <Reference URI="">
-            <Transforms>
-            <Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
-            </Transforms>
-            <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
-            <DigestValue></DigestValue>
-            </Reference>
-        </SignedInfo>
-        <SignatureValue></SignatureValue>
-        <KeyInfo>
-            <KeyValue>
-                <RSAKeyValue>
-                <Modulus></Modulus>
-                <Exponent></Exponent>
-                </RSAKeyValue>
-            </KeyValue>
-            <X509Data>
-            <X509Certificate></X509Certificate>
-            </X509Data>
-        </KeyInfo>
-    </Signature>
 </LibroCompraVenta>
