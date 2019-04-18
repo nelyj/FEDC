@@ -25,7 +25,7 @@ class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
 	Clase para seleccionar la empresa
 	@author Alberto Rincones ( at timg.cl)
 	@copyright TIMG
-	@date 11-04-19 (dd-mm-YY)
+	@date 28-03-19 (dd-mm-YY)
 	@version 1.0
 	"""
 	template_name = 'reportes_seleccionar_empresa.html'
@@ -59,7 +59,7 @@ class ReportesCreateListView(LoginRequiredMixin, CreateView):
 	Clase para crear y listar los reportes
 	@author Alberto Rincones ( at timg.cl)
 	@copyright TIMG
-	@date 11-04-19 (dd-mm-YY)
+	@date 28-03-19 (dd-mm-YY)
 	@version 1.0
 	"""
 
