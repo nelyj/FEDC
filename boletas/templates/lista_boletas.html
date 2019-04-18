@@ -29,10 +29,10 @@
             <td>{{lista.data.title}}</td>
             <td>{{lista.data.status_sii}}</td>
             <td>
-                <!-- <a  id="edit_foo" href="{% url 'facturas:send-invoice' pk=id_empresa slug=lista.data.name %}" class="btn btn-info">Detalle</a>
-                 -->
-                 <a  id="edit_foo" href="#" class="btn btn-info">Detalle</a>
-
+                <a  id="edit_foo" href="{% url 'boletas:send-boleta' pk=id_empresa slug=lista.data.name %}" class="btn btn-info">Detalle</a>
+                
+<!--                  <a  id="edit_foo" href="#" class="btn btn-info">Detalle</a>
+ -->
             </td>
         </tr>
         {%endfor%}
