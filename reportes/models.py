@@ -26,8 +26,8 @@ class Reporte(CreationModificationDateMixin):
 
 	class TIPO_DE_REPORTE(Enum):
 
-		compras			= ("COMPRAS", _('Informacion Electronica de Compras'))
-		ventas			= ("VENTAS", _('Informacion Electrónica de Ventas'))
+		compras			= ("COMPRA", _('Informacion Electronica de Compras'))
+		ventas			= ("VENTA", _('Informacion Electrónica de Ventas'))
 
 
 		@classmethod
@@ -66,6 +66,7 @@ class Reporte(CreationModificationDateMixin):
 	enviado = models.BooleanField(default=False)
 	nro_segmento = models.IntegerField(null=True, default=0)
 	xml_reporte = models.TextField(null=True, blank=True)
+	track_id = models.CharField(max_length=32, blank=True, null=True)
 
 
 	def __str__(self):
@@ -77,11 +78,11 @@ class Reporte(CreationModificationDateMixin):
 
 	def get_tipo_de_reporte(self):
 
-		if self.tipo_de_operacion == 'COMPRAS':
+		if self.tipo_de_operacion == 'COMPRA':
 
 			return 'Informacion electronica de compras'
 
-		elif self.tipo_de_operacion == 'VENTAS': 
+		elif self.tipo_de_operacion == 'VENTA': 
 
 			return 'Informacion electronica de ventas'
 
