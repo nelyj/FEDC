@@ -158,10 +158,10 @@ class ReportesCreateListView(LoginRequiredMixin, CreateView):
 		report_context['timestamp'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 		envio_libro = render_to_string('xml_templates/envioLibro_.xml', report_context)
 		# Agregada la firma
-		#sii_sdk = SII_SDK()
-		#libro_firmado = sii_sdk.generalSign(compania,envio_libro,compania.pass_certificado)
-		#instance.xml_reporte = '<?xml version="1.0" encoding="ISO-8859-1"?>\n'+libro_firmado
-		instance.xml_reporte = '<?xml version="1.0" encoding="ISO-8859-1"?>\n'+envio_libro
+		sii_sdk = SII_SDK()
+		libro_firmado = sii_sdk.generalSign(compania,envio_libro,compania.pass_certificado)
+		instance.xml_reporte = '<?xml version="1.0" encoding="ISO-8859-1"?>\n'+libro_firmado
+		#instance.xml_reporte = '<?xml version="1.0" encoding="ISO-8859-1"?>\n'+envio_libro
 
 		#print(libro_firmado)
 
