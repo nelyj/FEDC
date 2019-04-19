@@ -17,7 +17,7 @@ from .models import Intercambio, DteIntercambio
 class SeleccionarEmpresaIntercambioView(TemplateView):
   """
   Clase para seleccionar la empresa en el intercambio
-  @author Alberto Rincones ( at timg.cl)
+  @author Alberto Rincones (alberto at timg.cl)
   @copyright TIMG
   @date 08-04-19 (dd-mm-YY)
   @version 1.0
@@ -51,7 +51,7 @@ class SeleccionarEmpresaIntercambioView(TemplateView):
 class IntercambiosListView(ListView):
   """
   Clase para el listado de intercambios
-  @author Alberto Rincones ( at timg.cl)
+  @author Alberto Rincones (alberto at timg.cl)
   @copyright TIMG
   @date 01-04-19 (dd-mm-YY)
   @version 1.0
@@ -72,7 +72,7 @@ class IntercambiosListView(ListView):
 class IntercambiosDetailView(DetailView):
   """
   Clase para el detalle de intercambio
-  @author Alberto Rincones ( at timg.cl)
+  @author Alberto Rincones (alberto at timg.cl)
   @copyright TIMG
   @date 01-04-19 (dd-mm-YY)
   @version 1.0
@@ -96,7 +96,7 @@ class IntercambiosDetailView(DetailView):
 class RefrescarBandejaRedirectView(RedirectView):
   """
   Clase para refrescar la bandeja de entrada
-  @author Alberto Rincones ( at timg.cl)
+  @author Alberto Rincones (alberto at timg.cl)
   @copyright TIMG
   @date 05-04-19 (dd-mm-YY)
   @version 1.0

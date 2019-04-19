@@ -23,7 +23,7 @@ from .models import Reporte
 class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
 	"""
 	Clase para seleccionar la empresa
-	@author Alberto Rincones ( at timg.cl)
+	@author Alberto Rincones (alberto at timg.cl)
 	@copyright TIMG
 	@date 28-03-19 (dd-mm-YY)
 	@version 1.0
@@ -57,7 +57,7 @@ class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
 class ReportesCreateListView(LoginRequiredMixin, CreateView):
 	"""
 	Clase para crear y listar los reportes
-	@author Alberto Rincones ( at timg.cl)
+	@author Alberto Rincones (alberto at timg.cl)
 	@copyright TIMG
 	@date 28-03-19 (dd-mm-YY)
 	@version 1.0
@@ -218,7 +218,7 @@ class ReportesCreateListView(LoginRequiredMixin, CreateView):
 class ReporteDetailView(LoginRequiredMixin, DetailView):
 	"""
 	Clase para ver el detalle de un reporte
-	@author Alberto Rincones ( at timg.cl)
+	@author Alberto Rincones (alberto at timg.cl)
 	@copyright TIMG
 	@date 11-04-19 (dd-mm-YY)
 	@version 1.0
@@ -245,7 +245,7 @@ class ReporteDetailView(LoginRequiredMixin, DetailView):
 class ReportesDeleteView(LoginRequiredMixin,DeleteView):
 	"""
 	Clase para eliminar un reporte
-	@author Alberto Rincones ( at timg.cl)
+	@author Alberto Rincones (alberto at timg.cl)
 	@copyright TIMG
 	@date 11-04-19 (dd-mm-YY)
 	@version 1.0

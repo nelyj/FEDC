@@ -25,7 +25,7 @@ def upload_file_to(instance, filename):
 class Reporte(CreationModificationDateMixin):
 	"""
 	Clase del modelo de reportes
-	@author Alberto Rincones ( at timg.cl)
+	@author Alberto Rincones (alberto at timg.cl)
 	@copyright TIMG
 	@date 28-03-19 (dd-mm-YY)
 	@version 1.0

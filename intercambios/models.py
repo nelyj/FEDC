@@ -8,7 +8,7 @@ from conectores.models import Compania
 class Intercambio(CreationModificationDateMixin):
 	"""
 	Clase para el modelo de intercambio
-	@author Alberto Rincones ( at timg.cl)
+	@author Alberto Rincones (alberto at timg.cl)
 	@copyright TIMG
 	@date 01-04-19 (dd-mm-YY)
 	@version 1.0
@@ -26,7 +26,7 @@ class Intercambio(CreationModificationDateMixin):
 class DteIntercambio(models.Model):
 	"""
 	Clase para el modelo de dte en el intercambio
-	@author Alberto Rincones ( at timg.cl)
+	@author Alberto Rincones (alberto at timg.cl)
 	@copyright TIMG
 	@date 01-04-19 (dd-mm-YY)
 	@version 1.0

@@ -10,7 +10,7 @@ class ReporteCreateForm(forms.ModelForm):
 
     """
     Clase para el formulario de Reportes
-    @author Alberto Rincones ( at timg.cl)
+    @author Alberto Rincones (alberto at timg.cl)
     @copyright TIMG
     @date 28-03-19 (dd-mm-YY)
     @version 1.0
