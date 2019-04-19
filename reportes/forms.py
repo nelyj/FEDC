@@ -8,6 +8,14 @@ from conectores.models import Compania
 
 class ReporteCreateForm(forms.ModelForm):
 
+    """
+    Clase para el formulario de Reportes
+    @author Alberto Rincones (alberto at timg.cl)
+    @copyright TIMG
+    @date 28-03-19 (dd-mm-YY)
+    @version 1.0
+    """
+
     class Meta:
         model = Reporte
         fields = [
@@ -53,8 +61,3 @@ class ReporteCreateForm(forms.ModelForm):
             raise forms.ValidationError('Fecha de culminacion no puede ser mayor a la fecha actual',code='inicio_mayor_actual')
 
         return cleaned_data 
-
-
-
-
-# self.fields['b2b_reviewer'].queryset = Affiliates.objects.filter(owner=self.request.user,verified=True,activated=True)
