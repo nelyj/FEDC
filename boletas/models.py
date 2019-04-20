@@ -149,9 +149,9 @@ class Boleta(CreationModificationDateMixin):
 		carpeta=data['numero_factura'].replace('º','')
 
 		try:
-			xml_dir = settings.MEDIA_ROOT +'facturas'+'/'+carpeta
+			xml_dir = settings.MEDIA_ROOT +'boletas'+'/'+carpeta
 			if(not os.path.isdir(xml_dir)):
-				os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+carpeta)
+				os.makedirs(settings.MEDIA_ROOT +'boletas'+'/'+carpeta)
 			codes = encode(sin_aplanar,columns=10, security_level=5)
 			image = render_image(codes,scale=1, ratio=1)
 			image.save(xml_dir+'/timbre'+'.jpg')
