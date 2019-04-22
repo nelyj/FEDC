@@ -26,7 +26,7 @@
       <!-- Ionicons -->
       <link rel="stylesheet" href="{% static 'css/ionicons.min.css' %}">
 
-      <link rel="stylesheet" href="{% static 'plugins/datepicker/bootstrap-datetimepicker.css' %}">
+      <link rel="stylesheet" href="{% static 'plugins/datepicker/datepicker3.css' %}">
     <!-- jQuery -->
     {% block extras_css %}
     {% endblock extras_css %}
@@ -35,6 +35,8 @@
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <script src="{% static 'start/menu_toggle.js' %}"></script>
     <script src="{% static 'plugins/datepicker/bootstrap-datepicker.js' %}"></script>
+    <script src="{% static 'plugins/datepicker/locales/bootstrap-datepicker.es.js' %}"></script>
+    <script src="{% static 'js/funciones.js' %}"></script>
     {% block extras_constantes %}
     {% endblock extras_constantes %}
     {% block extras_js %}
@@ -49,6 +51,7 @@
     //$("#wrapper").toggleClass("toggled");
     $('.datepicker').datepicker({
         format: "dd/mm/yyyy"
+        language: 'es'
     });
     </script>
     {% block custom_js%}

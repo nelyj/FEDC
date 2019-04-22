@@ -65,6 +65,7 @@ class Reporte(CreationModificationDateMixin):
 	tipo_de_operacion = models.CharField(_('Tipo de reporte'),max_length=10,choices=[x.value for x in TIPO_DE_REPORTE],null=False,blank=False,default='')
 	tipo_de_envio = models.CharField(_('Tipo de envío'),max_length=10,choices=[x.value for x in TIPO_DE_ENVIO],null=False,blank=False,default='')
 	tipo_de_libro = models.CharField(_('Tipo de libro'),max_length=10,choices=[x.value for x in TIPO_DE_LIBRO],null=False,blank=False,default='')
+	periodo_tributario = models.CharField(max_length=7, blank=True, null=True)
 	fecha_de_inicio = models.DateField(_('Fecha de inicio'),null=False)
 	fecha_de_culminacion = models.DateField(_('Fecha de culminación'),null=False)
 	folio_notificacion = models.CharField(_('Folio notificación'),max_length=50,null=True,blank=True,default='')

@@ -77,10 +77,20 @@ class ReportesCreateListView(LoginRequiredMixin, CreateView):
 		fecha_de_inicio = instance.fecha_de_inicio
 		fecha_de_culminacion = instance.fecha_de_culminacion
 		tipo_de_operacion = instance.tipo_de_operacion
+		if(instance.tipo_de_envio!='TOTAL'):
+			instance.periodo_tributario = fecha_de_inicio.strftime("%Y-%m")
+		else:
+			from calendar import monthrange
+			date = instance.periodo_tributario.split('-')
+			last_day = monthrange(int(date[0]), int(date[1]))[1]
+			fecha_de_inicio = datetime.datetime(int(date[0]), int(date[1]), 1)
+			instance.fecha_de_inicio = fecha_de_inicio
+			fecha_de_culminacion = datetime.datetime(int(date[0]), int(date[1]), last_day)
+			instance.fecha_de_culminacion = fecha_de_culminacion
 		report_context = {
 			'compania': compania,
 			'reporte': instance,
-			'periodo_tributario': fecha_de_inicio.strftime("%Y-%m"),
+			'periodo_tributario': instance.periodo_tributario,
 			'resumen_periodos':[],
 			'detalles':[]
 		}
