@@ -1,24 +1,21 @@
 import requests, dicttoxml, json, codecs, os
+from requests import Request, Session
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, FileResponse
+from django.shortcuts import render, redirect
+from django.template.loader import render_to_string
+from django.urls import reverse_lazy
+from django.views.generic import ListView
 from django.views.generic.base import TemplateView, View
 from django.views.generic.edit import FormView
-from django.views.generic import ListView
-from requests import Request, Session
-from django.template.loader import render_to_string
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from conectores.models import *
 from conectores.forms import FormCompania
 from conectores.models import *
-from django.urls import reverse_lazy
-from django.shortcuts import (
-    redirect
-)
-from django.http import FileResponse
-from django.conf import settings
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
+from utils.utils import sendToSii
 from .models import *
 from .forms import * 
 
@@ -392,6 +389,7 @@ class EnvioMasivo(LoginRequiredMixin, View):
     Class that allows to send massive document of Boletas
 
     @author Ing. Luis Barrios (nikeven at gmail.com)
+    @author Rodrigo Boet (rudmanmrrod at gmail.com)
     @date 22-04-2019
     @version 1.0.0
     """
@@ -399,17 +397,31 @@ class EnvioMasivo(LoginRequiredMixin, View):
     def get(self, request, **kwargs):
         try:
             compania_id = self.request.GET.get('pk')
-            object_states = Boleta.objects.filter(compania_id=compania_id)
+            object_states = Boleta.objects.filter(compania_id=compania_id).exclude(status='ENVIADA')
+            if(not object_states):
+                messages.warning(self.request, "No posee boletas para enviar")
+                return JsonResponse(False, safe=False)
             compania = Compania.objects.get(pk=compania_id)
             pass_certificado = compania.pass_certificado
-            # serialized_object = serializers.serialize('json', object_states)
-            # data = json.loads(serialized_object)
             folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=33).order_by('fecha_de_autorizacion').first()
+            if folio is None:
+                messages.error(self.request, "No posee folios para asignacion de timbre")
+                return JsonResponse(False, safe=False)
             documento_final_firmado = Boleta.firmar_etiqueta_set_dte(compania, folio, object_states)
             caratula_firmada = Boleta.generar_documento_final(compania,documento_final_firmado,pass_certificado)
-            print(caratula_firmada)
-            messages.success(self.request, "Boleta enviada exitosamente")
-            return JsonResponse(True, safe=False)
+            send_sii = sendToSii(compania,caratula_firmada,pass_certificado)
+            if(not send_sii['estado']):
+                messages.error(self.request, send_sii['msg'])
+                return JsonResponse(False, safe=False)
+            else:
+                track_id = send_sii['track_id']
+                BoletaSended.objects.create(**{'track_id':track_id})
+                for boleta in object_states:
+                    boleta.status = 'ENVIADA'
+                    boleta.track_id = track_id
+                    boleta.save()
+                messages.success(self.request, "Boleta enviada exitosamente")
+                return JsonResponse(True, safe=False)
             
         except Exception as e:
             messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))

@@ -29,7 +29,7 @@ import codecs, dicttoxml, json, os, requests
 
 class Boleta(CreationModificationDateMixin):
 	"""!
-	Modelo Producto
+	Modelo Boleta
 	"""
 	status = models.CharField(max_length=128,blank=True, null=True)
 	compania = models.ForeignKey(Compania, on_delete=models.CASCADE, blank=True, null=True)
@@ -298,5 +298,8 @@ class Boleta(CreationModificationDateMixin):
 
 		return '<?xml version="1.0" encoding="ISO-8859-1"?>\n'+set_dte_sin_aplanar
 
-
-	
+class BoletaSended(CreationModificationDateMixin):
+	"""!
+	Modelo de Boletas enviadas
+	"""
+	track_id = models.CharField(max_length=32, blank=True, null=True)
