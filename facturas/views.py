@@ -452,6 +452,10 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView,WeasyTemplateResponseMixi
         num_factura = self.kwargs['slug']
         compania = self.kwargs['pk']
         tipo_doc = self.kwargs['doc']
+        impre_cont = request.GET.get('impre')
+        print(impre_cont)
+        if impre_cont == 'cont':
+            self.template_name = "pdf/impresion.continua.pdf.html"
         if tipo_doc in LIST_DOC:
             self.model = validarModelPorDoc(tipo_doc) 
             try:
