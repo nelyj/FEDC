@@ -43,9 +43,24 @@
         </tr>
     </tfoot>
 </table>
-    <script type="text/javascript">
-        $(document).ready( function () {
-          $('#myTable').DataTable();
-      });
-  </script>
-  {% endblock content_center %}
+<a  id="edit_foo" href="#" onclick="envio_masivo({{object_list.0.compania_id}})" class="btn btn-info">Envio Masivo</a>
+<script type="text/javascript">
+    function envio_masivo(compania) {
+        url="{% url 'boletas:envio_masivo' %}";
+        $.ajax({
+            type: 'GET',
+            url: url,
+            data: {
+                'pk':compania
+            },
+            success: function(response) {
+                location.reload(true);     
+            }
+            
+        })        
+    }
+    $(document).ready( function () {
+        $('#myTable').DataTable();
+    });
+</script>
+{% endblock content_center %}

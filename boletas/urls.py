@@ -10,6 +10,7 @@ urlpatterns = [
     path('boleta/<str:slug>/',DeatailInvoice.as_view(),name='detail-boleta'),
     re_path(r'^boletas-enviadas/(?P<pk>\d+)/$', BoletasEnviadasView.as_view(),name='lista-boletas-enviadas'),
 	path('enviar-boleta/<int:pk>/<str:slug>/', SendInvoice.as_view(),name='send-boleta'),
+	path('envio-masivo/', EnvioMasivo.as_view(),name="envio_masivo"),
     # path('imprimir-factura/<int:pk>/<str:slug>/<str:doc>/', ImprimirFactura.as_view(),name="imprimir_factura"),
     # path('estado-factura/<int:pk>/<str:slug>/',VerEstadoFactura.as_view(),name="ver_estado"),
     # re_path(r'^enviar-boleta/(?P<pk>\d+)/(?P<slug>[a-zA-Z0-9º-]+)/$', SendInvoice.as_view(),name='send-invoice'),

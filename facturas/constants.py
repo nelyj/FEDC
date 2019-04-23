@@ -8,7 +8,8 @@ LIST_DOC = ['FACT_ELEC',
             'LIQ_FACT_ELEC',
             'FACT_EXP_ELEC',
             'NOTA_DEB_EXP_ELEC',
-            'NOTA_CRE_EXP_ELEC'
+            'NOTA_CRE_EXP_ELEC',
+            'BOLE_ELEC'
            ]
 
 NOMB_DOC = {
@@ -22,4 +23,5 @@ NOMB_DOC = {
             'FACT_EXP_ELEC': 'Factura de Exportación Electrónica',
             'NOTA_DEB_EXP_ELEC': 'Nota de Débito de Exportación Electrónica',
             'NOTA_CRE_EXP_ELEC': 'Nota de Crédito de Exportación Electrónica',
+            'BOLE_ELEC': 'Boleta Electrónica',
             }
