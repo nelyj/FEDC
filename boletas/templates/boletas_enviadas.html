@@ -18,6 +18,7 @@
         <tr>
             <th>Factura</th>
             <th>Compañía</th>
+            <th>Estado</th>
             <th>N° de folio</th>
             <th>Acciones</th>
         </tr>
@@ -27,6 +28,7 @@
         <tr>
             <td> <a href="#">{{factura.numero_factura}}</a></td>
             <td>{{factura.compania.razon_social}}</td>
+            <td>{{factura.status}}</td>
             <td>{{ factura.n_folio }}</td>
             <td>
                 <a  id="edit_foo" href="#" class="btn btn-info">Imprimir</a>
@@ -38,14 +40,32 @@
         <tr>
             <th>Factura</th>
             <th>Compañía</th>
+            <th>Estado</th>
             <th>N° de folio</th>
             <th>Acciones</th>
         </tr>
     </tfoot>
 </table>
-    <script type="text/javascript">
-        $(document).ready( function () {
-          $('#myTable').DataTable();
-      });
-  </script>
-  {% endblock content_center %}
+<a  id="send_boleta" href="#" onclick="envio_masivo({{object_list.0.compania_id}})" class="btn btn-info">Envio Masivo</a>
+<script type="text/javascript">
+    function envio_masivo(compania) {
+        var url="{% url 'boletas:envio_masivo' %}";
+        $('#send_boleta').attr('disabled',true)
+        $.ajax({
+            type: 'GET',
+            url: url,
+            data: {
+                'pk':compania
+            },
+            success: function(response) {
+                $('#send_boleta').removeAttr('disabled')
+                location.reload(true);     
+            }
+            
+        })        
+    }
+    $(document).ready( function () {
+        $('#myTable').DataTable();
+    });
+</script>
+{% endblock content_center %}

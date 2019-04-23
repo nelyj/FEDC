@@ -29,7 +29,7 @@ import codecs, dicttoxml, json, os, requests
 
 class Boleta(CreationModificationDateMixin):
 	"""!
-	Modelo Producto
+	Modelo Boleta
 	"""
 	status = models.CharField(max_length=128,blank=True, null=True)
 	compania = models.ForeignKey(Compania, on_delete=models.CASCADE, blank=True, null=True)
@@ -233,7 +233,7 @@ class Boleta(CreationModificationDateMixin):
 		return set_dte_sin_aplanar
 
 
-	def firmar_etiqueta_set_dte(compania, folio, etiqueta_Documento, form):
+	def firmar_etiqueta_set_dte(compania, folio, documentos):
 
 
 		# Genera timestamp en formato correspondiente
@@ -247,12 +247,11 @@ class Boleta(CreationModificationDateMixin):
 			compania.rut = compania.rut.replace('k','K')
 		# LLena la plantilla set_DTE_tag.xml con los datos correspondientes
 		set_dte_sin_aplanar = render_to_string(
-			'snippets/set_DTE_tag.xml', {
+			'set_DTE_tag_boletas.xml', {
 				'compania':compania, 
 				'folio':folio, 
 				'timestamp_firma':timestamp_firma,
-				'documento': etiqueta_Documento,
-				'form': form
+				'documento': documentos
 			}
 		)
 
@@ -286,7 +285,7 @@ class Boleta(CreationModificationDateMixin):
 		# Incorpora todo el documento firmado al la presentacion final y elimina 
 		# las tabulaciones.
 
-		documento_final = render_to_string('invoice.xml', {'set_DTE':etiqueta_SetDte})
+		documento_final = render_to_string('boleta.xml', {'set_DTE':etiqueta_SetDte})
 
 		# Se firmó el archivo xml
 		sii_sdk = SII_SDK()
@@ -299,5 +298,8 @@ class Boleta(CreationModificationDateMixin):
 
 		return '<?xml version="1.0" encoding="ISO-8859-1"?>\n'+set_dte_sin_aplanar
 
-
-	
+class BoletaSended(CreationModificationDateMixin):
+	"""!
+	Modelo de Boletas enviadas
+	"""
+	track_id = models.CharField(max_length=32, blank=True, null=True)
