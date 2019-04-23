@@ -7,11 +7,14 @@ from django.views.generic.edit import FormView
 from django.views.generic import ListView
 from requests import Request, Session
 from django.template.loader import render_to_string
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from conectores.models import *
 from conectores.forms import FormCompania
 from conectores.models import *
 from django.urls import reverse_lazy
+from django.shortcuts import (
+    redirect
+)
 from django.http import FileResponse
 from django.conf import settings
 from folios.models import Folio
@@ -141,7 +144,7 @@ class DeatailInvoice(LoginRequiredMixin, TemplateView):
         payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
         headers = {'content-type': "application/json"}
         response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
-        url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+str(kwargs['slug'])
+        url=usuario.url_erp+'/api/resourfce/Sales%20Invoice/'+str(kwargs['slug'])
         aux=session.get(url)
         session.close()
         aux=json.loads(aux.text)
@@ -157,8 +160,6 @@ class BoletasEnviadasView(LoginRequiredMixin, ListView):
     def get_queryset(self):
 
         compania = self.kwargs.get('pk')
-        print('aqui')
-
         return Boleta.objects.filter(compania=compania).order_by('-created')
 
 class SendInvoice(LoginRequiredMixin, FormView):
@@ -363,38 +364,53 @@ class SendInvoice(LoginRequiredMixin, FormView):
             return super().form_valid(form)
         disponibles = folio.get_folios_disponibles()
         if disponibles == 1:
-            messages.success(self.request, "Factura enviada exitosamente")
+            messages.success(self.request, "Boleta generada exitosamente")
             messages.info(self.request, str('Queda ')+str(disponibles)+str('folio disponible'))
         elif disponibles < 50:
-            messages.success(self.request, "Factura enviada exitosamente")
+            messages.success(self.request, "Boleta generada exitosamente")
             messages.info(self.request, str('Quedan ')+str(disponibles)+str('folios disponibles'))
         else:
-            messages.success(self.request, "Factura enviada exitosamente")
+            messages.success(self.request, "Boleta generada exitosamente")
         form.compania = compania
        
         try:
             response_dd = Boleta._firmar_dd(data, folio, form)
-        #     documento_firmado = Factura.firmar_documento(response_dd,data,folio, compania, form, pass_certificado)
-        #     documento_final_firmado = Factura.firmar_etiqueta_set_dte(compania, folio, documento_firmado,form)
-        #     caratula_firmada = Factura.generar_documento_final(compania,documento_final_firmado,pass_certificado)
-        #     form.dte_xml = caratula_firmada
+            documento_firmado = Boleta.firmar_documento(response_dd,data,folio, compania, form, pass_certificado)
+            form.dte_xml = documento_firmado
         except Exception as e:
             messages.error(self.request, "Ocurrió un error al firmar el documento")
             return super().form_valid(form)
-        # etiqueta=self.kwargs['slug'].replace('º','')
-        # try:
-        #     xml_dir = settings.MEDIA_ROOT +'facturas'+'/'+etiqueta
-        #     if(not os.path.isdir(xml_dir)):
-        #         os.makedirs(settings.MEDIA_ROOT +'facturas'+'/'+etiqueta)
-        #     f = open(xml_dir+'/'+etiqueta+'.xml','w')
-        #     f.write(caratula_firmada)
-        #     f.close()
-        # except Exception as e:
-        #     messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
-        #     return super().form_valid(form)
         form.save()
         return super().form_valid(form)
 
     def form_invalid(self, form):
         messages.error(self.request, form.errors)
         return super().form_invalid(form)
+
+class EnvioMasivo(LoginRequiredMixin, View):
+    """!
+    Class that allows to send massive document of Boletas
+
+    @author Ing. Luis Barrios (nikeven at gmail.com)
+    @date 22-04-2019
+    @version 1.0.0
+    """
+
+    def get(self, request, **kwargs):
+        try:
+            compania_id = self.request.GET.get('pk')
+            object_states = Boleta.objects.filter(compania_id=compania_id)
+            compania = Compania.objects.get(pk=compania_id)
+            pass_certificado = compania.pass_certificado
+            # serialized_object = serializers.serialize('json', object_states)
+            # data = json.loads(serialized_object)
+            folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=33).order_by('fecha_de_autorizacion').first()
+            documento_final_firmado = Boleta.firmar_etiqueta_set_dte(compania, folio, object_states)
+            caratula_firmada = Boleta.generar_documento_final(compania,documento_final_firmado,pass_certificado)
+            print(caratula_firmada)
+            messages.success(self.request, "Boleta enviada exitosamente")
+            return JsonResponse(True, safe=False)
+            
+        except Exception as e:
+            messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
+            return JsonResponse(False, safe=False)
