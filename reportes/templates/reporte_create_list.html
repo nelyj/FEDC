@@ -19,8 +19,33 @@
 			<form id="form_register" method="post" enctype="multipart/form-data">
 			  {% csrf_token %}
 			  <div class="col-xs-12" >
-			    {{form.as_p}}
+			    <label>{{form.tipo_de_operacion.label}}</label>
+                {{form.tipo_de_operacion}}
 			  </div>
+              <div class="col-xs-12" >
+                <label>{{form.tipo_de_envio.label}}</label>
+                {{form.tipo_de_envio}}
+              </div>
+              <div class="col-xs-12" >
+                <label>{{form.tipo_de_libro.label}}</label>
+                {{form.tipo_de_libro}}
+              </div>
+              <div class="col-xs-12" id="s_periodo_tributario">
+                <label>{{form.periodo_tributario.label}}</label>
+                {{form.periodo_tributario}}
+              </div>
+              <div class="col-xs-12" id="s_fecha_de_inicio">
+                <label>{{form.fecha_de_inicio.label}}</label>
+                {{form.fecha_de_inicio}}
+              </div>
+              <div class="col-xs-12" id="s_fecha_de_culminacion">
+                <label>{{form.fecha_de_culminacion.label}}</label>
+                {{form.fecha_de_culminacion}}
+              </div>
+              <div class="col-xs-12" style="padding-bottom: 10px">
+                <label>{{form.folio_notificacion.label}}</label>
+                {{form.folio_notificacion}}
+              </div>
 			  <button id="submit" type="submit" class="btn btn-success btn-block btn-flat">Generar</button>               
 			</form>
 		</div>
@@ -70,22 +95,36 @@
 </table>
 
     <script type="text/javascript">
-        {% comment %} 
-        function validar(url) {
-            console.log(url)
-            $.ajax({
-                type: 'GET',
-                url: url,
-                success: function (data) {
-                    $('#foo_modal').find('.modal-body').html(data);
-                    $('#foo_modal').modal('show');
-                },
-            });
-            return false; 
-        }     
-        {% endcomment %}
+        $('#id_tipo_de_envio').change(function(){
+            if($(this).val()=='TOTAL'){
+                showField('#s_periodo_tributario',true)
+                showField('#s_fecha_de_inicio',false)
+                showField('#s_fecha_de_culminacion',false)
+            }
+            else{
+                showField('#s_periodo_tributario',false)
+                showField('#s_fecha_de_inicio',true)
+                showField('#s_fecha_de_culminacion',true)
+            }
+        })
         $(document).ready( function () {
           $('#myTable').DataTable();
+          if($('#id_tipo_de_envio').val()=='TOTAL'){
+            showField('#s_periodo_tributario',true)
+            showField('#s_fecha_de_inicio',false)
+            showField('#s_fecha_de_culminacion',false)
+          }
+          else{
+            showField('#s_periodo_tributario',false)
+            showField('#s_fecha_de_inicio',true)
+            showField('#s_fecha_de_culminacion',true)
+          }
+          $("#id_periodo_tributario").datepicker( {
+                format: "yyyy-mm",
+                startView: 'month',
+                minViewMode: 1,
+                language: 'es'
+          });
       });
 
 
