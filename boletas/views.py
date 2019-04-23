@@ -397,7 +397,10 @@ class EnvioMasivo(LoginRequiredMixin, View):
     def get(self, request, **kwargs):
         try:
             compania_id = self.request.GET.get('pk')
-            object_states = Boleta.objects.filter(compania_id=compania_id)
+            object_states = Boleta.objects.filter(compania_id=compania_id).exclude(status='ENVIADA')
+            if(not object_states):
+                messages.warning(self.request, "No posee boletas para enviar")
+                return JsonResponse(False, safe=False)
             compania = Compania.objects.get(pk=compania_id)
             pass_certificado = compania.pass_certificado
             folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=33).order_by('fecha_de_autorizacion').first()
