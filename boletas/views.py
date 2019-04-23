@@ -1,24 +1,21 @@
 import requests, dicttoxml, json, codecs, os
+from requests import Request, Session
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, FileResponse
+from django.shortcuts import render, redirect
+from django.template.loader import render_to_string
+from django.urls import reverse_lazy
+from django.views.generic import ListView
 from django.views.generic.base import TemplateView, View
 from django.views.generic.edit import FormView
-from django.views.generic import ListView
-from requests import Request, Session
-from django.template.loader import render_to_string
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from conectores.models import *
 from conectores.forms import FormCompania
 from conectores.models import *
-from django.urls import reverse_lazy
-from django.shortcuts import (
-    redirect
-)
-from django.http import FileResponse
-from django.conf import settings
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
+from utils.utils import sendToSii
 from .models import *
 from .forms import * 
 
@@ -405,6 +402,9 @@ class EnvioMasivo(LoginRequiredMixin, View):
             # serialized_object = serializers.serialize('json', object_states)
             # data = json.loads(serialized_object)
             folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=33).order_by('fecha_de_autorizacion').first()
+            if folio is None:
+                messages.error(self.request, "No posee folios para asignacion de timbre")
+                return JsonResponse(False, safe=False)
             documento_final_firmado = Boleta.firmar_etiqueta_set_dte(compania, folio, object_states)
             caratula_firmada = Boleta.generar_documento_final(compania,documento_final_firmado,pass_certificado)
             print(caratula_firmada)
