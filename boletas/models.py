@@ -61,7 +61,7 @@ class Boleta(CreationModificationDateMixin):
 	dte_xml = models.TextField(null=True, blank=True)
 	track_id = models.CharField(max_length=32, blank=True, null=True)
 
-	TIPO_DE_DOCUMENTO=33
+	TIPO_DE_DOCUMENTO=39
 
 	
 	class Meta:
@@ -199,6 +199,7 @@ class Boleta(CreationModificationDateMixin):
 		if('k' in datos['rut']):
 			datos['rut'] = datos['rut'].replace('k','K')
 		datos['numero_factura'] = datos['numero_factura'].replace('º','')
+		datos['numero_factura'] = datos['numero_factura'].replace(' ','')
 		datos['neto']=str(round(float(datos['neto'])))
 		datos['total']=str(round(float(datos['total'])))
 

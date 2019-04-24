@@ -59,7 +59,7 @@ class ListaGuiasViews(LoginRequiredMixin,TemplateView):
 
     def dispatch(self, *args, **kwargs):
         compania = self.kwargs.get('pk')
-        usuario = Conector.objects.filter(t_documento='33',empresa=compania).first()
+        usuario = Conector.objects.filter(t_documento='52',empresa=compania).first()
         if not usuario:
             messages.info(self.request, "No posee conectores asociados a esta empresa")
             return HttpResponseRedirect(reverse_lazy('guiaDespacho:seleccionar-empresa'))
@@ -71,7 +71,7 @@ class ListaGuiasViews(LoginRequiredMixin,TemplateView):
         compania = self.kwargs.get('pk')
         context['id_empresa'] = compania
         try:
-            usuario = Conector.objects.filter(t_documento='33',empresa=compania).first()
+            usuario = Conector.objects.filter(t_documento='52',empresa=compania).first()
         except Exception as e:
             messages.info(self.request, "No posee conectores asociados a esta empresa")
             return HttpResponseRedirect(reverse_lazy('guisDespacho:seleccionar-empresa'))
@@ -144,7 +144,7 @@ class SendInvoice(LoginRequiredMixin,FormView):
         compania = self.kwargs['pk']
 
         try:
-            usuario = Conector.objects.filter(t_documento='33',empresa=compania).first()
+            usuario = Conector.objects.filter(t_documento='52',empresa=compania).first()
         except Exception as e:
             print(e)
         payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
@@ -309,7 +309,7 @@ class SendInvoice(LoginRequiredMixin,FormView):
         # assert rut, "rut no existe"
         form = form.save(commit=False)
         try:
-            folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=33).order_by('fecha_de_autorizacion').first()
+            folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=52).order_by('fecha_de_autorizacion').first()
 
             if not folio:
                 raise Folio.DoesNotExist
