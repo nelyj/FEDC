@@ -61,7 +61,7 @@ class ListaBoletasViews(LoginRequiredMixin, TemplateView):
 
         compania = self.kwargs.get('pk')
 
-        usuario = Conector.objects.filter(t_documento='33',empresa=compania).first()
+        usuario = Conector.objects.filter(t_documento='39',empresa=compania).first()
 
         if not usuario:
 
@@ -78,7 +78,7 @@ class ListaBoletasViews(LoginRequiredMixin, TemplateView):
         context['id_empresa'] = compania
 
         try:
-            usuario = Conector.objects.filter(t_documento='33',empresa=compania).first()
+            usuario = Conector.objects.filter(t_documento='39',empresa=compania).first()
         except Exception as e:
             messages.info(self.request, "No posee conectores asociados a esta empresa")
             return HttpResponseRedirect(reverse_lazy('boletas:seleccionar-empresa'))
@@ -175,7 +175,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
         compania = self.kwargs['pk']
 
         try:
-            usuario = Conector.objects.filter(t_documento='33',empresa=compania).first()
+            usuario = Conector.objects.filter(t_documento='39',empresa=compania).first()
         except Exception as e:
             print(e)
         payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
@@ -339,7 +339,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
         # assert rut, "rut no existe"
         form = form.save(commit=False)
         try:
-            folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=33).order_by('fecha_de_autorizacion').first()
+            folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=39).order_by('fecha_de_autorizacion').first()
 
             if not folio:
                 raise Folio.DoesNotExist
@@ -353,7 +353,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
         except ElCAFSenEncuentraVencido:
             messages.error(self.request, "El CAF se encuentra vencido")
             return super().form_valid(form)
-        form.status = 'Aprobado'
+        form.status = 'TIMBRADO'
         try:
             form.recibir_folio(folio)
         except (ElCafNoTieneMasTimbres, ValueError):
@@ -403,7 +403,7 @@ class EnvioMasivo(LoginRequiredMixin, View):
                 return JsonResponse(False, safe=False)
             compania = Compania.objects.get(pk=compania_id)
             pass_certificado = compania.pass_certificado
-            folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=33).order_by('fecha_de_autorizacion').first()
+            folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=39).order_by('fecha_de_autorizacion').first()
             if folio is None:
                 messages.error(self.request, "No posee folios para asignacion de timbre")
                 return JsonResponse(False, safe=False)
