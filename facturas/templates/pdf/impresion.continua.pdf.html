@@ -28,19 +28,21 @@
                     <p class="base-compania"><b>Sucursales: </b></p>
                     <p class="base-compania"><b>Telefono: </b></p>
                     <p class="base-compania"><b>Email:</b> {{factura.compania.correo_intercambio}}</p>
-                    <h3>Fecha: {{factura.fecha|date:"SHORT_DATE_FORMAT"}}</h3>
+                    
                 </div>
             </div>
+            <p>
+                <h3 class="fecha">Fecha:{{factura.fecha|date:"SHORT_DATE_FORMAT"}}</h3>
+            </p>
             <div>
                 <table class="table-factura">
-                    <thead>
+                        
+                    <tbody>
                         <tr>
-                            <th width="50%">
+                            <th width="75%" colspan="2">
                                 Codigo/Descripción
                             </th>
-                            <th width="25%">
-                                
-                            </th>
+                            
                             <th width="25%">
                                 Unidad medida
                             </th>
@@ -56,8 +58,6 @@
                                 Total
                             </th>
                         </tr>
-                    </thead>
-                    <tbody>
                         <!--Tr para el for-->
                         {% for prod in productos%}
                             <tr>
@@ -72,8 +72,6 @@
                             </tr>
                         {% endfor %}
                         <!--Fin del for del re-->
-                    </tbody>
-                    <tfoot>
                         <!--Tr final de la tabla-->
                         <tr class="border_footer">
                             <td colspan="2">
@@ -82,8 +80,8 @@
                             <td class="align-right">
                                 {{factura.total|default_if_none:0|format_mil}}
                             </td>
-                        </tr>                        
-                    </tfoot>
+                        </tr>
+                    </tbody>
                 </table>
             </div><br><br>
             <div class="timbre">

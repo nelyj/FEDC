@@ -1,3 +1,4 @@
+from boletas.models import Boleta
 from facturas.models import Factura
 from guia_despacho.models import guiaDespacho
 from nota_credito.models import notaCredito
@@ -22,6 +23,8 @@ def validarModelPorDoc(tipo_doc):
         modelo = notaDebito
     elif tipo_doc == 'NOTA_CRE_ELEC':
         modelo = notaCredito
+    elif tipo_doc == 'BOLE_ELEC':
+        modelo = Boleta
     return modelo
 
 def sendToSii(compania,invoice, pass_certificado):
