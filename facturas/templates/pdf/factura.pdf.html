@@ -16,7 +16,7 @@
                     <h3>{{factura.compania.razon_social}}</h3>
                     <p><b>{{factura.compania.actividad_principal}}</b></p>
                     <p><b>Casa Matriz: </b>{{factura.compania.direccion}} {{factura.compania.comuna|upper}}</p>
-                    <p><b>Casa Matriz: </b></p>
+                    <p><b>Sucursal: </b></p>
                     <p class="base-compania"><b>Telefono: Email: {{factura.compania.correo_intercambio}}  Web: {{factura.compania.web}}</b></p>
                 </div>
                 <div class="document">
@@ -183,9 +183,9 @@
                             <td class="align-center">Unidad</td>
                             <td class="align-center">{{prod.item_code}}</td>
                             <td class="align-center">{{prod.item_name}}</td>
-                            <td class="align-right">{{prod.rate}}</td>
+                            <td class="align-right">{{prod.rate|default_if_none:0|format_mil}}</td>
                             <td class="align-right">{{prod.discount_percentage}}</td>
-                            <td class="align-right">{{prod.amount}}</td>
+                            <td class="align-right">{{prod.amount|default_if_none:0|format_mil}}</td>
                         </tr>
                         {% endfor %}
                         <!--Fin del for del re-->
