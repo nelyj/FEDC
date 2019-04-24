@@ -31,6 +31,7 @@
             <td>
                 <a href="{% url 'nota_credito:ver_estado_nc' factura.compania.pk factura.numero_factura %}"  class="btn btn-success">Ver Estado</a>
                 <a  id="edit_foo" href="{% url 'nota_credito:imprimir_nc' factura.compania.pk factura.numero_factura 'NOTA_CRE_ELEC' %}" target="_blank" class="btn btn-info">Imprimir</a>
+                <a  id="edit_foo" href="{% url 'facturas:imprimir_factura' factura.compania.pk factura.numero_factura 'NOTA_CRE_ELEC' %}?impre=cont" target="_blank" class="btn btn-warning">Impresion continua</a>
             </td>
         </tr>
         {%endfor%}

@@ -80,3 +80,7 @@
 .align-right { 
     text-align: right; 
 }
+.fecha{
+	width:100%;
+	text-align:center;
+}

@@ -34,7 +34,6 @@
                 <a href="{% url 'facturas:ver_estado' factura.compania.pk factura.numero_factura %}"  class="btn btn-success">Ver Estado</a>
                 <a  id="edit_foo" href="{% url 'facturas:imprimir_factura' factura.compania.pk factura.numero_factura 'FACT_ELEC' %}" target="_blank" class="btn btn-info">Imprimir</a>
                 <a  id="edit_foo" href="{% url 'facturas:imprimir_factura' factura.compania.pk factura.numero_factura 'FACT_ELEC' %}?impre=cont" target="_blank" class="btn btn-warning">Impresion continua</a>
-
             </td>
         </tr>
         {%endfor%}
