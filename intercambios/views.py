@@ -116,8 +116,7 @@ class RefrescarBandejaRedirectView(RedirectView):
     print(correo,passw)
     try:
 
-      #mail.login(correo,passw)
-      mail.login('rudmanmrrod@gmail.com','rudman22!')
+      mail.login(correo,passw)
     except imaplib.IMAP4.error as e:
       
       messages.error(self.request, str(e))
