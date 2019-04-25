@@ -1,0 +1,37 @@
+A continuación los nuevos accesos al servidor de factura electrónica
+
+Droplet: svr17-timg-prd-fact
+URL: http://facturador.timgtools.ml
+IP: 157.230.5.48
+
+Accesso SSH
+Servidor: facturador.timgtools.ml
+Usuario: django
+Contraseña: dJ@ng0usrd3v
+
+Para acceder:
+
+     ssh django@facturador.timgtools.ml
+     sudo su - root
+
+
+
+# Accedemos como root estando en el servidor
+django@svr17-timg-prd-fact:~$ sudo su - root
+
+# Nos dirigimos a la carpte del proyecto y activamos el entorno virtual
+root@svr17-timg-prd-fact:~# cd factura_timg/factura_timg2
+root@svr17-timg-prd-fact:~/factura_timg/factura_timg2# source ../env/factura_timg/bin/activate
+
+#Realizamos pull al repositorio que ya se encuantra apuntando a github
+(factura_timg) root@svr17-timg-prd-fact:~/factura_timg/factura_timg2# git pull
+
+# Instalamos requerimientos del sistema por si ocurrieron cambios
+pip install -r requerimientos.txt
+
+# Realizamos las migraciones correspondientes
+(factura_timg) root@svr17-timg-prd-fact:~/factura_timg/factura_timg2# python manage.py makemigrations 
+(factura_timg) root@svr17-timg-prd-fact:~/factura_timg/factura_timg2# python manage.py migrate
+
+# Reiniciamos servidor
+/etc/init.d/apache2 restart
