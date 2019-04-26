@@ -4,14 +4,13 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.hashers import PBKDF2PasswordHasher
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, DeleteView, UpdateView
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from .forms import *
 from .models import *
 from datetime import datetime
-from django.views.generic.edit import DeleteView, UpdateView
 
 from certificados.models import Certificado
 from .exceptions import ContrasenaDeCertificadoIncorrecta
@@ -167,11 +166,9 @@ class CompaniaUpdate(LoginRequiredMixin, UpdateView):
         
         compania = get_object_or_404(self.model, pk=self.kwargs['pk'])
         
-        print (str(form.cleaned_data['logo']), str(str(compania.logo).split('/')[2]), str(form.cleaned_data['logo'])==str(str(compania.logo).split('/')[2]))
 
         if not str(form.cleaned_data['logo']) == str(compania.logo):
             files = self.request.FILES
-            print (files['logo'].size)
             ruta_archivo = settings.MEDIA_ROOT+str(compania.logo)
             ruta = '/'.join(ruta_archivo.split('/')[:-1])
             if os.path.exists(ruta):

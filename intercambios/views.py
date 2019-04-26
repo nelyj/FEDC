@@ -7,9 +7,9 @@ from django.conf import settings
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.http import HttpResponseRedirect
-
-from django.views.generic import TemplateView, RedirectView, ListView, DetailView
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from django.views.generic import TemplateView, RedirectView, ListView, DetailView
 from conectores.models import Compania
 from .models import Intercambio, DteIntercambio
 
@@ -149,12 +149,17 @@ class RefrescarBandejaRedirectView(RedirectView):
     else:
 
       latest_emails = id_list[-new_elements:]
+
+    latest_emails = latest_emails[0:3]
     for element in latest_emails:
 
       result, email_data = mail.fetch(element, "(RFC822)")
       raw_email = email_data[0][1]
       raw_multipart = email.message_from_bytes(raw_email)
-      raw_email_string = raw_email.decode('utf-8')
+      try:
+        raw_email_string = raw_email.decode('utf-8')
+      except Exception as e:
+        raw_email_string = raw_email.decode('latin-1')
       email_message = email.message_from_string(raw_email_string)
       attachment_count, attachments = self.get_attachment(raw_multipart)
       remisor_name, remisor_email = self.get_remisor(str(email.header.make_header(email.header.decode_header(email_message['From']))))
@@ -166,7 +171,7 @@ class RefrescarBandejaRedirectView(RedirectView):
         fecha_de_recepcion = self.get_received_time(str(email.header.make_header(email.header.decode_header(email_message['Received'])))),
         cantidad_dte = attachment_count,
         titulo = str(email.header.make_header(email.header.decode_header(email_message['Subject']))),
-        contenido = self.get_body(raw_multipart).decode('latin-1')
+        contenido = str(self.get_body(raw_multipart).decode('latin-1'))
       ) 
 
     messages.success(self.request, "Cantidad de correos nuevos: {}".format(new_elements))
@@ -215,11 +220,16 @@ class RefrescarBandejaRedirectView(RedirectView):
   def get_received_time(self, received_string):
 
     list_ = received_string.split('\r\n')
-    final_date = list_[1].split()
-    string_date = "{} {} {}".format(final_date[2], final_date[1], final_date[3])
-    datef = datetime.strptime(string_date, '%b %d %Y')
+    final_date = list_[0].split(';')[1].strip()
+    if(final_date==''):
+      final_date = list_[1].strip()
+    other_date = " ".join(final_date.split(" ")[:-2])
+    #string_date = "{} {} {}".format(final_date[2], final_date[1], final_date[3])
+    datef = datetime.strptime(other_date, '%a, %d %b %Y %H:%M:%S')
+    datef.replace(tzinfo=timezone.utc)
 
     return datef
+
 
   def get_remisor(self, remisor_string):
 
