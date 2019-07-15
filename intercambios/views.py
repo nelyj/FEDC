@@ -63,7 +63,7 @@ class IntercambiosListView(ListView):
     user = self.request.user
     compania = Compania.objects.get(pk=pk)
 
-    queryset = Intercambio.objects.filter(receptor=compania).order_by('-codigo_email')
+    queryset = Intercambio.objects.filter(receptor=compania).order_by('-fecha_de_recepcion')
     print(queryset)
     return queryset
 
@@ -108,12 +108,12 @@ class RefrescarBandejaRedirectView(RedirectView):
     mail = imaplib.IMAP4_SSL('imap.gmail.com')
     user = self.request.user
     compania = Compania.objects.get(pk=pk)
-    print(compania)
+    
     assert compania.correo_intercambio, "No hay correo"
     assert compania.pass_correo_intercambio, "No hay password"
     correo = compania.correo_intercambio.strip()
     passw = compania.pass_correo_intercambio.strip()
-    print(correo,passw)
+    
     try:
 
       mail.login(correo,passw)
@@ -126,7 +126,8 @@ class RefrescarBandejaRedirectView(RedirectView):
     result, data = mail.search(None, "ALL")
     id_list = data[0].split()
     try:
-      last_email = Intercambio.objects.latest('codigo_email')
+      last_email = Intercambio.objects.filter(receptor=compania).count()#latest('codigo_email')
+      last_email = 0
     except Intercambio.DoesNotExist:
       last_email = 0
 
@@ -135,8 +136,8 @@ class RefrescarBandejaRedirectView(RedirectView):
 
       local_last_email_code = last_email
     else:
-
-      local_last_email_code = int(last_email.codigo_email)
+      pass
+      #local_last_email_code = int(last_email.codigo_email)
     if last_email_code > local_last_email_code:
 
       new_elements = last_email_code - local_last_email_code
@@ -150,7 +151,8 @@ class RefrescarBandejaRedirectView(RedirectView):
 
       latest_emails = id_list[-new_elements:]
 
-    latest_emails = latest_emails[0:3]
+    #: Trae los 5 primeros correos
+    latest_emails = latest_emails[0:5]
     for element in latest_emails:
 
       result, email_data = mail.fetch(element, "(RFC822)")
@@ -162,19 +164,49 @@ class RefrescarBandejaRedirectView(RedirectView):
         raw_email_string = raw_email.decode('latin-1')
       email_message = email.message_from_string(raw_email_string)
       attachment_count, attachments = self.get_attachment(raw_multipart)
+      
       remisor_name, remisor_email = self.get_remisor(str(email.header.make_header(email.header.decode_header(email_message['From']))))
-      Intercambio.objects.create(
-        codigo_email = element.decode(),
-        receptor = compania,
-        remisor = remisor_name,
-        email_remisor = remisor_email,
-        fecha_de_recepcion = self.get_received_time(str(email.header.make_header(email.header.decode_header(email_message['Received'])))),
-        cantidad_dte = attachment_count,
-        titulo = str(email.header.make_header(email.header.decode_header(email_message['Subject']))),
-        contenido = str(self.get_body(raw_multipart).decode('latin-1'))
-      ) 
+      obj, created = Intercambio.objects.update_or_create(
+        #codigo_email = element.decode(),
+        receptor=compania,
+        email_remisor=remisor_email,
+        fecha_de_recepcion=self.get_received_time(str(email.header.make_header(email.header.decode_header(email_message['Received'])))),
+        defaults={
+                "remisor" : remisor_name,
+                "cantidad_dte" : attachment_count,
+                "titulo" : str(email.header.make_header(email.header.decode_header(email_message['Subject']))),
+                "contenido" : str(self.get_body(raw_multipart).decode('latin-1'))}
+      )
+      mail.store(element, '+FLAGS', r'(\Deleted)')
+      if attachment_count > 0:
+        for attach in attachments:
+          filename = attach
 
+          download_folder = obj.receptor.rut
+
+          initial_route = os.path.join(settings.MEDIA_ROOT, 'intercambio_dte') 
+          if not os.path.isdir(initial_route):
+            os.mkdir(initial_route)
+          
+          relative_path =  os.path.join(initial_route, download_folder)
+
+          if not os.path.isdir(relative_path):
+            os.mkdir(relative_path)
+
+          att_path = os.path.join(filename)
+          fp = open(os.path.join(initial_route, relative_path, att_path), 'wb')
+          fp.write(attachments[attach])
+          fp.close()
+
+          fp = open(os.path.join(initial_route, relative_path, att_path), 'rb')          
+          attach_dte = DteIntercambio(id_intercambio=obj)
+          
+          attach_dte.dte_attachment.save(att_path, fp) 
+        
+          fp.close()
+          
     messages.success(self.request, "Cantidad de correos nuevos: {}".format(new_elements))
+
     return reverse_lazy('intercambios:lista', kwargs={'pk':pk})
 
   def search(self, key, value, con):
