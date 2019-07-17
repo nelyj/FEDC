@@ -31,3 +31,23 @@ function modal_user(id_user){
   $("#perfil").click(function(){
     perfil_modals();
   })
+
+
+function modal_inbox(id_intercambio){
+  console.log(ruta_mensaje)
+  $("#myModalLabel").text("Detalles del mensaje")
+  ruta_mensaje = ruta_mensaje.split("/", 3)
+  ruta_mensaje = ruta_mensaje.join("/") + "/" + id_intercambio
+  $.ajax({
+    url: ruta_mensaje,
+    type: "GET",
+    data: {
+    },
+    dataType: 'html',
+    success: function(data) {
+      $('#modal-body').html(data);
+    }
+  });
+  
+
+}

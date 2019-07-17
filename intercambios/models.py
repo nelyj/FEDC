@@ -18,7 +18,7 @@ class Intercambio(CreationModificationDateMixin):
     @version 1.0
     """
 
-    ##codigo_email = models.IntegerField(null=True, default=0)
+    ## codigo_email = models.IntegerField(null=True, default=0)
     receptor = models.ForeignKey(Compania, on_delete=models.CASCADE, blank=True, null=True)
     remisor = models.CharField(max_length=128,blank=True, null=True)
     email_remisor = models.EmailField(blank=True, null=True)

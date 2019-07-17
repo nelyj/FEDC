@@ -40,6 +40,8 @@ notaDebito/__pycache__
 *.planner
 *.tmp
 *.orig
+*.db
+*.pid
 sources/*
 mydatabase
 config/settings.py
