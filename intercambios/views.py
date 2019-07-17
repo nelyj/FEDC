@@ -1,15 +1,23 @@
 import imaplib, email, os, json
 
+import pytz
+
 from datetime import datetime
 from base64 import b64decode,b64encode
 
 from django.conf import settings
+from django.db.models import Q
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.views.generic import TemplateView, RedirectView, ListView, DetailView
+from django_datatables_view.base_datatable_view import BaseDatatableView
+
+from utils.views import (
+    LoginRequeridoPerAuth
+)
 from conectores.models import Compania
 from .models import Intercambio, DteIntercambio
 
@@ -48,7 +56,7 @@ class SeleccionarEmpresaIntercambioView(TemplateView):
     else:
         return HttpResponseRedirect('/')
 
-class IntercambiosListView(ListView):
+class IntercambiosListView(TemplateView):
   """
   Clase para el listado de intercambios
   @author Alberto Rincones (alberto at timg.cl)
@@ -56,7 +64,7 @@ class IntercambiosListView(ListView):
   @date 01-04-19 (dd-mm-YY)
   @version 1.0
   """
-  template_name = "intercambios.html"
+  template_name = "intercambio_list.html"
 
   def get_queryset(self):
     pk=self.kwargs.get('pk')
@@ -80,8 +88,9 @@ class IntercambiosDetailView(DetailView):
 
   template_name="intercambio_detail.html"
 
-  def get_object(self):
+  def get_context_data(self, *args, **kwargs): 
 
+    context = super().get_context_data(*args, **kwargs)
     compania_pk=self.kwargs.get('pk')
     intercambio_pk=self.kwargs.get('inter_pk')
     intercambio = get_object_or_404(
@@ -89,186 +98,97 @@ class IntercambiosDetailView(DetailView):
       receptor=compania_pk, 
       pk=intercambio_pk
     )
+    context['dte_intercambio'] = DteIntercambio.objects.select_related().filter(id_intercambio=intercambio)
+    return context
+
+  def get_object(self):
+    compania_pk=self.kwargs.get('pk')
+    intercambio_pk=self.kwargs.get('inter_pk')
+    intercambio = get_object_or_404(
+      Intercambio, 
+      receptor=compania_pk, 
+      pk=intercambio_pk
+    )
+    
     return intercambio
 
+from .tasks import updateInbox
 
 
-class RefrescarBandejaRedirectView(RedirectView):
-  """
-  Clase para refrescar la bandeja de entrada
-  @author Alberto Rincones (alberto at timg.cl)
-  @copyright TIMG
-  @date 05-04-19 (dd-mm-YY)
-  @version 1.0
-  """
-
-  def get_redirect_url(self, *args, **kwargs):
-
-    pk=self.kwargs.get('pk')
-    mail = imaplib.IMAP4_SSL('imap.gmail.com')
-    user = self.request.user
-    compania = Compania.objects.get(pk=pk)
-    
-    assert compania.correo_intercambio, "No hay correo"
-    assert compania.pass_correo_intercambio, "No hay password"
-    correo = compania.correo_intercambio.strip()
-    passw = compania.pass_correo_intercambio.strip()
-    
-    try:
-
-      mail.login(correo,passw)
-    except imaplib.IMAP4.error as e:
-      
-      messages.error(self.request, str(e))
-      return reverse_lazy('intercambios:lista', kwargs={'pk':pk})
-    mail.list()
-    mail.select("inbox")
-    result, data = mail.search(None, "ALL")
-    id_list = data[0].split()
-    try:
-      last_email = Intercambio.objects.filter(receptor=compania).count()#latest('codigo_email')
-      last_email = 0
-    except Intercambio.DoesNotExist:
-      last_email = 0
-
-    last_email_code = int(id_list[-1].decode())
-    if last_email == 0:
-
-      local_last_email_code = last_email
-    else:
-      pass
-      #local_last_email_code = int(last_email.codigo_email)
-    if last_email_code > local_last_email_code:
-
-      new_elements = last_email_code - local_last_email_code
-    else:
-      messages.info(self.request, "No posee nuevos correos")
-      return reverse_lazy('intercambios:lista', kwargs={'pk':pk})
-    if new_elements == 1:
-
-      latest_emails = [id_list[-1]]
-    else:
-
-      latest_emails = id_list[-new_elements:]
-
-    #: Trae los 5 primeros correos
-    latest_emails = latest_emails[0:5]
-    for element in latest_emails:
-
-      result, email_data = mail.fetch(element, "(RFC822)")
-      raw_email = email_data[0][1]
-      raw_multipart = email.message_from_bytes(raw_email)
-      try:
-        raw_email_string = raw_email.decode('utf-8')
-      except Exception as e:
-        raw_email_string = raw_email.decode('latin-1')
-      email_message = email.message_from_string(raw_email_string)
-      attachment_count, attachments = self.get_attachment(raw_multipart)
-      
-      remisor_name, remisor_email = self.get_remisor(str(email.header.make_header(email.header.decode_header(email_message['From']))))
-      obj, created = Intercambio.objects.update_or_create(
-        #codigo_email = element.decode(),
-        receptor=compania,
-        email_remisor=remisor_email,
-        fecha_de_recepcion=self.get_received_time(str(email.header.make_header(email.header.decode_header(email_message['Received'])))),
-        defaults={
-                "remisor" : remisor_name,
-                "cantidad_dte" : attachment_count,
-                "titulo" : str(email.header.make_header(email.header.decode_header(email_message['Subject']))),
-                "contenido" : str(self.get_body(raw_multipart).decode('latin-1'))}
-      )
-      mail.store(element, '+FLAGS', r'(\Deleted)')
-      if attachment_count > 0:
-        for attach in attachments:
-          filename = attach
-
-          download_folder = obj.receptor.rut
-
-          initial_route = os.path.join(settings.MEDIA_ROOT, 'intercambio_dte') 
-          if not os.path.isdir(initial_route):
-            os.mkdir(initial_route)
-          
-          relative_path =  os.path.join(initial_route, download_folder)
-
-          if not os.path.isdir(relative_path):
-            os.mkdir(relative_path)
-
-          att_path = os.path.join(filename)
-          fp = open(os.path.join(initial_route, relative_path, att_path), 'wb')
-          fp.write(attachments[attach])
-          fp.close()
-
-          fp = open(os.path.join(initial_route, relative_path, att_path), 'rb')          
-          attach_dte = DteIntercambio(id_intercambio=obj)
-          
-          attach_dte.dte_attachment.save(att_path, fp) 
-        
-          fp.close()
-          
-    messages.success(self.request, "Cantidad de correos nuevos: {}".format(new_elements))
-
-    return reverse_lazy('intercambios:lista', kwargs={'pk':pk})
-
-  def search(self, key, value, con):
-
-    result, data = con.search(None,key,'"{}"'.format(value))
-    return data
-
-  def get_emails(self,results_bytes, mail):
-
-    msgs = []
-    for num in results_bytes[0].split():
-
-      type, data = mail.fetch(num, "(RFC822)")
-      msgs.append(data)
-      print(email_from,email_to, subject)
-    return msgs
-
-  def get_body(self, msg):
-
-    if msg.is_multipart():
-      return self.get_body(msg.get_payload(0))
-    else:
-      return msg.get_payload(None, True)
-
-  def get_attachment(self, msg):
-
-    attachment_count = 0
-    attachment_dict = dict() 
-    for part in msg.walk():
-      if part.get_content_maintype() == 'multipart':
-        continue
-      if part.get('Content-Disposition') is None:
-        continue
-      attachment_count += 1
-      fileName = part.get_filename()
-      if fileName is not None:
-        decoded_filename = str(email.header.make_header(email.header.decode_header(fileName)))
-        attachment_dict[decoded_filename] = part.get_payload(decode=True)
-      else:
-        attachment_dict["dte"+str(attachment_count)] = part.get_payload(decode=True)
-    return (attachment_count,attachment_dict)
-
-  def get_received_time(self, received_string):
-
-    list_ = received_string.split('\r\n')
-    final_date = list_[0].split(';')[1].strip()
-    if(final_date==''):
-      final_date = list_[1].strip()
-    other_date = " ".join(final_date.split(" ")[:-2])
-    #string_date = "{} {} {}".format(final_date[2], final_date[1], final_date[3])
-    datef = datetime.strptime(other_date, '%a, %d %b %Y %H:%M:%S')
-    datef.replace(tzinfo=timezone.utc)
-
-    return datef
 
 
-  def get_remisor(self, remisor_string):
+class ListIboxAjaxView(LoginRequeridoPerAuth, BaseDatatableView):
 
-    remisor = remisor_string.split('<')
-    if len(remisor) > 1: 
-      remisor_mail = remisor[1].strip('<>')
-      remisor_name = remisor[0].strip()
-      return remisor_name, remisor_mail
-    else:
-      return "Desconocido", remisor[0]
+    """!
+    Prepara la data para mostrar en el datatable
+
+    @author Rodrigo A. Boet (rudmanmrrod at gmail.com)
+    @date 16-07-2019
+    @version 1.0.0
+    """
+    # The model we're going to show
+    model = Intercambio
+    # define the columns that will be returned
+    columns = ['pk', 'fecha_de_recepcion', 'remisor', 'titulo', 'cantidad_dte']
+    # define column names that will be used in sorting
+    # order is important and should be same as order of columns
+    # displayed by datatables. For non sortable columns use empty
+    # value like ''
+    order_columns = ['-fecha_de_recepcion', 'remisor', 'titulo', 'cantidad_dte']
+    # set max limit of records returned, this is used to protect our site if someone tries to attack our site
+    # and make it return huge amount of data
+    max_display_length = 500
+    group_required = [u"Super Admin", 'Admin']
+
+    def __init__(self):
+        super(ListIboxAjaxView, self).__init__()
+
+    def get_initial_queryset(self):
+        """!
+        Consulta el modelo Intercambio
+
+        @return: Objeto de la consulta
+        """
+        # return queryset used as base for futher sorting/filtering
+        # these are simply objects displayed in datatable
+        # You should not filter data returned here by any filter values entered by Intercambio. This is because
+        # we need some base queryset to count total number of records.
+        return self.model.objects.all().order_by('-fecha_de_recepcion')
+
+    def filter_queryset(self, qs):
+        # use parameters passed in GET request to filter queryset
+
+        search = self.request.GET.get(u'search[value]', None)
+        if search:
+            qs_params = None
+            q = Q(pk__istartswith=search)|Q(fecha_de_recepcion__icontains=search)|Q(remisor__icontains=search)|Q(titulo__icontains=search)|Q(cantidad_dte__istartswith=search)
+            qs_params = qs_params | q if qs_params else q
+            qs = qs.filter(qs_params)
+        return qs
+
+    def prepare_results(self, qs):
+        """!
+        Prepara la data para mostrar en el datatable
+        @return: Objeto json con los datos del intercambio
+        """
+        # prepare list with output column data
+        json_data = []
+        for item in qs:
+            try:
+              fecha = item.fecha_de_recepcion.strftime("%Y-%m-%d %H:%M:%S")
+            except:
+              fecha = "Error al obtener fecha"
+            detail = "<a data-toggle='modal' data-target='#myModal' \
+                    class='btn btn-block btn-info btn-xs fa fa-search' \
+                    onclick='modal_inbox({0})'></a>\
+                    ".format(str(item.pk))
+            json_data.append([
+                str(item.pk),
+                fecha,
+                item.remisor,
+                item.titulo,
+                item.cantidad_dte,
+                detail
+            ])
+            
+        return json_data

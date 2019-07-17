@@ -1,0 +1,50 @@
+{% extends "utils_start.html" %}
+{% block titulo %} Intercambios {% endblock titulo %}
+{% block extras_css %}
+{% load staticfiles %}
+    <link type="text/css" rel="stylesheet" href="{% static 'jquery-entropizer-master/dist/css/jquery-entropizer.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'DataTables/media/css/jquery.dataTables.min.css' %}">
+    <style type="text/css">
+        .modal-dialog {
+          width: 98%;
+          height: 92%;
+          padding: 0;
+        }
+
+        .modal-content {
+          height: 99%;
+        }
+    </style>
+{% endblock extras_css %}
+{% block extras_js %}
+    <script type="text/javascript">
+        // Objeto Json lista de intercambios
+        var URL = "{% url 'intercambios:lista_ajax' pk %}";
+        var ruta_mensaje = "{% url 'intercambios:detalle' pk 0 %}";
+    </script>
+    <script src="{% static 'DataTables/media/js/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'custom_datatable/listDataTable.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'start/modals.js' %}"></script>
+
+{% endblock extras_js %}
+{% block content_center %}
+
+    <a class="glyphicon glyphicon-list" id="menu-toggle"></a>
+    <div class="container">
+        <div class="row">
+            <a  href="{% url 'intercambios:actualizar' view.kwargs.pk %}" class="btn btn-info">Actualizar bandeja de intercambio</a>
+        </div>
+    </div>
+    <table id="datatable" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Recibido</th>
+                <th>Emisor</th>
+                <th>Asunto</th>
+                <th>cantidad de DTE</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+    </table>
+{% endblock content_center %}

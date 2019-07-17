@@ -98,6 +98,9 @@ Para instalar la apliacacion en modo desarrollo debera seguir los siguientes pas
     Esto permitira cargar los grupos de usuarios y permisos de los usuarios y el superusuario:
     (UserManager)$  python manage.py loaddata fixtures/initial_data_auth.json
 
+    Esto activa una tarea celery para actualizar el corrreo de intercambio cada hora; de las empresas registradas en la plataforma.
+    (UserManager)$  python manage.py loaddata fixtures/initial_data_beat_tasks.json
+
 
 
 7-) Correr la aplicacion UserManager
@@ -111,3 +114,84 @@ Ingresar a la plataforma con la siguientes credenciales:
 Username: admin
 
 password: 1234567890admin
+
+
+8-) Iniciar los servicios de celery:
+
+    Para iniciar la gestión de colas se debe ejecutar el rabbitmq-server. Si no está corriendo
+    se puede utilizar el siguiente comando como root:
+    # /etc/init.d/rabbitmq-server start
+    
+    Para iniciar la gestión de tareas en segundo plano o programadas a futuro se usa Celery.
+    En el caso de modo de desarrollo, en una nueva consola con el entorno virtual habilitado 
+    se debe ejecutar el siguiente comando:
+
+    Este comando habilitará la escucha de las tareas que se generen.
+    
+    (UserManager)$ celery -A config worker -l info
+
+    Este comando permite ejecutar las tareas periodicas configuradas en django.
+    
+    (UserManager)$ celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+
+
+    Para el caso de despliegue en producción leer la sección Configuración y automatización de Celery en producción que se encuentra más abajo en este documento.
+
+
+9-) Configuración y automatización de Celery en producción:
+
+    Desplegar en producción requiere habilitar el proceso worker de Celery
+    para que se ejecute en segundo plano (background). En este caso se va a utilizar Supervisord.
+
+    Para instalar supervisord se ejecuta el siguiente comando como root:
+    # aptitude install supervisor
+
+    Luego en el directorio `/etc/supervisor/conf.d/` crear un archivo de configuración 
+    para el sistema `factura_timg-celery.conf` con el siguiente contenido:
+
+    [program:factura_timg-celery]
+    command=/home/ubuntu/factura_timg/bin/celery -A config worker --beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    directory=/home/ubuntu/factura_timg/
+    user=ubuntu
+    numprocs=1
+    stdout_logfile=/home/ubuntu/factura_timg/celery.log
+    stderr_logfile=/home/ubuntu/factura_timg/celery.log
+    autostart=true
+    autorestart=true
+    starsecs=10
+
+    ; Need to wait for currently executing tasks to finish at shutdown.
+    ; Increase this if you have very long running tasks.
+    stopwaitsecs = 600
+
+    stopasgroup=true
+
+    ; Set Celery priority higher than default (999)
+    ; so, if rabbitmq is supervised, it will start first.
+    priority=1000
+
+    NOTA: la variable command especifica el comando celery que habilita tanto el worker como el beat
+    simultanemente. Las tareas de actualizacion de precio de criptomoneda se toman a partir de los
+    datos en la base de datos.
+
+
+    La documentación de cada variables se puede encontrar en el siguiente enlace:
+    http://supervisord.org/configuration.html#program-x-section-settings
+
+    Una vez guardado el archivo `/etc/supervisor/conf.d/factura_timg-celery.conf` se
+    carga la confiuración en el supervisord al ejecutar los siguientes comandos:
+
+    # supervisorctl reread
+    # supervisorctl update
+
+    Se puede chequear el estado con el siguente comando:
+    # supervisorctl status factura_timg-celery
+    factura_timg-celery                   RUNNING   pid 6329, uptime 11:01:49
+
+    En el archivo de configuración `/etc/supervisor/conf.d/factura_timg-celery.conf`
+    se establecieron rutas para mantener los logs de celery, específicamente:
+
+    stdout_logfile=/home/ubuntu/factura_timg/celery.log
+    stderr_logfile=/home/ubuntu/factura_timg/celery.log
+
+    Allí se puede revisarn los eventos reportados por celery.
