@@ -1,21 +1,3 @@
-A continuación los nuevos accesos al servidor de factura electrónica
-
-Droplet: svr17-timg-prd-fact
-URL: http://facturador.timgtools.ml
-IP: 157.230.5.48
-
-Accesso SSH
-Servidor: facturador.timgtools.ml
-Usuario: django
-Contraseña: dJ@ng0usrd3v
-
-Para acceder:
-
-     ssh django@facturador.timgtools.ml
-     sudo su - root
-
-
-
 # Accedemos como root estando en el servidor
 django@svr17-timg-prd-fact:~$ sudo su - root
 
