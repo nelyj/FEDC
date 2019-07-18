@@ -32,7 +32,7 @@
     <a class="glyphicon glyphicon-list" id="menu-toggle"></a>
     <div class="container">
         <div class="row">
-            <a  href="{% url 'intercambios:actualizar' view.kwargs.pk %}" class="btn btn-info">Actualizar bandeja de intercambio</a>
+            <a  onclick='updateTable()' class="btn btn-info">Actualizar bandeja de intercambio</a>
         </div>
     </div>
     <table id="datatable" class="display" style="width:100%">
@@ -48,3 +48,39 @@
         </thead>
     </table>
 {% endblock content_center %}
+{% block custom_js%}
+<script type="text/javascript">
+
+var table = $('#datatable').DataTable( {
+        "processing": true,
+        "serverSide": true,
+        "destroy": true,
+        "ajax": URL,
+        language: {
+            url: JSON_DATA
+        }
+    })
+setInterval( function () {
+    table.ajax.reload( null, true ); // user paging is not reset on reload
+}, 500000 );
+
+
+function updateTable(){
+    $.ajax({
+        url: "{% url 'intercambios:actualizar' view.kwargs.pk %}",
+        type: "GET",
+        data: {
+        },
+        dataType: 'html',
+        success: function(data) {
+
+          $(".alert-success").text("Se ejecuto el proceso de actualizacion de la bandeja de intercambio");
+          $(".alert-success").show();
+        }
+    }); 
+    setTimeout( function(){
+        table.ajax.reload( null, true );
+    },10000); 
+}    
+</script>
+{% endblock custom_js%}
