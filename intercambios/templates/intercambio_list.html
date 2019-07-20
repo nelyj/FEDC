@@ -4,15 +4,21 @@
 {% load staticfiles %}
     <link type="text/css" rel="stylesheet" href="{% static 'jquery-entropizer-master/dist/css/jquery-entropizer.min.css' %}" />
     <link rel="stylesheet" href="{% static 'DataTables/media/css/jquery.dataTables.min.css' %}">
+     <link href="{% static 'plugins/kartik/css/fileinput.min.css' %}" media="all" rel="stylesheet" type="text/css"/>
+     <link href="{% static 'plugins/kartik/themes/explorer-fas/theme.min.css' %}" media="all" rel="stylesheet" type="text/css"/>
     <style type="text/css">
         .modal-dialog {
           width: 98%;
-          height: 92%;
+          height: auto;
           padding: 0;
         }
 
         .modal-content {
-          height: 99%;
+          height: auto;
+        }
+        hr.atta {
+            border-top: 1.5px dotted #5bc0de;
+            border-radius: 3px;
         }
     </style>
 {% endblock extras_css %}
@@ -25,7 +31,11 @@
     <script src="{% static 'DataTables/media/js/jquery.dataTables.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'custom_datatable/listDataTable.js' %}" ></script>
     <script type="text/javascript" src="{% static 'start/modals.js' %}"></script>
-
+        <!-- sortable plugin for sorting/rearranging initial preview -->
+    <script src="{% static 'plugins/kartik/js/plugins/sortable.min.js' %}"></script>
+    <!-- purify plugin for safe rendering HTML content in preview -->
+    <script src="{% static 'plugins/kartik/js/plugins/purify.min.js' %}"></script>
+    <script src="{% static 'plugins/kartik/js/fileinput.min.js' %}"></script>
 {% endblock extras_js %}
 {% block content_center %}
 

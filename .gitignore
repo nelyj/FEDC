@@ -49,3 +49,4 @@ config/wsgi.py
 __pycache__/
 migrations/
 migrations/*
+results.sqlite

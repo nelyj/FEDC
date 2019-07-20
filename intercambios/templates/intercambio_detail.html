@@ -1,13 +1,71 @@
-
 <div class="tab-content">
-    <h1>{{object.titulo}}</h1>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h1 class="panel-title">{{object.titulo}}</h1>
+        </div>      
+        
+        <div class="panel-body">
+            <p><b>{{object.remisor}}</b><i> < {{object.email_remisor}} ></i></p>
+            <hr>
+            <p>
+                {{object.contenido|safe}}
+            </p>
 
-    <p><b>{{object.remisor}}</b><i> < {{object.email_remisor}} ></i></p>
-
-    <p>
-        {{object.contenido|safe}}
-    </p>
-    {% if dte_intercambio%}
-        {{dte_intercambio}}
-    {% endif %}
+            {% if dte_intercambio%}
+                <hr class="atta">
+                <div class="file-loading">
+                    <input id="input-pd" name="input-pd[]" type="file" multiple>
+                </div>
+                
+            {% endif %}
+        </div>
+    </div>
 </div>
+{% load staticfiles %}
+<script type="text/javascript">
+    var initialPrevie = []
+    var initialPreviewConf = [];
+    var formats_txt = ["txt", "csv", "xml", "html"]
+    var formats_office = ["docx", "doc", "xls", "ppt", "pptx"]
+    {% if dte_intercambio%}
+        {% for int in dte_intercambio %}
+            var site =  "{% if request.is_secure %}https://{% else %}http://{% endif %}{{request.get_host}}";
+            var ruta_atth = "{{int.dte_attachment}}";
+            console.log(ruta_atth)
+            var ext = ruta_atth.split(".").slice(-1);
+            
+            initialPrevie.push(site + "{{MEDIA_URL}}" + ruta_atth)
+            if (ext == "pdf"){
+                initialPreviewConf.push({type: "pdf", caption: ruta_atth.split("/").slice(-1), url: ruta_atth, showRemove: false,});
+            }
+            else if (formats_txt.includes(ext[0])){
+
+                initialPreviewConf.push({type: "text", caption: ruta_atth.split("/").slice(-1), url: ruta_atth, showRemove: false,});
+            }
+            
+            else if (formats_office.includes(ext[0])){
+                initialPreviewConf.push({type: "office", caption: ruta_atth.split("/").slice(-1), url: ruta_atth, showRemove: false,});
+            }
+            else{
+                initialPreviewConf.push({caption: ruta_atth.split("/").slice(-1), url: ruta_atth, showRemove: false,});   
+            }; 
+        {% endfor %}
+    {% endif %}
+    console.log(initialPreviewConf)
+    $("#input-pd").fileinput({
+        dropZoneEnabled: false,
+        uploadAsync: false,
+        minFileCount: 2,
+        maxFileCount: 5,
+        overwriteInitial: false,
+        initialPreview: initialPrevie,
+        initialPreviewDownloadUrl: site+"{{MEDIA_URL}}"+ruta_atth.split("/").slice(0,-1).join("/")+"/{filename}",
+        initialPreviewConfig: initialPreviewConf,
+        initialPreviewAsData: true,
+        initialPreviewFileType: 'image',
+        purifyHtml: true
+    })
+    .fileinput('clear')
+    .fileinput('disable');
+    $(".file-caption-main").hide();
+</script>
