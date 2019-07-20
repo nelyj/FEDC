@@ -1,20 +1,25 @@
-
 <div class="tab-content">
-    <h1>{{object.titulo}}</h1>
-
-    <p><b>{{object.remisor}}</b><i> < {{object.email_remisor}} ></i></p>
-
-    <p>
-        {{object.contenido|safe}}
-    </p>
-
-    {% if dte_intercambio%}
-        <hr class="atta">
-        <div class="file-loading">
-            <input id="input-pd" name="input-pd[]" type="file" multiple>
-        </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h1 class="panel-title">{{object.titulo}}</h1>
+        </div>      
         
-    {% endif %}
+        <div class="panel-body">
+            <p><b>{{object.remisor}}</b><i> < {{object.email_remisor}} ></i></p>
+            <hr>
+            <p>
+                {{object.contenido|safe}}
+            </p>
+
+            {% if dte_intercambio%}
+                <hr class="atta">
+                <div class="file-loading">
+                    <input id="input-pd" name="input-pd[]" type="file" multiple>
+                </div>
+                
+            {% endif %}
+        </div>
+    </div>
 </div>
 {% load staticfiles %}
 <script type="text/javascript">
