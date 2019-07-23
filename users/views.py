@@ -248,7 +248,6 @@ class LoginValidateView(FormView):
     """!
     class that validates authentication in two stages
 
-    @author Ing. Leonel P. Hernandez M. (leonelphm@gmail.com)
     @author Ing. Luis Barrios (nikeven at gmail.com)
     @date 12-04-2018
     @version 1.0.0
@@ -426,7 +425,6 @@ class LogOutView(RedirectView):
     """!
     Salir de la apliacion
 
-    @author Ing. Leonel P. Hernandez M. (leonelphm at gmail.com)
     @author Ing. Luis Barrios (nikeven at gmail.com)
     @copyright <a href='http://www.gnu.org/licenses/gpl-2.0.html'>GNU Public License versión 2 (GPLv2)</a>
     @date 09-01-2017
@@ -448,7 +446,6 @@ class ListUsersView(LoginRequeridoPerAuth, TemplateView):
     """!
     Listar usuarios de la apliacion
 
-    @author Ing. Leonel P. Hernandez M. (leonelphm at gmail.com)
     @author Ing. Luis Barrios (nikeven at gmail.com)
     @copyright <a href='http://www.gnu.org/licenses/gpl-2.0.html'>GNU Public License versión 2 (GPLv2)</a>
     @date 09-01-2017
@@ -498,7 +495,6 @@ class StartView(LoginRequiredMixin, TemplateView):
     """!
     Muestra el inicio de la plataforma
 
-    @author Ing. Leonel P. Hernandez M. (leonelphm at gmail.com)
     @author Ing. Luis Barrios (nikeven at gmail.com)
     @copyright <a href='http://www.gnu.org/licenses/gpl-2.0.html'>GNU Public License versión 2 (GPLv2)</a>
     @date 09-01-2017
@@ -533,7 +529,6 @@ class RegisterView(LoginRequeridoPerAuth, MultiModelFormView):
     """!
     Muestra el formulario de registro de usuarios
 
-    @author Ing. Leonel P. Hernandez M. (leonelphm at gmail.com)
     @author Ing. Luis Barrios (nikeven at gmail.com)
     @copyright <a href='http://www.gnu.org/licenses/gpl-2.0.html'>GNU Public License versión 2 (GPLv2)</a>
     @date 09-01-2017
@@ -590,7 +585,6 @@ class ModalsPerfil(LoginRequeridoPerAuth, MultiModelFormView):
     """!
     Construye el modals para la actualizacion del usuario
 
-    @author Ing. Leonel P. Hernandez M. (leonelphm at gmail.com)
     @author Ing. Luis Barrios (nikeven at gmail.com)
     @copyright <a href='http://www.gnu.org/licenses/gpl-2.0.html'>GNU Public License versión 2 (GPLv2)</a>
     @date 09-01-2017
@@ -664,7 +658,6 @@ class ResetPassConfirm(PasswordResetConfirmView):
     Class that inherits from the PasswordResetConfirmView which overwrites\
     the triggers and the form_view to make the respective saved in the log
 
-    @author Ing. Leonel P. Hernandez M. (leonelphm@gmail.com)
     @author Ing. Luis Barrios (nikeven at gmail.com)
     @date 24-04-2018
     @version 1.0.0
@@ -756,7 +749,6 @@ class ResetPassSuccess(PasswordResetCompleteView):
     Class that inherits from the PasswordResetCompleteView which overwrites\
     the initial parameter of the template_name
 
-    @author Ing. Leonel P. Hernandez M. (leonelphm@gmail.com)
     @author Ing. Luis Barrios (nikeven at gmail.com)
     @date 24-04-2018
     @version 1.0.0
@@ -769,7 +761,7 @@ class ResetPass(PasswordResetView):
     Class that inherits from the PasswordResetView which overwrites\
     the form to add the log of forgetfulness the password
 
-    @author Ing. Leonel P. Hernandez M. leonelphm@gmail.com
+    @author Ing. Luis Barrios (nikeven at gmail.com)
     @date 24-04-2018
     @version 1.0.0
     """
@@ -822,7 +814,6 @@ class ResetPassDone(PasswordResetDoneView):
     Class that inherits from the PasswordResetDoneView which overwrites\
     the initial parameter of the template_name
 
-    @author Ing. Leonel P. Hernandez M. (leonelphm@gmail.com)
     @author Ing. Luis Barrios (nikeven at gmail.com)
     @date 24-04-2018
     @version 1.0.0
