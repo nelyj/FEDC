@@ -6,6 +6,7 @@ bs4==0.0.1
 BTrees==4.5.1
 cairocffi==1.0.2
 CairoSVG==2.3.0
+celery==4.3.0
 certifi==2018.11.29
 cffi==1.12.0
 chardet==3.0.4

@@ -234,3 +234,9 @@ class SII_SDK():
         xml_response = ET.fromstring(response)
         estado = xml_response.find('{http://www.sii.cl/XMLSchema}RESP_HDR').find('ESTADO').text
         glosa = xml_response.find('{http://www.sii.cl/XMLSchema}RESP_HDR').find('GLOSA').text
+
+    def getCsv(self,token):
+        headers = {'User-Agent': 'Mozilla/4.0 (compatible; PROG 1.0; Windows NT 5.0; YComp 5.0.2.4)',
+        'Cookie':'TOKEN='+token, 'Accept-Encoding': 'gzip, deflate, sdch'}
+        response = requests.post('https://maullin.sii.cl/cvc_cgi/dte/ce_empresas_dwnld?NOMBRE_ARCHIVO=ce_empresas_dwnld_1.csv',headers=headers)
+        print(response.content)
