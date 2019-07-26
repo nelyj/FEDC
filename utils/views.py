@@ -9,7 +9,13 @@ Vista que construye los controladores para las utilidades de la plataforma
 """
 import json
 import random
+import base64
 
+from Crypto.Cipher import AES
+from Crypto.Hash import SHA256
+from Crypto import Random
+
+from django.conf import settings
 from django.core import signing
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
@@ -177,3 +183,37 @@ class IpClient():
         else:
             ip = request.META.get('REMOTE_ADDR')
         return ip
+
+
+class DecodeEncodeChain():
+    """
+
+    """
+    secret_key = settings.SECRET_KEY
+
+    def encrypt(self, source, encode=True):
+        if isinstance(self.secret_key, str):
+            self.secret_key = str.encode(self.secret_key)
+        if isinstance(source, str):
+            source = str.encode(source)
+        key = SHA256.new(self.secret_key).digest()  # use SHA-256 over our key to get a proper-sized AES key
+        IV = Random.new().read(AES.block_size)  # generate IV
+        encryptor = AES.new(key, AES.MODE_CBC, IV)
+        padding = AES.block_size - len(source) % AES.block_size  # calculate needed padding
+        source += bytes([padding]) * padding # Python 2.x: source += chr(padding) * padding
+        data = IV + encryptor.encrypt(source)  # store the IV at the beginning and encrypt
+        return base64.b64encode(data).decode("latin-1") if encode else data
+
+    def decrypt(self, source, decode=True):
+        if isinstance(self.secret_key, str):
+            self.secret_key = str.encode(self.secret_key)
+        if decode:
+            source = base64.b64decode(source.encode("latin-1"))
+        key = SHA256.new(self.secret_key).digest()  # use SHA-256 over our key to get a proper-sized AES key
+        IV = source[:AES.block_size]  # extract the IV from the beginning
+        decryptor = AES.new(key, AES.MODE_CBC, IV)
+        data = decryptor.decrypt(source[AES.block_size:])  # decrypt
+        padding = data[-1]  # pick the padding value from the end; Python 2.x: ord(data[-1])
+        if data[-padding:] != bytes([padding]) * padding:  # Python 2.x: chr(padding) * padding
+            raise ValueError("Invalid padding...")
+        return data[:-padding]  # remove the padding

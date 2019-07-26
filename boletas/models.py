@@ -25,8 +25,6 @@ from django.conf import settings
 import codecs, dicttoxml, json, os, requests
 
 
-
-
 class Boleta(CreationModificationDateMixin):
 	"""!
 	Modelo Boleta

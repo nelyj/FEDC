@@ -331,6 +331,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
             messages.error(self.request, "No ha seleccionado la compania")
             return super().form_valid(form)
         assert compania, "compania no existe"
+
         pass_certificado = compania.pass_certificado
         
         data['productos']=eval(data['productos'])
