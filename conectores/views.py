@@ -13,6 +13,7 @@ from .models import *
 from datetime import datetime
 
 from certificados.models import Certificado
+from utils.views import DecodeEncodeChain
 from .exceptions import ContrasenaDeCertificadoIncorrecta
 
 class ConectorViews(LoginRequiredMixin, FormView):
@@ -23,6 +24,7 @@ class ConectorViews(LoginRequiredMixin, FormView):
     success_url =reverse_lazy('conectores:registrar_conector')
     model = Conector
     hasher = PBKDF2PasswordHasher
+    decode_encode = DecodeEncodeChain()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -52,7 +54,7 @@ class ConectorViews(LoginRequiredMixin, FormView):
                 'url_erp': form['url_erp'].value(),
                 'url_sii': form['url_sii'].value(),
                 #'password': self.hasher().encode(password=form['password'].value(), salt='salt', iterations=50000),
-                'password': form['password'].value(),
+                'password': self.decode_encode.encrypt(form['password'].value()),
                 'time_cron': form['time_cron'].value(),
                 'certificado': form['certificado'].value(),
                 'empresa': Compania.objects.get(pk=form['empresa'].value())
@@ -60,9 +62,11 @@ class ConectorViews(LoginRequiredMixin, FormView):
             msg = "Se configuro el Conector con éxito"
             messages.info(self.request, msg)
         except Exception as e:
+           print(e)
            msg = "Ocurrio un problema al guardar la información"
            messages.error(self.request, msg)
         return super().form_valid(form)
+
     def form_invalid(self, form):
         """!
         Form Invalid Method
@@ -89,6 +93,7 @@ class CompaniaViews(LoginRequiredMixin, FormView):
     template_name = 'registrar_compania.html'
     success_url =reverse_lazy('conectores:registrar_compania')
     model = Compania
+    decode_encode = DecodeEncodeChain()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -120,7 +125,12 @@ class CompaniaViews(LoginRequiredMixin, FormView):
 
 
         try:
-            saved_instance = form.save()
+            saved_instance = form.save(commit=False)
+            saved_instance.pass_correo_sii = self.decode_encode.encrypt(saved_instance.pass_correo_sii)
+            saved_instance.pass_correo_intercambio = self.decode_encode.encrypt(saved_instance.pass_correo_intercambio)
+            saved_instance.pass_certificado = self.decode_encode.encrypt(saved_instance.pass_certificado)
+            saved_instance.save()
+            
             Certificado.objects.create(
                     empresa=saved_instance,
                     owner=self.request.user,
@@ -153,6 +163,7 @@ class CompaniaUpdate(LoginRequiredMixin, UpdateView):
     template_name = 'actualizar_compania.html'
     success_url =reverse_lazy('conectores:registrar_compania')
     model = Compania
+    decode_encode = DecodeEncodeChain()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -198,8 +209,12 @@ class CompaniaUpdate(LoginRequiredMixin, UpdateView):
                 return super().form_invalid(form)
 
         try:
-            update_compania = form.save()
-    
+            update_compania = form.save(commit=False)
+            update_compania.pass_correo_sii = self.decode_encode.encrypt(update_compania.pass_correo_sii)
+            update_compania.pass_correo_intercambio = self.decode_encode.encrypt(update_compania.pass_correo_intercambio)
+            update_compania.pass_certificado = self.decode_encode.encrypt(update_compania.pass_certificado)
+            update_compania.save()
+
             msg = "Se Actualizo la Compañia con éxito"
             messages.info(self.request, msg)
         except Exception as e:

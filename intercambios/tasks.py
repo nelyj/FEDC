@@ -24,7 +24,7 @@ from conectores.models import Compania
 from .models import (
     Intercambio, DteIntercambio
 )
-#from .views import RefrescarBandejaRedirectView
+from utils.views import DecodeEncodeChain
     
 logger = get_task_logger(__name__)
 
@@ -113,10 +113,12 @@ def sycnInbox(comp, mail, refresh):
     """
     last_email = 0
     local_last_email_code = last_email
+    decode_encode = DecodeEncodeChain()
     assert comp.correo_intercambio, "No hay correo"
     assert comp.pass_correo_intercambio, "No hay password"
     correo = comp.correo_intercambio.strip()
     passw = comp.pass_correo_intercambio.strip()
+    passw = decode_encode.decrypt(passw).decode("utf-8")
     try:
       mail.login(correo,passw)
     except imaplib.IMAP4.error as e:

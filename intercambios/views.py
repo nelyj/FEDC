@@ -9,6 +9,7 @@ from django.conf import settings
 from django.db.models import Q
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -22,7 +23,7 @@ from conectores.models import Compania
 from .models import Intercambio, DteIntercambio
 
 
-class SeleccionarEmpresaIntercambioView(TemplateView):
+class SeleccionarEmpresaIntercambioView(LoginRequiredMixin, TemplateView):
   """
   Clase para seleccionar la empresa en el intercambio
   @author Alberto Rincones (alberto at timg.cl)
@@ -56,7 +57,7 @@ class SeleccionarEmpresaIntercambioView(TemplateView):
     else:
         return HttpResponseRedirect('/')
 
-class IntercambiosListView(TemplateView):
+class IntercambiosListView(LoginRequiredMixin, TemplateView):
   """
   Clase para el listado de intercambios
   @author Alberto Rincones (alberto at timg.cl)
@@ -77,7 +78,7 @@ class IntercambiosListView(TemplateView):
 
 
 
-class IntercambiosDetailView(DetailView):
+class IntercambiosDetailView(LoginRequiredMixin, DetailView):
   """
   Clase para el detalle de intercambio
   @author Alberto Rincones (alberto at timg.cl)
@@ -122,7 +123,7 @@ class ListIboxAjaxView(LoginRequeridoPerAuth, BaseDatatableView):
     """!
     Prepara la data para mostrar en el datatable
 
-    @author Rodrigo A. Boet (rudmanmrrod at gmail.com)
+    @author Rodrigo A. Boet (rodrigo.b at timgla.com)
     @date 16-07-2019
     @version 1.0.0
     """

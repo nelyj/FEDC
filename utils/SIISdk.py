@@ -15,6 +15,8 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 from lxml import etree
 
+from .views import DecodeEncodeChain
+
 
 class SII_SDK():
     """
@@ -24,6 +26,8 @@ class SII_SDK():
     @date 27-02-19 (dd-mm-YY)
     @version 1.0
     """
+    decode_encode = DecodeEncodeChain()
+
     def _get_soap_body(self,soap_string):
         """!
         Método para obtener el cuerpo de una petición
@@ -75,6 +79,7 @@ class SII_SDK():
         @param compania recibe el objeto compañia
         @return xml con la fima 
         """
+        pass_certificado = self.decode_encode.decrypt(pass_certificado).decode("utf-8")
         signature = etree.parse(settings.BASE_DIR+'/facturas/templates/snippets/signature_sii.xml').getroot()
         signature = etree.tostring(signature)
         authentication = render_to_string('snippets/authentication.xml', {'seed':seed,'signature':signature.decode()})
@@ -87,6 +92,7 @@ class SII_SDK():
         @param compania recibe el string a firmar
         @return xml con la fima 
         """
+        pass_certificado = self.decode_encode.decrypt(pass_certificado).decode("utf-8")
         template = etree.fromstring(xml_string)
         signature_node = xmlsec.tree.find_node(template, xmlsec.constants.NodeSignature)
         ctx = xmlsec.SignatureContext()
@@ -110,6 +116,7 @@ class SII_SDK():
         @param compania recibe el string a firmar
         @return xml con la fima 
         """
+        pass_certificado = self.decode_encode.decrypt(pass_certificado).decode("utf-8")
         tree = etree.fromstring(xml_string)
         sig = tree.findall(".//{http://www.w3.org/2000/09/xmldsig#}Signature")
         s = sig[index]

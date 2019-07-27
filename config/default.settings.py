@@ -26,7 +26,7 @@ CELERY_TASK_SERIALIZER = 'json'
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'n02)^6vfqa)@mi!u519=buiec223iowu4)0b8u5y7lx9vl+hq@'
+SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -108,10 +108,10 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'user_manager',
-        'USER': 'postgres',
-        'PASSWORD': '123456',
-        'HOST': 'localhost',
+        'NAME': os.environ['DBNAME'],
+        'USER': os.environ['DBUSER'],
+        'PASSWORD': os.environ['DBPASSWORD'],
+        'HOST': os.environ['DBHOST'],
         'PORT': '5432',
         'ATOMIC_REQUESTS': True, # Crea transacciones en cada peticion de la vista
     }
