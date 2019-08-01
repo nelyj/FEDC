@@ -410,7 +410,9 @@ class EnvioMasivo(LoginRequiredMixin, View):
                 return JsonResponse(False, safe=False)
             documento_final_firmado = Boleta.firmar_etiqueta_set_dte(compania, folio, object_states)
             caratula_firmada = Boleta.generar_documento_final(compania,documento_final_firmado,pass_certificado)
+            print(caratula_firmada)
             send_sii = sendToSii(compania,caratula_firmada,pass_certificado)
+
             if(not send_sii['estado']):
                 messages.error(self.request, send_sii['msg'])
                 return JsonResponse(False, safe=False)

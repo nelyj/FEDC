@@ -87,7 +87,7 @@ Para instalar la apliacacion en modo desarrollo debera seguir los siguientes pas
     (UserManager)$ python manage.py makemigrations
     (UserManager)$ python manage.py migrate
 
-    5.1-) Migraciones individuales
+    6.1-) Migraciones individuales
 
         (UserManager)$ python manage.py makemigrations boletas
         (UserManager)$ python manage.py makemigrations certificados
