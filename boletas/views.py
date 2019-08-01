@@ -16,8 +16,11 @@ from conectores.models import *
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
 from utils.utils import sendToSii
+
 from .models import *
 from .forms import * 
+from .tasks import massshippingBoletas
+
 
 class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
     template_name = 'seleccionar_empresa_boleta.html'
@@ -385,6 +388,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
         messages.error(self.request, form.errors)
         return super().form_invalid(form)
 
+from django.core.serializers import serialize
 class EnvioMasivo(LoginRequiredMixin, View):
     """!
     Class that allows to send massive document of Boletas
@@ -399,7 +403,7 @@ class EnvioMasivo(LoginRequiredMixin, View):
         try:
             compania_id = self.request.GET.get('pk')
             object_states = Boleta.objects.filter(compania_id=compania_id).exclude(status='ENVIADA')
-            if(not object_states):
+            if(not object_states.exists()):
                 messages.warning(self.request, "No posee boletas para enviar")
                 return JsonResponse(False, safe=False)
             compania = Compania.objects.get(pk=compania_id)
@@ -408,20 +412,19 @@ class EnvioMasivo(LoginRequiredMixin, View):
             if folio is None:
                 messages.error(self.request, "No posee folios para asignacion de timbre")
                 return JsonResponse(False, safe=False)
-            documento_final_firmado = Boleta.firmar_etiqueta_set_dte(compania, folio, object_states)
-            caratula_firmada = Boleta.generar_documento_final(compania,documento_final_firmado,pass_certificado)
-            send_sii = sendToSii(compania,caratula_firmada,pass_certificado)
-            if(not send_sii['estado']):
+            
+            #documento_final_firmado = Boleta.firmar_etiqueta_set_dte(compania, folio, object_states)
+            #caratula_firmada = Boleta.generar_documento_final(compania,documento_final_firmado,pass_certificado)
+            
+            #send_sii = sendToSii(compania,caratula_firmada,pass_certificado)
+            if(not True):#send_sii['estado']):
                 messages.error(self.request, send_sii['msg'])
                 return JsonResponse(False, safe=False)
             else:
-                track_id = send_sii['track_id']
-                BoletaSended.objects.create(**{'track_id':track_id})
-                for boleta in object_states:
-                    boleta.status = 'ENVIADA'
-                    boleta.track_id = track_id
-                    boleta.save()
-                messages.success(self.request, "Boleta enviada exitosamente")
+                #send_sii_json = serialize('json', [send_sii])
+                object_states_json = serialize('json', object_states)
+                massshippingBoletas.apply_async((object_states_json, {'track_id':"algo_aca"}))
+                messages.success(self.request, "Se activo el proceso de envio masivo de boletas")
                 return JsonResponse(True, safe=False)
             
         except Exception as e:
