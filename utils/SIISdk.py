@@ -92,7 +92,6 @@ class SII_SDK():
         @param compania recibe el string a firmar
         @return xml con la fima 
         """
-        pass_certificado = self.decode_encode.decrypt(pass_certificado).decode("utf-8")
         template = etree.fromstring(xml_string)
         signature_node = xmlsec.tree.find_node(template, xmlsec.constants.NodeSignature)
         ctx = xmlsec.SignatureContext()

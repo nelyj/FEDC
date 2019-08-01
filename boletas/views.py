@@ -406,24 +406,14 @@ class EnvioMasivo(LoginRequiredMixin, View):
             if(not object_states.exists()):
                 messages.warning(self.request, "No posee boletas para enviar")
                 return JsonResponse(False, safe=False)
-            compania = Compania.objects.get(pk=compania_id)
-            pass_certificado = compania.pass_certificado
+            
             folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=39).order_by('fecha_de_autorizacion').first()
             if folio is None:
                 messages.error(self.request, "No posee folios para asignacion de timbre")
                 return JsonResponse(False, safe=False)
-            
-            #documento_final_firmado = Boleta.firmar_etiqueta_set_dte(compania, folio, object_states)
-            #caratula_firmada = Boleta.generar_documento_final(compania,documento_final_firmado,pass_certificado)
-            
-            #send_sii = sendToSii(compania,caratula_firmada,pass_certificado)
-            if(not True):#send_sii['estado']):
-                messages.error(self.request, send_sii['msg'])
-                return JsonResponse(False, safe=False)
+
             else:
-                #send_sii_json = serialize('json', [send_sii])
-                object_states_json = serialize('json', object_states)
-                massshippingBoletas.apply_async((object_states_json, {'track_id':"algo_aca"}))
+                massshippingBoletas.apply_async(args=[compania_id])
                 messages.success(self.request, "Se activo el proceso de envio masivo de boletas")
                 return JsonResponse(True, safe=False)
             

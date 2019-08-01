@@ -65,7 +65,18 @@ Para instalar la apliacacion en modo desarrollo debera seguir los siguientes pas
 
     (UserManager)$ pip install -r requerimientos.txt
 
-5-) Crear base de datos y Migrar los modelos:
+
+5-) Configurar variables de entorno
+
+    Se deben configurar variables de entorno para el proyecto, entre las cuales estan:
+
+        SECRET_KEY => Para la llave secreta de Django
+        DBNAME => Para el nombre de la base de datos
+        DBUSER => Para el usuario de la base de datos
+        DBPASSWORD => Para la contraseña de la base de datos
+        DBHOST => Para el host de la base de datos
+
+6-) Crear base de datos y Migrar los modelos:
 
     El manejador de base de datos que usa el proyecto es postgres, es necesario, crear la base de datos desde postgres de la siguiente manera si se usa la consola de postgres:
 
@@ -76,7 +87,7 @@ Para instalar la apliacacion en modo desarrollo debera seguir los siguientes pas
     (UserManager)$ python manage.py makemigrations
     (UserManager)$ python manage.py migrate
 
-    5.1-) Migraciones individuales
+    6.1-) Migraciones individuales
 
         (UserManager)$ python manage.py makemigrations boletas
         (UserManager)$ python manage.py makemigrations certificados
@@ -88,7 +99,7 @@ Para instalar la apliacacion en modo desarrollo debera seguir los siguientes pas
 
         (UserManager)$ python manage.py migrate
 
-6-) Cargar data inicial del proyecto 
+7-) Cargar data inicial del proyecto 
 
     Asegurese de que los modelos esten migrados en base de datos y ejecute los siguientes comando para cargar la data inicial del proyecto:
 
@@ -103,7 +114,7 @@ Para instalar la apliacacion en modo desarrollo debera seguir los siguientes pas
 
 
 
-7-) Correr la aplicacion UserManager
+8-) Correr la aplicacion UserManager
 
     Para correr la apliacion se debe  ejecutar el siguiente comando:
 
@@ -116,7 +127,7 @@ Username: admin
 password: 1234567890admin
 
 
-8-) Iniciar los servicios de celery:
+9-) Iniciar los servicios de celery:
 
     Para iniciar la gestión de colas se debe ejecutar el rabbitmq-server. Si no está corriendo
     se puede utilizar el siguiente comando como root:
@@ -138,7 +149,7 @@ password: 1234567890admin
     Para el caso de despliegue en producción leer la sección Configuración y automatización de Celery en producción que se encuentra más abajo en este documento.
 
 
-9-) Configuración y automatización de Celery en producción:
+10-) Configuración y automatización de Celery en producción:
 
     Desplegar en producción requiere habilitar el proceso worker de Celery
     para que se ejecute en segundo plano (background). En este caso se va a utilizar Supervisord.
