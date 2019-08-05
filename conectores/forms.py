@@ -66,6 +66,7 @@ class FormCompania(ModelForm):
             'pass_correo_sii',
             'correo_intercambio',
             'pass_correo_intercambio',
+            'imap_correo_intercambio',
             'certificado',
             'pass_certificado',
             'tasa_de_iva',
@@ -104,6 +105,8 @@ class FormCompania(ModelForm):
         self.fields['pass_correo_intercambio'].required = True
         self.fields['correo_intercambio'].widget.attrs.update({'class': 'form-control'})
         self.fields['correo_intercambio'].required = True
+        self.fields['imap_correo_intercambio'].widget.attrs.update({'class': 'form-control'})
+        self.fields['imap_correo_intercambio'].required = True
         self.fields['logo'].widget.attrs.update({'class': 'form-control'})
         self.fields['certificado'].widget.attrs.update({'class': 'form-control'})
         self.fields['pass_certificado'].widget = PasswordInput()
@@ -147,6 +150,7 @@ class CompaniaUpdateForm(ModelForm):
             'pass_correo_sii',
             'correo_intercambio',
             'pass_correo_intercambio',
+            'imap_correo_intercambio',
             'certificado',
             'pass_certificado',
             'tasa_de_iva',
@@ -185,6 +189,8 @@ class CompaniaUpdateForm(ModelForm):
         self.fields['pass_correo_intercambio'].required = False
         self.fields['correo_intercambio'].widget.attrs.update({'class': 'form-control'})
         self.fields['correo_intercambio'].required = True
+        self.fields['imap_correo_intercambio'].widget.attrs.update({'class': 'form-control'})
+        self.fields['imap_correo_intercambio'].required = True
         self.fields['pass_certificado'].widget = PasswordInput()
         self.fields['pass_certificado'].widget.attrs.update({'class': 'form-control'})
         self.fields['pass_certificado'].required = False
