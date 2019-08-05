@@ -228,7 +228,6 @@ def updateInbox(compania=None):
     @return True o False
     """
     refresh = RefrescarBandejaRedirectView()
-    mail = imaplib.IMAP4_SSL('imap.gmail.com')
 
     try:
         obj_compania = Compania.objects.get(pk=compania) if compania else Compania.objects.all()  
@@ -240,6 +239,8 @@ def updateInbox(compania=None):
     except Exception as e:
         num_compania = 0
 
+    mail = imaplib.IMAP4_SSL(obj_compania.imap_correo_intercambio)
+    
     if num_compania > 0:
         for comp in obj_compania:
             sycnInbox(comp, mail, refresh)
