@@ -1,0 +1,28 @@
+<ResumenPeriodo>
+  {% for periodo in total_periodo %}
+    <TotalesPeriodo>
+      <TpoDoc>{{ periodo.tipo_doc }}</TpoDoc>
+      <TotDoc>{{ periodo.total_doc }}</TotDoc>
+      <TotMntExe>{{ periodo.total_monto_excento }}</TotMntExe>
+      <TotMntNeto>{{ periodo.total_monto_neto }}</TotMntNeto>
+      <TotMntIVA>{{ periodo.total_monto_iva }}</TotMntIVA>
+      <TotIVAFueraPlazo>{{ periodo.total_iva_fuera_plazo }}</TotIVAFueraPlazo>
+      <TotMntTotal>{{ periodo.monto_total }}</TotMntTotal>
+    </TotalesPeriodo>
+  {% endfor %}
+  {% for detalle in detalles %}
+    <Detalle>
+      <TpoDoc>{{ detalle.tipo }}</TpoDoc>
+      <NroDoc>{{ detalle.nro }}</NroDoc>
+      <TasaImp>{{ detalle.impuesto }}</TasaImp>
+      <NumInt>{{ detalle.numero }}</NumInt>
+      <FchDoc>{{ detalle.fecha }}</FchDoc>
+      <RUTDoc>{{ detalle.rut }}</RUTDoc>
+      <RznSoc>{{ detalle.razon_social }}</RznSoc>
+      <MntExe>{{ detalle.monto_excento }}</MntExe>
+      <MntNeto>{{ detalle.monto_neto }}</MntNeto>
+      <MntIVA>{{ detalle.monto_iva }}</MntIVA>
+      <MntTotal>{{ detalle.monto_total }}</MntTotal>
+    </Detalle>
+  {% endfor %}
+</ResumenPeriodo>
