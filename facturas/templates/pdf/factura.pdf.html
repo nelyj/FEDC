@@ -213,7 +213,7 @@
                         </tr>
                         <tr class="border">
                             <td>
-                                <b>IVA (19%)</b>
+                                <b>IVA( {{ factura.compania.tasa_de_iva}} %)</b>
                             </td>
                             <td class="align-right">
                                 {{factura.iva|default_if_none:"0"|format_mil}}

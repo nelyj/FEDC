@@ -496,6 +496,7 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView,WeasyTemplateResponseMixi
         context['ruta']=ruta
         return context
 
+
 class VerEstadoFactura(LoginRequiredMixin, TemplateView):
     """!
     Clase para ver el estado de envio de una factura

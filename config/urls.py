@@ -49,6 +49,7 @@ urlpatterns = [
     path('', include('nota_debito.urls',namespace="notaDebito")),
     path('', include('reportes.urls',namespace="reportes")),
     path('', include('intercambios.urls',namespace="intercambios")),
+    path('', include('libro_compra_venta.urls',namespace="libro")),
     path('api/', include(router.urls)),
 ]
 
