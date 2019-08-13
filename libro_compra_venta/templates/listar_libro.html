@@ -6,6 +6,11 @@
     <link rel="stylesheet" href="{% static 'DataTables/media/css/jquery.dataTables.min.css' %}">
 {% endblock extras_css %}
 {% block extras_js %}
+    <script type="text/javascript">
+        var ruta_detail_libro = "{% url 'libro:detalle_libro' 0%}";
+    </script>
+    
+    <script type="text/javascript" src="{% static 'start/modals.js' %}"></script>
 {% endblock extras_js %}
 {% block content_center %}
     <div id="page-content-wrapper">

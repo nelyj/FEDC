@@ -3,6 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.template.loader import render_to_string
+from django.views.generic import  DetailView
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from django.db.models import Q
@@ -92,15 +93,20 @@ class CreateLibro(LoginRequiredMixin, FormView):
         if detail:
             xml = render_to_string('xml_lcv/resumen_periodo.xml', {'objects':objects, 'objects_details': objects})
         else:
-            xml = render_to_string('xml_lcv/resumen_periodo.xml', {'objects':objects})    
-        libro = self.model(
-            current_date=end_date,
-            details=form['details'].value(),
-            libro_xml=xml
-            )
-        libro.save()
-        messages.success(self.request, "Se registro el libro con éxito")
-        return HttpResponseRedirect(reverse_lazy('libro:listar_libro', kwargs={'pk':compania}))
+            xml = render_to_string('xml_lcv/resumen_periodo.xml', {'objects':objects})
+        try:
+            compania = Compania.objects.get(pk=compania)    
+            libro = self.model(
+                fk_compania=compania,
+                current_date=end_date,
+                details=form['details'].value(),
+                libro_xml=xml
+                )
+            libro.save()
+            messages.success(self.request, "Se registro el libro con éxito")
+        except Exception as e:
+            messages.error(self.request, e)
+        return HttpResponseRedirect(reverse_lazy('libro:listar_libro', kwargs={'pk':compania.pk}))
 
 
 class ListarLibrosViews(LoginRequiredMixin, TemplateView):
@@ -119,7 +125,7 @@ class AjaxListTable(LoginRequiredMixin, BaseDatatableView):
     """
     # The model we're going to show
     model = Libro
-    columns = ['current_date', 'details', 'libro_xml']
+    columns = ['current_date', 'details', 'libro_xml', 'enviada']
     # define column names that will be used in sorting
     # order is important and should be same as order of columns
     # displayed by datatables. For non sortable columns use empty
@@ -176,14 +182,30 @@ class AjaxListTable(LoginRequiredMixin, BaseDatatableView):
                     class='btn btn-block btn-info btn-xs fa fa-search' \
                     onclick='modal_detalle_libro({0})'></a>\
                     ".format(str(item.pk))
-
-            send = ""
+            if not item.enviada:
+                send = "<a  class='btn btn-block btn-success btn-xs fa fa-paper-plane' onclick='enviar_libro({0})'></a>\
+                    ".format(str(item.pk))
+            else:
+                send = ""
             json_data.append([
                 item.current_date.strftime("%Y-%m-%d"),
                 detail,
                 item.libro_xml,
-                ver,
-                send
+                ver + send,
+                
             ])
             
         return json_data
+
+
+class LibroDetailView(LoginRequiredMixin, DetailView):
+  """
+  Clase para el detalle de intercambio
+  @author Alberto Rincones (alberto at timg.cl)
+  @copyright TIMG
+  @date 01-04-19 (dd-mm-YY)
+  @version 1.0
+  """
+
+  template_name="libro_detail.html"
+  model = Libro
