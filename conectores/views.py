@@ -177,7 +177,6 @@ class CompaniaUpdate(LoginRequiredMixin, UpdateView):
         
         compania = get_object_or_404(self.model, pk=self.kwargs['pk'])
         
-
         if not str(form.cleaned_data['logo']) == str(compania.logo):
             files = self.request.FILES
             ruta_archivo = settings.MEDIA_ROOT+str(compania.logo)
@@ -210,9 +209,14 @@ class CompaniaUpdate(LoginRequiredMixin, UpdateView):
 
         try:
             update_compania = form.save(commit=False)
-            update_compania.pass_correo_sii = self.decode_encode.encrypt(update_compania.pass_correo_sii)
-            update_compania.pass_correo_intercambio = self.decode_encode.encrypt(update_compania.pass_correo_intercambio)
-            update_compania.pass_certificado = self.decode_encode.encrypt(update_compania.pass_certificado)
+            if update_compania.pass_correo_sii is not None or update_compania.pass_correo_intercambio is not None or update_compania.pass_certificado != '':
+                update_compania.pass_correo_sii = self.decode_encode.encrypt(update_compania.pass_correo_sii)
+                update_compania.pass_correo_intercambio = self.decode_encode.encrypt(update_compania.pass_correo_intercambio)
+                update_compania.pass_certificado = self.decode_encode.encrypt(update_compania.pass_certificado)
+            else:
+                update_compania.pass_certificado = compania.pass_correo_sii
+                update_compania.pass_correo_intercambio = compania.pass_correo_intercambio
+                update_compania.pass_certificado = compania.pass_certificado
             update_compania.save()
 
             msg = "Se Actualizo la Compañia con éxito"
