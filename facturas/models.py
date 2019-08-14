@@ -29,7 +29,7 @@ import codecs, dicttoxml, json, os, requests
 
 class Factura(CreationModificationDateMixin):
 	"""!
-	Modelo Producto
+	Modelo Factura
 	"""
 	status = models.CharField(max_length=128,blank=True, null=True)
 	compania = models.ForeignKey(Compania, on_delete=models.CASCADE, blank=True, null=True)
