@@ -9,3 +9,15 @@ $(document).ready(function() {
         autoclose: true,
     })
 })
+
+function enviar_libro(pk){
+   $.ajax({
+      url: '/libro/enviar/'+pk,
+      type: "POST",
+      data: {
+      },
+      success: function(data) {
+      	
+      }
+  });
+}
