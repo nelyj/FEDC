@@ -75,15 +75,15 @@ class CreateLibro(LoginRequiredMixin, FormView):
         nota_debito = self.model_nota_db.objects.filter(compania=compania, fecha__range=[start_date, end_date])
         
         for fact in factura:
-            fact.doc_type = 32
+            fact.doc_type = 33
             fact.total_doc = 1
             fact.numero_factura = fact.numero_factura.replace('º','')
         for fact in nota_debito:
-            fact.doc_type = 111
+            fact.doc_type = 56
             fact.total_doc = 1
             fact.numero_factura = fact.numero_factura.replace('º','')
         for fact in nota_credito:
-            fact.doc_type = 112
+            fact.doc_type = 61
             fact.total_doc = 1
             fact.numero_factura = fact.numero_factura.replace('º','')
         objects.append(factura)
