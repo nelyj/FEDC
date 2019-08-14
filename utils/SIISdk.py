@@ -56,7 +56,7 @@ class SII_SDK():
         headers = {'content-type': 'text/xml', 'SOAPAction':''}
         response = requests.post('https://'+self.sii_url+'.sii.cl/DTEWS/CrSeed.jws?WSDL',data=soap,headers=headers)
         body = self._get_soap_body(response.content)
-        response = body.find('{https://'+self.sii_url+'.sii.cl/DTEWS/CrSeed.jws}getSeedResponse').find('{https://maullin.sii.cl/DTEWS/CrSeed.jws}getSeedReturn').text
+        response = body.find('{https://'+self.sii_url+'.sii.cl/DTEWS/CrSeed.jws}getSeedResponse').find('{https://'+self.sii_url+'.sii.cl/DTEWS/CrSeed.jws}getSeedReturn').text
         xml_response = ET.fromstring(response)
         return xml_response.find('{http://www.sii.cl/XMLSchema}RESP_BODY').find('SEMILLA').text
 
@@ -72,7 +72,7 @@ class SII_SDK():
         headers = {'content-type': 'text/xml', 'SOAPAction':''}
         response = requests.post('https://'+self.sii_url+'.sii.cl/DTEWS/GetTokenFromSeed.jws?WSDL',data=soap,headers=headers)
         body = self._get_soap_body(response.content)
-        response = body.find('{https://'+self.sii_url+'.sii.cl/DTEWS/GetTokenFromSeed.jws}getTokenResponse').find('{https://maullin.sii.cl/DTEWS/GetTokenFromSeed.jws}getTokenReturn').text
+        response = body.find('{https://'+self.sii_url+'.sii.cl/DTEWS/GetTokenFromSeed.jws}getTokenResponse').find('{https://'+self.sii_url+'.sii.cl/DTEWS/GetTokenFromSeed.jws}getTokenReturn').text
         xml_response = ET.fromstring(response)
         estado = xml_response.find('{http://www.sii.cl/XMLSchema}RESP_HDR').find('ESTADO').text
         if(estado=='00'):
@@ -86,7 +86,6 @@ class SII_SDK():
         @param compania recibe el objeto compañia
         @return xml con la fima 
         """
-        pass_certificado = self.decode_encode.decrypt(pass_certificado).decode("utf-8")
         signature = etree.parse(settings.BASE_DIR+'/facturas/templates/snippets/signature_sii.xml').getroot()
         signature = etree.tostring(signature)
         authentication = render_to_string('snippets/authentication.xml', {'seed':seed,'signature':signature.decode()})
@@ -99,6 +98,7 @@ class SII_SDK():
         @param compania recibe el string a firmar
         @return xml con la fima 
         """
+        pass_certificado = self.decode_encode.decrypt(pass_certificado).decode("utf-8")
         template = etree.fromstring(xml_string)
         signature_node = xmlsec.tree.find_node(template, xmlsec.constants.NodeSignature)
         ctx = xmlsec.SignatureContext()
@@ -196,7 +196,7 @@ class SII_SDK():
         headers = {'content-type': 'text/xml', 'SOAPAction':''}
         response = requests.post('https://'+self.sii_url+'.sii.cl/DTEWS/QueryEstUp.jws?WSDL',data=soap,headers=headers)
         body = self._get_soap_body(response.content)
-        response = body.find('{http://'+self.sii_url+'.sii.cl/DTEWS/QueryEstUp.jws}getEstUpResponse').find('{http://maullin.sii.cl/DTEWS/QueryEstUp.jws}getEstUpReturn').text
+        response = body.find('{http://'+self.sii_url+'.sii.cl/DTEWS/QueryEstUp.jws}getEstUpResponse').find('{http://'+self.sii_url+'.sii.cl/DTEWS/QueryEstUp.jws}getEstUpReturn').text
         xml_response = ET.fromstring(response)
         estado = xml_response.find('{http://www.sii.cl/XMLSchema}RESP_HDR').find('ESTADO').text
         glosa = xml_response.find('{http://www.sii.cl/XMLSchema}RESP_HDR').find('GLOSA').text
@@ -236,7 +236,7 @@ class SII_SDK():
         headers = {'content-type': 'text/xml', 'SOAPAction':''}
         response = requests.post('https://'+self.sii_url+'.sii.cl/D TEWS/QueryEstDte.jws?WSDL',data=soap,headers=headers)
         body = self._get_soap_body(response.content)
-        response = body.find('{http://'+self.sii_url+'.sii.cl/DTEWS/QueryEstDte.jws}getEstDteResponse').find('{http://maullin.sii.cl/DTEWS/QueryEstDte.jws}getEstDteReturn').text
+        response = body.find('{http://'+self.sii_url+'.sii.cl/DTEWS/QueryEstDte.jws}getEstDteResponse').find('{http://'+self.sii_url+'.sii.cl/DTEWS/QueryEstDte.jws}getEstDteReturn').text
         xml_response = ET.fromstring(response)
         estado = xml_response.find('{http://www.sii.cl/XMLSchema}RESP_HDR').find('ESTADO').text
         glosa = xml_response.find('{http://www.sii.cl/XMLSchema}RESP_HDR').find('GLOSA').text

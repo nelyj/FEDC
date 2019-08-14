@@ -380,6 +380,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
             caratula_firmada = Factura.generar_documento_final(compania,documento_final_firmado,pass_certificado)
             form.dte_xml = caratula_firmada
         except Exception as e:
+            print(e)
             messages.error(self.request, "Ocurrió un error al firmar el documento")
             return super().form_valid(form)
 
