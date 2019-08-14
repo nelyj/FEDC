@@ -2,6 +2,7 @@ import datetime
 from base64 import b64decode,b64encode
 
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 
@@ -212,7 +213,7 @@ class Boleta(CreationModificationDateMixin):
 			})
 
 
-		sii_sdk = SII_SDK()
+		sii_sdk = SII_SDK(settings.SII_PRODUCTION)
 		set_dte_sin_aplanar = sii_sdk.generalSign(compania,documento_sin_aplanar,pass_certificado)
 
 
@@ -255,7 +256,7 @@ class Boleta(CreationModificationDateMixin):
 		)
 
 		# Se firmó el archivo xml
-		#sii_sdk = SII_SDK()
+		#sii_sdk = SII_SDK(settings.SII_PRODUCTION)
 		#set_dte_sin_aplanar = sii_sdk.generalSign(compania,set_dte_sin_aplanar,pass_certificado)
 
 		# Crea el digest eliminando espacios y tabulaciones
@@ -287,7 +288,7 @@ class Boleta(CreationModificationDateMixin):
 		documento_final = render_to_string('boleta.xml', {'set_DTE':etiqueta_SetDte})
 
 		# Se firmó el archivo xml
-		sii_sdk = SII_SDK()
+		sii_sdk = SII_SDK(settings.SII_PRODUCTION)
 		set_dte_sin_aplanar = sii_sdk.multipleSign(compania,documento_final,pass_certificado,1)
 		#set_dte_sin_aplanar = sii_sdk.generalSign(compania,set_dte_sin_aplanar,pass_certificado,1)
 

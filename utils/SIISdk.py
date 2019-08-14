@@ -28,6 +28,13 @@ class SII_SDK():
     """
     decode_encode = DecodeEncodeChain()
 
+    def __init__(self,production = False):
+        self.production = production
+        if self.production:
+            self.sii_url = 'maullin'
+        else:
+            self.sii_url = 'palena'
+
     def _get_soap_body(self,soap_string):
         """!
         Método para obtener el cuerpo de una petición
@@ -44,12 +51,12 @@ class SII_SDK():
         @return xml con la semilla
         """
         soap = '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">'
-        soap += '<SOAP-ENV:Body><m:getSeed xmlns:m="https://maullin.sii.cl/DTEWS/CrSeed.jws"/>' 
+        soap += '<SOAP-ENV:Body><m:getSeed xmlns:m="https://'+self.sii_url+'.sii.cl/DTEWS/CrSeed.jws"/>' 
         soap += '</SOAP-ENV:Body></SOAP-ENV:Envelope>'
         headers = {'content-type': 'text/xml', 'SOAPAction':''}
-        response = requests.post('https://maullin.sii.cl/DTEWS/CrSeed.jws?WSDL',data=soap,headers=headers)
+        response = requests.post('https://'+self.sii_url+'.sii.cl/DTEWS/CrSeed.jws?WSDL',data=soap,headers=headers)
         body = self._get_soap_body(response.content)
-        response = body.find('{https://maullin.sii.cl/DTEWS/CrSeed.jws}getSeedResponse').find('{https://maullin.sii.cl/DTEWS/CrSeed.jws}getSeedReturn').text
+        response = body.find('{https://'+self.sii_url+'.sii.cl/DTEWS/CrSeed.jws}getSeedResponse').find('{https://maullin.sii.cl/DTEWS/CrSeed.jws}getSeedReturn').text
         xml_response = ET.fromstring(response)
         return xml_response.find('{http://www.sii.cl/XMLSchema}RESP_BODY').find('SEMILLA').text
 
@@ -59,13 +66,13 @@ class SII_SDK():
         @return xml con la semilla
         """
         soap = '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">' 
-        soap += '<SOAP-ENV:Body><m:getToken xmlns:m="https://maullin.sii.cl/DTEWS/GetTokenFromSeed.jws">'
+        soap += '<SOAP-ENV:Body><m:getToken xmlns:m="https://'+self.sii_url+'.sii.cl/DTEWS/GetTokenFromSeed.jws">'
         soap += '<pszXml xsi:type="xsd:string"><![CDATA['+seed_sign+']]></pszXml>'
         soap += '</m:getToken></SOAP-ENV:Body></SOAP-ENV:Envelope>'
         headers = {'content-type': 'text/xml', 'SOAPAction':''}
-        response = requests.post('https://maullin.sii.cl/DTEWS/GetTokenFromSeed.jws?WSDL',data=soap,headers=headers)
+        response = requests.post('https://'+self.sii_url+'.sii.cl/DTEWS/GetTokenFromSeed.jws?WSDL',data=soap,headers=headers)
         body = self._get_soap_body(response.content)
-        response = body.find('{https://maullin.sii.cl/DTEWS/GetTokenFromSeed.jws}getTokenResponse').find('{https://maullin.sii.cl/DTEWS/GetTokenFromSeed.jws}getTokenReturn').text
+        response = body.find('{https://'+self.sii_url+'.sii.cl/DTEWS/GetTokenFromSeed.jws}getTokenResponse').find('{https://maullin.sii.cl/DTEWS/GetTokenFromSeed.jws}getTokenReturn').text
         xml_response = ET.fromstring(response)
         estado = xml_response.find('{http://www.sii.cl/XMLSchema}RESP_HDR').find('ESTADO').text
         if(estado=='00'):
@@ -159,7 +166,7 @@ class SII_SDK():
                 ('archivo', ('envioDTE.xml', invoice,'text/xml'))
             ])
         headers['Content-Type'] = datos.content_type
-        response = requests.post('https://maullin.sii.cl/cgi_dte/UPL/DTEUpload',data=datos,headers=headers)
+        response = requests.post('https://'+self.sii_url+'.sii.cl/cgi_dte/UPL/DTEUpload',data=datos,headers=headers)
         xml_response = ET.fromstring(response.content)
         print(response.content)
         estado = xml_response.find('STATUS').text
@@ -180,16 +187,16 @@ class SII_SDK():
         """
         rut, dv = rut_consultante.split('-')
         soap = '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">'
-        soap += '<SOAP-ENV:Body><m:getEstUp xmlns:m="http://maullin.sii.cl/DTEWS/QueryEstUp.jws">'
+        soap += '<SOAP-ENV:Body><m:getEstUp xmlns:m="http://'+self.sii_url+'.sii.cl/DTEWS/QueryEstUp.jws">'
         soap += '<Rut xsi:type="xsd:string">'+rut+'</Rut>'
         soap += '<Dv xsi:type="xsd:string">'+dv+'</Dv>'
         soap += '<TrackId xsi:type="xsd:string">'+track_id+'</TrackId>'
         soap += '<Token xsi:type="xsd:string">'+token+'</Token> '
         soap += '</m:getEstUp></SOAP-ENV:Body></SOAP-ENV:Envelope>'
         headers = {'content-type': 'text/xml', 'SOAPAction':''}
-        response = requests.post('https://maullin.sii.cl/DTEWS/QueryEstUp.jws?WSDL',data=soap,headers=headers)
+        response = requests.post('https://'+self.sii_url+'.sii.cl/DTEWS/QueryEstUp.jws?WSDL',data=soap,headers=headers)
         body = self._get_soap_body(response.content)
-        response = body.find('{http://maullin.sii.cl/DTEWS/QueryEstUp.jws}getEstUpResponse').find('{http://maullin.sii.cl/DTEWS/QueryEstUp.jws}getEstUpReturn').text
+        response = body.find('{http://'+self.sii_url+'.sii.cl/DTEWS/QueryEstUp.jws}getEstUpResponse').find('{http://maullin.sii.cl/DTEWS/QueryEstUp.jws}getEstUpReturn').text
         xml_response = ET.fromstring(response)
         estado = xml_response.find('{http://www.sii.cl/XMLSchema}RESP_HDR').find('ESTADO').text
         glosa = xml_response.find('{http://www.sii.cl/XMLSchema}RESP_HDR').find('GLOSA').text
@@ -213,7 +220,7 @@ class SII_SDK():
         RutCompania, DvCompania = rut_compania.split('-')
         RutReceptor, DvReceptor = rut_receptor.split('-')
         soap = '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">'
-        soap += '<SOAP-ENV:Body><m:getEstDte xmlns:m="http://maullin.sii.cl/DTEWS/QueryEstDte.jws">'
+        soap += '<SOAP-ENV:Body><m:getEstDte xmlns:m="http://'+self.sii_url+'.sii.cl/DTEWS/QueryEstDte.jws">'
         soap += '<RutConsultante xsi:type="xsd:string">'+RutConsultante+'</RutConsultante>'
         soap += '<DvConsultante xsi:type="xsd:string">'+DvConsultante+'</DvConsultante>'
         soap += '<RutCompania xsi:type="xsd:string">'+RutCompania+'</RutCompania>'
@@ -227,9 +234,9 @@ class SII_SDK():
         soap += '<Token xsi:type="xsd:string">'+Token+'</Token> '
         soap += '</m:getEstDte></SOAP-ENV:Body></SOAP-ENV:Envelope>'
         headers = {'content-type': 'text/xml', 'SOAPAction':''}
-        response = requests.post('https://maullin.sii.cl/D TEWS/QueryEstDte.jws?WSDL',data=soap,headers=headers)
+        response = requests.post('https://'+self.sii_url+'.sii.cl/D TEWS/QueryEstDte.jws?WSDL',data=soap,headers=headers)
         body = self._get_soap_body(response.content)
-        response = body.find('{http://maullin.sii.cl/DTEWS/QueryEstDte.jws}getEstDteResponse').find('{http://maullin.sii.cl/DTEWS/QueryEstDte.jws}getEstDteReturn').text
+        response = body.find('{http://'+self.sii_url+'.sii.cl/DTEWS/QueryEstDte.jws}getEstDteResponse').find('{http://maullin.sii.cl/DTEWS/QueryEstDte.jws}getEstDteReturn').text
         xml_response = ET.fromstring(response)
         estado = xml_response.find('{http://www.sii.cl/XMLSchema}RESP_HDR').find('ESTADO').text
         glosa = xml_response.find('{http://www.sii.cl/XMLSchema}RESP_HDR').find('GLOSA').text
@@ -237,5 +244,5 @@ class SII_SDK():
     def getCsv(self,token):
         headers = {'User-Agent': 'Mozilla/4.0 (compatible; PROG 1.0; Windows NT 5.0; YComp 5.0.2.4)',
         'Cookie':'TOKEN='+token, 'Accept-Encoding': 'gzip, deflate, sdch'}
-        response = requests.post('https://maullin.sii.cl/cvc_cgi/dte/ce_empresas_dwnld?NOMBRE_ARCHIVO=ce_empresas_dwnld_1.csv',headers=headers)
+        response = requests.post('https://'+self.sii_url+'.sii.cl/cvc_cgi/dte/ce_empresas_dwnld?NOMBRE_ARCHIVO=ce_empresas_dwnld_1.csv',headers=headers)
         print(response.content)

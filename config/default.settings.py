@@ -212,3 +212,6 @@ CORS_ORIGIN_ALLOW_ALL=True
 CORS_ORIGIN_WHITELIST = (
     'localhost:8080',
 )
+
+# Sii production variable
+SII_PRODUCTION = False
