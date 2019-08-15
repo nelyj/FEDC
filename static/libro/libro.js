@@ -17,7 +17,7 @@ function enviar_libro(pk){
       data: {
       },
       success: function(data) {
-      	
+      	location.reload(true);
       }
   });
 }

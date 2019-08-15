@@ -251,16 +251,19 @@ class LibroSendView(LoginRequiredMixin,View):
                 compania = libro.fk_compania
                 send_sii = sendToSii(compania,signed_xml,compania.pass_certificado)
                 if(not send_sii['estado']):
-                    print(send_sii['msg'])
-                    return JsonResponse({'success':False,'message':send_sii['msg']})
+                    messages.error(self.request, send_sii['msg'])
+                    return JsonResponse(False, safe=False)
                 else:
                     libro.enviada = True
                     libro.track_id = send_sii['track_id']
                     libro.save()
-                    return JsonResponse({'success':True,'message':'Libro envíado con éxito'})
+                    messages.success(self.request, "Libro envíado con éxito")
+                    return JsonResponse(True, safe=False)
             else:
-                return JsonResponse({'success':True,'message':'Éste libro ya fue enviado'})
+                messages.info(self.request, "Éste libro ya fue envíado")
+                return JsonResponse(True, safe=False)
         except Exception as e:
             print(e)
-            return JsonResponse({'success':False,'message':'Libro incorrecto'})
+            messages.error(self.request, "Libro incorrecto")
+            return JsonResponse(False, safe=False)
 
