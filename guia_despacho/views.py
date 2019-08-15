@@ -407,7 +407,7 @@ class SendInvoice(LoginRequiredMixin,FormView):
         @return dict con la respuesta
         """
         try:
-            sii_sdk = SII_SDK()
+            sii_sdk = SII_SDK(settings.SII_PRODUCTION)
             seed = sii_sdk.getSeed()
             try:
                 sign = sii_sdk.signXml(seed, compania, pass_certificado)
@@ -536,7 +536,7 @@ class VerEstadoGuia(LoginRequiredMixin, TemplateView):
         @return dict con la respuesta
         """
         try:
-            sii_sdk = SII_SDK()
+            sii_sdk = SII_SDK(settings.SII_PRODUCTION)
             seed = sii_sdk.getSeed()
             try:
                 sign = sii_sdk.signXml(seed, compania, compania.pass_certificado)

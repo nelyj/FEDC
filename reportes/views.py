@@ -1,5 +1,5 @@
 import datetime
-
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect
@@ -168,7 +168,7 @@ class ReportesCreateListView(LoginRequiredMixin, CreateView):
 		report_context['timestamp'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 		envio_libro = render_to_string('xml_templates/envioLibro_.xml', report_context)
 		# Agregada la firma
-		sii_sdk = SII_SDK()
+		sii_sdk = SII_SDK(settings.SII_PRODUCTION)
 		libro_firmado = sii_sdk.generalSign(compania,envio_libro,compania.pass_certificado)
 		instance.xml_reporte = '<?xml version="1.0" encoding="ISO-8859-1"?>\n'+libro_firmado
 		#instance.xml_reporte = '<?xml version="1.0" encoding="ISO-8859-1"?>\n'+envio_libro

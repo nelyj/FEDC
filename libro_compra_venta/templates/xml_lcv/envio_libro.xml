@@ -1,4 +1,4 @@
-<EnvioLibro ID="ID201204">
+<EnvioLibro ID="{{libro_pk}}">
   <Caratula>
     <RutEmisorLibro>{{compania.rut}}</RutEmisorLibro>
     <RutEnvia>{{compania.rut}}</RutEnvia>

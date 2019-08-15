@@ -1,9 +1,11 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
-from django.urls import reverse_lazy
+from django.http import HttpResponseRedirect, JsonResponse
 from django.template.loader import render_to_string
-from django.views.generic import  DetailView
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import  View, DetailView
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from django.db.models import Q
@@ -18,6 +20,7 @@ from nota_credito.models import notaCredito
 
 from nota_debito.models import notaDebito
 
+from utils.utils import sendToSii
 from utils.CustomMixin import SeleccionarEmpresaView
 
 from .forms import *
@@ -26,6 +29,11 @@ from .models import *
 
 class StartLibro(SeleccionarEmpresaView):
     """
+    Selecciona la empresa
+
+    @author Rodrigo A. Boet (rodrigo.b at timgla.com)
+    @date 12-08-2019
+    @version 1.0.0
     """
 
     def post(self, request):
@@ -44,6 +52,11 @@ class StartLibro(SeleccionarEmpresaView):
 
 class CreateLibro(LoginRequiredMixin, FormView):
     """
+    Registra un nuevo libro
+
+    @author Rodrigo A. Boet (rodrigo.b at timgla.com)
+    @date 12-08-2019
+    @version 1.0.0
     """
     form_class = FormLibro
     template_name = 'crear_libro.html'
@@ -111,6 +124,11 @@ class CreateLibro(LoginRequiredMixin, FormView):
 
 class ListarLibrosViews(LoginRequiredMixin, TemplateView):
     """
+    Lista los libros
+
+    @author Rodrigo A. Boet (rodrigo.b at timgla.com)
+    @date 12-08-2019
+    @version 1.0.0
     """
     template_name = 'listar_libro.html'
 
@@ -201,11 +219,30 @@ class AjaxListTable(LoginRequiredMixin, BaseDatatableView):
 class LibroDetailView(LoginRequiredMixin, DetailView):
   """
   Clase para el detalle de intercambio
-  @author Alberto Rincones (alberto at timg.cl)
+  @author Rodrigo A. Boet (rodrigo.b at timgla.com)
   @copyright TIMG
-  @date 01-04-19 (dd-mm-YY)
+  @date 12-08-2019
   @version 1.0
   """
 
   template_name="libro_detail.html"
   model = Libro
+
+@method_decorator(csrf_exempt, name='dispatch')
+class LibroSendView(LoginRequiredMixin,View):
+    def post(self,request,pk):
+        try:
+            libro = Libro.objects.get(pk=pk)
+            signed_xml = libro.sign_base('VENTA','MENSUAL','TOTAL')
+            compania = libro.fk_compania
+            send_sii = sendToSii(compania,signed_xml,compania.pass_certificado)
+            if(not send_sii['estado']):
+                print(send_sii['msg'])
+                return JsonResponse({'success':False,'message':send_sii['msg']})
+            else:
+                print(send_sii['track_id'])
+                return JsonResponse({'success':True,'message':'Libro envíado con éxito'})
+        except Exception as e:
+            print(e)
+            return JsonResponse({'success':False,'message':'Libro incorrecto'})
+
