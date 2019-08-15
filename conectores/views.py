@@ -209,14 +209,11 @@ class CompaniaUpdate(LoginRequiredMixin, UpdateView):
 
         try:
             update_compania = form.save(commit=False)
-            if update_compania.pass_correo_sii is not None or update_compania.pass_correo_intercambio is not None or update_compania.pass_certificado != '':
-                update_compania.pass_correo_sii = self.decode_encode.encrypt(update_compania.pass_correo_sii)
-                update_compania.pass_correo_intercambio = self.decode_encode.encrypt(update_compania.pass_correo_intercambio)
-                update_compania.pass_certificado = self.decode_encode.encrypt(update_compania.pass_certificado)
-            else:
-                update_compania.pass_certificado = compania.pass_correo_sii
-                update_compania.pass_correo_intercambio = compania.pass_correo_intercambio
-                update_compania.pass_certificado = compania.pass_certificado
+
+            update_compania.pass_correo_sii = self.decode_encode.encrypt(update_compania.pass_correo_sii)  if update_compania.pass_correo_sii is not None else compania.pass_correo_sii
+            update_compania.pass_correo_intercambio = self.decode_encode.encrypt(update_compania.pass_correo_intercambio) if update_compania.pass_correo_intercambio is not None else compania.pass_correo_intercambio     
+            update_compania.pass_certificado = self.decode_encode.encrypt(update_compania.pass_certificado) if update_compania.pass_certificado != '' else compania.pass_certificado
+            
             update_compania.save()
 
             msg = "Se Actualizo la Compañia con éxito"
