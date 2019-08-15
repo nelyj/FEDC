@@ -14,6 +14,7 @@ class Libro(models.Model):
     details = models.BooleanField(default=False)
     libro_xml = models.TextField()
     enviada = models.BooleanField(default=False)
+    track_id = models.CharField(max_length=32, blank=True, null=True)
     
     class Meta:
         ordering = ('-current_date',)

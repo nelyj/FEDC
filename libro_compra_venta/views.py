@@ -230,18 +230,36 @@ class LibroDetailView(LoginRequiredMixin, DetailView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class LibroSendView(LoginRequiredMixin,View):
+    """
+    Clase para enviar el libro
+    @author Rodrigo A. Boet (rodrigo.b at timgla.com)
+    @copyright TIMG
+    @date 14-08-2019
+    @version 1.0
+    """
     def post(self,request,pk):
+        """!
+        Método para enviar el libro
+        @param request Recibe el objeto de la petición
+        @param pk Recibe el pk del libro
+        @return: Objeto json con success y message
+        """
         try:
             libro = Libro.objects.get(pk=pk)
-            signed_xml = libro.sign_base('VENTA','MENSUAL','TOTAL')
-            compania = libro.fk_compania
-            send_sii = sendToSii(compania,signed_xml,compania.pass_certificado)
-            if(not send_sii['estado']):
-                print(send_sii['msg'])
-                return JsonResponse({'success':False,'message':send_sii['msg']})
+            if(not libro.enviada):
+                signed_xml = libro.sign_base('VENTA','MENSUAL','TOTAL')
+                compania = libro.fk_compania
+                send_sii = sendToSii(compania,signed_xml,compania.pass_certificado)
+                if(not send_sii['estado']):
+                    print(send_sii['msg'])
+                    return JsonResponse({'success':False,'message':send_sii['msg']})
+                else:
+                    libro.enviada = True
+                    libro.track_id = send_sii['track_id']
+                    libro.save()
+                    return JsonResponse({'success':True,'message':'Libro envíado con éxito'})
             else:
-                print(send_sii['track_id'])
-                return JsonResponse({'success':True,'message':'Libro envíado con éxito'})
+                return JsonResponse({'success':True,'message':'Éste libro ya fue enviado'})
         except Exception as e:
             print(e)
             return JsonResponse({'success':False,'message':'Libro incorrecto'})
