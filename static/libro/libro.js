@@ -7,6 +7,8 @@ $(document).ready(function() {
         endDate: "31/12/"+ today.getFullYear(),
         changeYear: false,
         autoclose: true,
+        viewMode: "months", 
+        minViewMode: "months"
     })
 })
 

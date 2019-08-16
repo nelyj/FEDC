@@ -1,3 +1,6 @@
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect, JsonResponse
@@ -36,16 +39,17 @@ class StartLibro(SeleccionarEmpresaView):
     @version 1.0.0
     """
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
 
         empresa = int(request.POST.get('empresa'))
-
+        print (self.kwargs['tipo'])
         if not empresa:
             return HttpResponseRedirect('/')
         empresa_obj = Compania.objects.get(pk=empresa)
-        if empresa_obj and self.request.user == empresa_obj.owner:
-
+        if empresa_obj and self.request.user == empresa_obj.owner and self.kwargs['tipo'] == 'crear':
             return HttpResponseRedirect(reverse_lazy('libro:crear_libro', kwargs={'pk':empresa}))
+        elif empresa_obj and self.request.user == empresa_obj.owner and self.kwargs['tipo'] == 'listar':
+            return HttpResponseRedirect(reverse_lazy('libro:listar_libro', kwargs={'pk':empresa}))
         else:
             return HttpResponseRedirect('/')
 
@@ -78,9 +82,14 @@ class CreateLibro(LoginRequiredMixin, FormView):
         compania = self.kwargs['pk']
         date = form['current_date'].value()
         date_arr = date.split('/')
+        
         start_date = date_arr[2]+"-"+date_arr[1]+"-"+'01'
-        date_arr.reverse()
-        end_date = "-".join(date_arr)
+        objeto_datetime = datetime.datetime.strptime(start_date, "%Y-%m-%d")
+        start_date = objeto_datetime - relativedelta(months=1)
+        end_date = objeto_datetime - timedelta(days=1)  # Resta a fecha actual 1 día
+        #print(objeto_datetime, start_date)
+        #date_arr.reverse()
+        #end_date = "-".join(date_arr)
 
         objects = []
         factura = self.model_factura.objects.filter(compania=compania, fecha__range=[start_date, end_date])
@@ -107,6 +116,10 @@ class CreateLibro(LoginRequiredMixin, FormView):
             xml = render_to_string('xml_lcv/resumen_periodo.xml', {'objects':objects, 'objects_details': objects})
         else:
             xml = render_to_string('xml_lcv/resumen_periodo.xml', {'objects':objects})
+        if not factura and not nota_debito and not nota_credito:
+            messages.warning(self.request, "No existen facturas, notas de credito o debito para esta fecha {0}/{1}".format(start_date, end_date))
+            return HttpResponseRedirect(reverse_lazy('libro:crear_libro', kwargs={'pk':compania}))
+
         try:
             compania = Compania.objects.get(pk=compania)    
             libro = self.model(
@@ -118,7 +131,9 @@ class CreateLibro(LoginRequiredMixin, FormView):
             libro.save()
             messages.success(self.request, "Se registro el libro con éxito")
         except Exception as e:
+            compania = Compania.objects.get(pk=compania)
             messages.error(self.request, e)
+
         return HttpResponseRedirect(reverse_lazy('libro:listar_libro', kwargs={'pk':compania.pk}))
 
 

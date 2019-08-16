@@ -99,8 +99,14 @@
                     <a href="{% url 'intercambios:empresa' %}">Intercambios</a>
                 </li>
                 <li>
-                    <a href="{% url 'libro:libro' %}">Libros</a>
+                    <a data-toggle="collapse" href="#libros-collapse" aria-expanded="false" aria-controls="boletas-collapse">Libros</a>
                 </li>
+                <div class="collapse" id="libros-collapse">
+                    <ul class="submenu" id="marketing_services">
+                        <li><a href="{% url 'libro:libro' tipo='crear' %}"> Crear Libros</a></li>
+                        <li><a href="{% url 'libro:libro' tipo='listar' %}">Listar Libros</a></li>
+                    </ul>
+                </div>
                 <li>
                     <a href="{% url 'users:logout' %}">Salir</a>
                 </li>
