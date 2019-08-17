@@ -7,7 +7,7 @@ class FormLibro(forms.ModelForm):
     """
     class Meta:
         model = Libro
-        exclude = ('libro_xml', 'fk_compania', 'enviada')
+        exclude = ('libro_xml', 'fk_compania', 'enviada','track_id')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
