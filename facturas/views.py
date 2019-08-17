@@ -380,6 +380,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
             caratula_firmada = Factura.generar_documento_final(compania,documento_final_firmado,pass_certificado)
             form.dte_xml = caratula_firmada
         except Exception as e:
+            print(e)
             messages.error(self.request, "Ocurrió un error al firmar el documento")
             return super().form_valid(form)
 
@@ -496,6 +497,7 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView,WeasyTemplateResponseMixi
         context['ruta']=ruta
         return context
 
+
 class VerEstadoFactura(LoginRequiredMixin, TemplateView):
     """!
     Clase para ver el estado de envio de una factura
@@ -539,7 +541,7 @@ class VerEstadoFactura(LoginRequiredMixin, TemplateView):
         @return dict con la respuesta
         """
         try:
-            sii_sdk = SII_SDK()
+            sii_sdk = SII_SDK(settings.SII_PRODUCTION)
             seed = sii_sdk.getSeed()
             try:
                 sign = sii_sdk.signXml(seed, compania, compania.pass_certificado)

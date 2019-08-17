@@ -1,3 +1,4 @@
+from django.conf import settings
 from boletas.models import Boleta
 from facturas.models import Factura
 from guia_despacho.models import guiaDespacho
@@ -36,7 +37,7 @@ def sendToSii(compania,invoice, pass_certificado):
     @return dict con la respuesta
     """
     try:
-        sii_sdk = SII_SDK()
+        sii_sdk = SII_SDK(settings.SII_PRODUCTION)
         seed = sii_sdk.getSeed()
         try:
             sign = sii_sdk.signXml(seed, compania, pass_certificado)

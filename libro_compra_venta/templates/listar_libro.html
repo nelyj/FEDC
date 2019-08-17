@@ -1,0 +1,56 @@
+{% extends "utils_start.html" %}
+{% block titulo %} Listar Libro {% endblock titulo %}
+{% load staticfiles %}
+{% block extras_css %}
+    <link type="text/css" rel="stylesheet" href="{% static 'jquery-entropizer-master/dist/css/jquery-entropizer.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'DataTables/media/css/jquery.dataTables.min.css' %}">
+{% endblock extras_css %}
+{% block extras_js %}
+    <script type="text/javascript">
+        var ruta_detail_libro = "{% url 'libro:detalle_libro' 0%}";
+    </script>
+    
+    <script type="text/javascript" src="{% static 'start/modals.js' %}"></script>
+{% endblock extras_js %}
+{% block content_center %}
+    <div id="page-content-wrapper">
+        <div class="container-fluid">
+            <a class="glyphicon glyphicon-list" id="menu-toggle"></a>
+            <div class="col-xs-12">
+                <div class="content">
+                
+                  <!-- Inicio Tab panes -->
+                    <div class="tab-content">
+                        <div class="col-lg-3">
+                            <a href="{% url 'libro:crear_libro' pk %}" class="glyphicon glyphicon-plus btn btn-block btn-primary"> Crear Libros</a>
+                        </div><br><br>
+                        <div role="tabpanel" class="tab-pane active" id="libro_listar">
+                          <h3>Listar Libros</h3>
+                        </div>
+                        <table id="datatable" class="display" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Fecha de la creacion</th>
+                                    <th>Posee Detalles ?</th>
+                                    <th>Libro XML</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <!-- Fin Tab panel -->
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content_center %}
+{% block custom_js%}
+
+    <script type="text/javascript">
+    // Objeto Json lista de intercambios
+        var URL = "{% url 'libro:listar_libro_ajax' pk %}";
+    </script>
+    <script type="text/javascript" src="{% static 'libro/libro.js' %}"></script>
+    <script src="{% static 'DataTables/media/js/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'custom_datatable/listDataTable.js' %}" ></script>
+{% endblock custom_js%}

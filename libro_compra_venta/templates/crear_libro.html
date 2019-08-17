@@ -1,0 +1,39 @@
+{% extends "utils_start.html" %}
+{% block titulo %} Crear Libro {% endblock titulo %}
+{% load staticfiles %}
+{% block extras_css %}
+{% endblock extras_css %}
+{% block extras_js %}
+    <script type="text/javascript" src="{% static 'libro/libro.js' %}"></script>
+{% endblock extras_js %}
+{% block content_center %}
+<div id="page-content-wrapper">
+    <div class="container-fluid">
+        <a class="glyphicon glyphicon-list" id="menu-toggle"></a>
+        <div class="col-xs-12">
+            <div class="content">
+            
+              <!-- Inicio Tab panes -->
+                <div class="tab-content">
+                    <div class="col-lg-3">
+                        <a href="{% url 'libro:listar_libro' compania %}" class="glyphicon glyphicon-list btn btn-block btn-primary"> Listar Libros</a>
+                    </div><br><br>
+                    <div role="tabpanel" class="tab-pane active" id="libro">
+                      <h3>Crear Libro</h3>
+                      <form id="form_register" method="post">
+                          {% csrf_token %}
+                          <div class="col-xs-12" >
+                            {{form.as_p}}
+                          </div>
+                         <button id="submit" type="submit" class="btn btn-success btn-block btn-flat">Registrar</button>
+                    </div>
+                  
+                  </form>
+                  <br>
+                </div>
+                <!-- Fin Tab panel -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content_center %}

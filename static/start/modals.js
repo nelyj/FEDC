@@ -34,7 +34,6 @@ function modal_user(id_user){
 
 
 function modal_inbox(id_intercambio){
-  console.log(ruta_mensaje)
   $("#myModalLabel").text("Detalles del mensaje")
   ruta_mensaje = ruta_mensaje.split("/", 3)
   ruta_mensaje = ruta_mensaje.join("/") + "/" + id_intercambio
@@ -49,5 +48,20 @@ function modal_inbox(id_intercambio){
     }
   });
   
+}
 
+function modal_detalle_libro(id_libro){
+  $("#myModalLabel").text("Detalles del libro")
+  ruta_detail_libro = ruta_detail_libro.split("/", 3)
+  ruta_detail_libro = ruta_detail_libro.join("/") + "/" + id_libro
+  $.ajax({
+    url: ruta_detail_libro,
+    type: "GET",
+    data: {
+    },
+    dataType: 'html',
+    success: function(data) {
+      $('#modal-body').html(data);
+    }
+  });
 }

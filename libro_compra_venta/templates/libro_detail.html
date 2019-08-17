@@ -1,0 +1,15 @@
+<div class="tab-content">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h1 class="panel-title">Fecha de creacion: {{object.current_date}}</h1>
+        </div>      
+        
+        <div class="panel-body">
+            <p>Posee detalles: {% if object.details %} Si {% else %} No {% endif%}</p>
+            <hr>
+            <p>
+                {{object.libro_xml|escape}}
+            </p>
+        </div>
+    </div>
+</div>

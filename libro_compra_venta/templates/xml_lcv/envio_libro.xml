@@ -1,0 +1,16 @@
+<EnvioLibro ID="{{libro_pk}}">
+  <Caratula>
+    <RutEmisorLibro>{{compania.rut}}</RutEmisorLibro>
+    <RutEnvia>{{compania.rut}}</RutEnvia>
+    <PeriodoTributario>{{periodo_tributario}}</PeriodoTributario>
+    <FchResol>{{compania.fecha_resolucion|date:"Y-m-d"}}</FchResol>
+    <NroResol>{{compania.numero_resolucion}}</NroResol>
+    <TipoOperacion>{{tipo_operacion}}</TipoOperacion>
+    <TipoLibro>{{tipo_libro}}</TipoLibro>
+    <TipoEnvio>{{tipo_envio}}</TipoEnvio>
+    <FolioNotificacion>1</FolioNotificacion>
+  </Caratula>
+  {% autoescape off %}
+  {{ resumen_periodo }}{% endautoescape %}
+  <TmstFirma>{{ timestamp }}</TmstFirma>
+</EnvioLibro>
