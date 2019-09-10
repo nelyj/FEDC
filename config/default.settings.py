@@ -213,5 +213,7 @@ CORS_ORIGIN_WHITELIST = (
     'localhost:8080',
 )
 
+PASSWORD_RESET_TIMEOUT_DAYS = 1
+
 # Sii production variable
 SII_PRODUCTION = False
