@@ -22,7 +22,6 @@ from django.contrib.auth.views import (
     INTERNAL_RESET_SESSION_TOKEN,
     PasswordResetCompleteView
 )
-
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 from django.contrib.auth.models import (
     Group, Permission, User
@@ -35,6 +34,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
+from django.core.validators import validate_email
 from django.http import (
     JsonResponse, HttpResponseRedirect
 )
