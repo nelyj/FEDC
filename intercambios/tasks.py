@@ -57,7 +57,6 @@ class RefrescarBandejaRedirectView(RedirectView):
 
       type, data = mail.fetch(num, "(RFC822)")
       msgs.append(data)
-      print(email_from,email_to, subject)
     return msgs
 
   def get_body(self, msg):
@@ -163,7 +162,6 @@ def sycnInbox(comp, mail, refresh):
       
       remisor_name, remisor_email = refresh.get_remisor(str(email.header.make_header(email.header.decode_header(email_message['From']))))
       
-      print(str(email.header.make_header(email.header.decode_header(email_message['Received']))))
       try:
         date = refresh.get_received_time(str(email.header.make_header(email.header.decode_header(email_message['Received']))))
       except:
@@ -213,7 +211,8 @@ def sycnInbox(comp, mail, refresh):
           attach_dte.dte_attachment.save(att_path, fp) 
         
           fp.close()
-      mail.store(element, '+FLAGS', r'(\Deleted)')  
+      if comp.borrar_correo_intercambio:
+        mail.store(element, '+FLAGS', r'(\Deleted)')  
     logger.info("Cantidad de correos nuevos: {}".format(new_elements))
 
 

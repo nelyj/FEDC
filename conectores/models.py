@@ -48,6 +48,7 @@ class Compania(models.Model):
     correo_intercambio = models.EmailField(blank=True, null=True)
     pass_correo_intercambio = models.CharField(max_length=128, blank=True, null=True)
     imap_correo_intercambio = models.CharField(max_length=128, blank=True, null=True)
+    borrar_correo_intercambio = models.BooleanField(default=False)
     certificado = models.FileField('Certificado', upload_to=get_cert_upload_to,validators=[FileExtensionValidator(allowed_extensions=['pfx'])], blank=False, null=True)
     tasa_de_iva = models.IntegerField("Tasa IVA", blank=False, null=False, default=0)
     pass_certificado = models.CharField(max_length=128)
