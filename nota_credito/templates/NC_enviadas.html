@@ -1,5 +1,5 @@
 {% extends "utils_start.html" %}
-{% block titulo %}Registrar Conectores{% endblock titulo %}
+{% block titulo %}Notas de Crédito{% endblock titulo %}
 {% block extras_css %}
 {% load staticfiles %}
 <link type="text/css" rel="stylesheet" href="{% static 'jquery-entropizer-master/dist/css/jquery-entropizer.min.css' %}" />
@@ -13,10 +13,19 @@
 {% endblock extras_js %}
 {% block content_center %}
 <a class="glyphicon glyphicon-list" id="menu-toggle"></a>
+{% if sistema %}
+<div class="row" style="margin-bottom:10px">
+    <div class="col-md-offset-10">
+        <a href="{% url 'nota_credito:nota_sistema_crear' compania %}" class="btn btn-success">
+            Crear Nota de Crédito
+        </a>
+    </div>
+</div>
+{% endif %}
 <table id="myTable" class="display" style="width:100%">
     <thead>
         <tr>
-            <th>Factura</th>
+            <th>N°</th>
             <th>Compañía</th>
             <th>N° de folio</th>
             <th>Acciones</th>
@@ -29,9 +38,13 @@
             <td>{{factura.compania.razon_social}}</td>
             <td>{{ factura.n_folio }}</td>
             <td>
+                {% if sistema %}
+                    <a href="{% url 'nota_credito:ver_estado_nc' factura.compania.pk factura.numero_factura %}"  class="btn btn-success">Enviar al Sii</a>
+                {% else %}
                 <a href="{% url 'nota_credito:ver_estado_nc' factura.compania.pk factura.numero_factura %}"  class="btn btn-success">Ver Estado</a>
                 <a  id="edit_foo" href="{% url 'nota_credito:imprimir_nc' factura.compania.pk factura.numero_factura 'NOTA_CRE_ELEC' %}" target="_blank" class="btn btn-info">Imprimir</a>
                 <a  id="edit_foo" href="{% url 'facturas:imprimir_factura' factura.compania.pk factura.numero_factura 'NOTA_CRE_ELEC' %}?impre=cont" target="_blank" class="btn btn-warning">Impresion continua</a>
+                {% endif %}
             </td>
         </tr>
         {%endfor%}
@@ -50,4 +63,4 @@
           $('#myTable').DataTable();
       });
   </script>
-  {% endblock content_center %}
+{% endblock content_center %}

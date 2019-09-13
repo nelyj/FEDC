@@ -1,0 +1,12 @@
+{% extends "utils_start.html" %}
+{% load staticfiles %}
+{% block titulo %}Crear Notas de Crédito{% endblock titulo %}
+{% block content_center %}
+    <a href="{% url 'nota_credito:nota_sistema_listado' compania %}" class="btn btn-info">
+        Regresar
+    </a>
+    <h1 class="text-center">Nota de Crédito</h1>
+    <form>
+        {{ form.as_p }}
+    </form>
+{% endblock content_center %}

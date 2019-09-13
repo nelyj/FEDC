@@ -13,7 +13,7 @@ from django.shortcuts import (
     render, redirect
     )
 from django.views.generic.base import TemplateView, View
-from django.views.generic import ListView
+from django.views.generic import ListView, CreateView
 from django.template.loader import render_to_string
 from django_weasyprint import WeasyTemplateResponseMixin
 from conectores.models import *
@@ -43,15 +43,19 @@ class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
 
     def post(self, request):
         enviadas = self.request.GET.get('enviadas', None)
+        sistema = self.request.GET.get('sistema', None)
         empresa = int(request.POST.get('empresa'))
         if not empresa:
             return HttpResponseRedirect('/')
         empresa_obj = Compania.objects.get(pk=empresa)
         if empresa_obj and self.request.user == empresa_obj.owner:
-            if enviadas == "1":
-                return HttpResponseRedirect(reverse_lazy('notaCredito:lista-enviadas', kwargs={'pk':empresa}))
+            if sistema:
+                return HttpResponseRedirect(reverse_lazy('notaCredito:nota_sistema_listado', kwargs={'pk':empresa}))
             else:
-                return HttpResponseRedirect(reverse_lazy('notaCredito:lista_nota_credito', kwargs={'pk':empresa}))
+                if enviadas == "1":
+                    return HttpResponseRedirect(reverse_lazy('notaCredito:lista-enviadas', kwargs={'pk':empresa}))
+                else:
+                    return HttpResponseRedirect(reverse_lazy('notaCredito:lista_nota_credito', kwargs={'pk':empresa}))
         else:
             return HttpResponseRedirect('/')
 
@@ -77,7 +81,6 @@ class ListaNotaCreditoViews(LoginRequiredMixin, TemplateView):
         session = requests.Session()
         compania = self.kwargs.get('pk')
         context['id_empresa'] = compania
-
         try:
             usuario = Conector.objects.filter(t_documento='33',empresa=compania).first()
         except Exception as e:
@@ -429,7 +432,7 @@ class NotaCreditoEnviadasView(LoginRequiredMixin, ListView):
     def get_queryset(self):
 
         compania = self.kwargs.get('pk')
-        return notaCredito.objects.filter(compania=compania).order_by('-created')
+        return notaCredito.objects.filter(compania=compania).exclude(track_id='').order_by('-created')
 
 class ImprimirNC(LoginRequiredMixin, TemplateView,WeasyTemplateResponseMixin):
     """!
@@ -547,3 +550,50 @@ class VerEstadoNC(LoginRequiredMixin, TemplateView):
         except Exception as e:
             print(e)
             return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
+
+class NotaCreditoSistemaView(LoginRequiredMixin, ListView):
+    """!
+    Clase para ver el listado de notas del sistema
+
+    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @date 13-09-2019
+    @version 1.0.0
+    """
+    template_name = 'NC_enviadas.html'
+
+    def get_context_data(self, *args, **kwargs): 
+        """
+        Método para colocar contexto en la vista
+        """
+        context = super().get_context_data(*args, **kwargs)
+        context['sistema'] = True
+        context['compania'] = self.kwargs.get('pk')
+        return context
+
+    def get_queryset(self):
+        """
+        Método para establecer la consulta
+        """
+        compania = self.kwargs.get('pk')
+        return notaCredito.objects.filter(compania=compania,track_id='').order_by('-created')
+
+
+class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
+    """!
+    Clase para generar una nota de crédito por el sistema
+
+    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @date 13-09-2019
+    @version 1.0.0
+    """
+    template_name = "nc_crear.html"
+    model = notaCredito
+    form_class = FormCreateNotaCredito
+
+    def get_context_data(self, *args, **kwargs): 
+        """
+        Método para colocar contexto en la vista
+        """
+        context = super().get_context_data(*args, **kwargs)
+        context['compania'] = self.kwargs.get('pk')
+        return context
