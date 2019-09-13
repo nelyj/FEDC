@@ -38,7 +38,7 @@
             </li>
             {% endif %}
             <li>
-                <a data-toggle="collapse" href="#facturas-collapse" aria-expanded="false" aria-controls="facturas-collapse">Facturas</a>
+                <a data-toggle="collapse" href="#facturas-collapse" aria-expanded="false" aria-controls="facturas-collapse">Facturas<span class="caret "></a>
             </li>
             <div class="collapse" id="facturas-collapse">
                 <ul class="submenu" id="marketing_services">
@@ -47,16 +47,21 @@
                 </ul>
             </div>
             <li>
-                <a data-toggle="collapse" href="#notasCredito-collapse" aria-expanded="false" aria-controls="notasCredito-collapse">Notas de Credito</a>
+                <a data-toggle="collapse" href="#notasCredito-collapse" aria-expanded="false" aria-controls="notasCredito-collapse">Notas de Credito<span class="caret "></a>
             </li>
             <div class="collapse" id="notasCredito-collapse">
                 <ul class="submenu" id="marketing_services">
+                    <li><a href="{% url 'notaCredito:seleccionar-empresa' %}?sistema=1">
+                        Crear NC
+                    </a></li>
                     <li><a href="{% url 'notaCredito:seleccionar-empresa' %}">NC no enviadas</a></li>
-                    <li><a href="{% url 'notaCredito:seleccionar-empresa' %}?enviadas=1">NC enviadas</a></li>
+                    <li><a href="{% url 'notaCredito:seleccionar-empresa' %}?enviadas=1"
+                        >NC enviadas
+                    </a></li>
                 </ul>
             </div>
             <li>
-                <a data-toggle="collapse" href="#notasDebito-collapse" aria-expanded="false" aria-controls="notasDebito-collapse">Notas de Debito</a>
+                <a data-toggle="collapse" href="#notasDebito-collapse" aria-expanded="false" aria-controls="notasDebito-collapse">Notas de Debito<span class="caret "></a>
             </li>
             <div class="collapse" id="notasDebito-collapse">
                 <ul class="submenu" id="marketing_services">
@@ -65,7 +70,7 @@
                 </ul>
             </div>
             <li>
-                <a data-toggle="collapse" href="#boletas-collapse" aria-expanded="false" aria-controls="boletas-collapse">Boletas</a>
+                <a data-toggle="collapse" href="#boletas-collapse" aria-expanded="false" aria-controls="boletas-collapse">Boletas<span class="caret "></a>
             </li>
             <div class="collapse" id="boletas-collapse">
                 <ul class="submenu" id="marketing_services">
@@ -74,7 +79,7 @@
                 </ul>
             </div>
             <li>
-                <a data-toggle="collapse" href="#guias-collapse" aria-expanded="false" aria-controls="guias-collapse">Guia de Despacho</a>
+                <a data-toggle="collapse" href="#guias-collapse" aria-expanded="false" aria-controls="guias-collapse">Guia de Despacho<span class="caret "></a>
             </li>
             <div class="collapse" id="guias-collapse">
                 <ul class="submenu" id="marketing_services">
@@ -99,7 +104,7 @@
                     <a href="{% url 'intercambios:empresa' %}">Intercambios</a>
                 </li>
                 <li>
-                    <a data-toggle="collapse" href="#libros-collapse" aria-expanded="false" aria-controls="boletas-collapse">Libros</a>
+                    <a data-toggle="collapse" href="#libros-collapse" aria-expanded="false" aria-controls="boletas-collapse">Libros<span class="caret "></a>
                 </li>
                 <div class="collapse" id="libros-collapse">
                     <ul class="submenu" id="marketing_services">

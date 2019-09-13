@@ -12,6 +12,8 @@ urlpatterns = [
     path('enviar-nota-credito/<int:pk>/<str:slug>/', SendInvoice.as_view(),name='send-invoice'),
     path('imprimir-nc/<int:pk>/<str:slug>/<str:doc>/', ImprimirNC.as_view(),name="imprimir_nc"),
     path('estado-nc/<int:pk>/<str:slug>/',VerEstadoNC.as_view(),name="ver_estado_nc"),
+    path('sistema-nc/<int:pk>', NotaCreditoSistemaView.as_view(),name="nota_sistema_listado"),
+    path('crear-nc/<int:pk>', NotaCreditoCreateView.as_view(),name="nota_sistema_crear"),
 ]
 
 
