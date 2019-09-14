@@ -1,12 +1,97 @@
 {% extends "utils_start.html" %}
-{% load staticfiles %}
 {% block titulo %}Crear Notas de Crédito{% endblock titulo %}
+{% load staticfiles %}
+{% block extras_css %}
+<link rel="stylesheet" href="{% static 'DataTables/media/css/jquery.dataTables.min.css' %}">
+{% endblock extras_css %}
+{% block extras_js %}
+<script src="{% static 'DataTables/media/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'dte/nota_credito.js' %}"></script>
+{% endblock extras_js %}
 {% block content_center %}
     <a href="{% url 'nota_credito:nota_sistema_listado' compania %}" class="btn btn-info">
         Regresar
     </a>
     <h1 class="text-center">Nota de Crédito</h1>
-    <form>
-        {{ form.as_p }}
+    <form method="post">
+        <div class="row">
+            <div class="col-md-6">
+                <label>{{ form.numero_factura.label }} </label> <i class="fa fa-star" aria-hidden="true"></i>
+                {{ form.numero_factura }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.senores.label }}</label> <i class="fa fa-star" aria-hidden="true"></i>
+                {{ form.senores }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.giro.label }}</label> <i class="fa fa-star" aria-hidden="true"></i>
+                {{ form.giro }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.rut.label }}</label> <i class="fa fa-star" aria-hidden="true"></i>
+                {{ form.rut }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.fecha.label }}</label> <i class="fa fa-star" aria-hidden="true"></i>
+                {{ form.fecha }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.ciudad_receptora.label }}</label> <i class="fa fa-star" aria-hidden="true"></i>
+                {{ form.ciudad_receptora }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.comuna.label }}</label> <i class="fa fa-star" aria-hidden="true"></i>
+                {{ form.comuna }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.region.label }}</label> <i class="fa fa-star" aria-hidden="true"></i>
+                {{ form.region }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.transporte.label }}</label>
+                {{ form.transporte }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.despachar.label }}</label>
+                {{ form.despachar }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.guia.label }}</label>
+                {{ form.guia }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.orden_compra.label }}</label>
+                {{ form.orden_compra }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.nota_venta.label }}</label>
+                {{ form.nota_venta }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.observaciones.label }}</label>
+                {{ form.observaciones }}
+            </div>
+            <div class="col-md-12">
+                <h4>Productos <i class="fa fa-star" aria-hidden="true"></i></h4> 
+                <a class="btn btn-success" onclick="appendRow('#myTable')"> <i class="fa fa-plus" aria-hidden="true"></i> </a>
+                <table id="myTable" class="table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                            <th>Total</th>
+                            <th>Opciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-12 text-center">
+            <button type="submit" class="btn btn-success">Guardar</button>
+        </div>
     </form>
 {% endblock content_center %}

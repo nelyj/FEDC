@@ -4,9 +4,10 @@ from django import forms
 from django.conf import settings
 from django.forms import ModelForm
 from django.forms.fields import CharField
-from django.forms.widgets import PasswordInput
+from django.forms.widgets import PasswordInput, Textarea
 from .models import *
 from conectores.models import Compania
+
 
 
 class FormNotaCredito(ModelForm):
@@ -101,25 +102,27 @@ class FormCreateNotaCredito(ModelForm):
         model = notaCredito
         fields = ['numero_factura','senores','transporte','despachar','observaciones',
                     'giro','rut','fecha','guia','orden_compra','nota_venta',
-                    'productos','monto_palabra','ciudad_receptora','comuna', 'region']
+                    'productos','ciudad_receptora','comuna', 'region']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['numero_factura'].widget.attrs.update({'class': 'form-control'})
         self.fields['numero_factura'].required = True
+        self.fields['numero_factura'].label = "Número"
         self.fields['senores'].widget.attrs.update({'class': 'form-control'})
         self.fields['senores'].required = True
         self.fields['transporte'].widget.attrs.update({'class': 'form-control'})
         self.fields['transporte'].required = False
         self.fields['despachar'].widget.attrs.update({'class': 'form-control'})
         self.fields['despachar'].required = False
+        self.fields['observaciones'].widget = Textarea()
         self.fields['observaciones'].widget.attrs.update({'class': 'form-control'})
         self.fields['observaciones'].required = False
         self.fields['giro'].widget.attrs.update({'class': 'form-control'})
         self.fields['giro'].required = True
         self.fields['rut'].widget.attrs.update({'class': 'form-control'})
         self.fields['rut'].required = True
-        self.fields['fecha'].widget.attrs.update({'class': 'form-control'})
+        self.fields['fecha'].widget.attrs.update({'class': 'form-control datepicker', 'readonly':'readonly'})
         self.fields['fecha'].required = True
         self.fields['guia'].widget.attrs.update({'class': 'form-control'})
         self.fields['guia'].required = False
@@ -127,7 +130,7 @@ class FormCreateNotaCredito(ModelForm):
         self.fields['orden_compra'].required = False
         self.fields['nota_venta'].widget.attrs.update({'class': 'form-control'})
         self.fields['nota_venta'].required = False
-        self.fields['productos'].widget.attrs.update({'class': 'form-control'})
+        self.fields['productos'].widget.attrs.update({'class': 'form-control', 'style':'display:none'})
         self.fields['productos'].required = True
         self.fields['ciudad_receptora'].widget.attrs.update({'class': 'form-control'})
         self.fields['ciudad_receptora'].required = True
