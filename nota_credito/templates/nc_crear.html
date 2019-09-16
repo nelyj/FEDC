@@ -14,6 +14,7 @@
     </a>
     <h1 class="text-center">Nota de Crédito</h1>
     <form method="post">
+        {% csrf_token %}
         <div class="row">
             <div class="col-md-6">
                 <label>{{ form.numero_factura.label }} </label> <i class="fa fa-star" aria-hidden="true"></i>
@@ -46,6 +47,11 @@
             <div class="col-md-6">
                 <label>{{ form.region.label }}</label> <i class="fa fa-star" aria-hidden="true"></i>
                 {{ form.region }}
+            </div>
+            <div class="col-md-12">
+                <label>{{ form.forma_pago.label }}</label> 
+                <i class="fa fa-star" aria-hidden="true"></i>
+                {{ form.forma_pago }}
             </div>
             <div class="col-md-6">
                 <label>{{ form.transporte.label }}</label>
@@ -88,6 +94,20 @@
                     <tbody>
                     </tbody>
                 </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-offset-8">
+                <label>Neto</label>
+                <input class="form-control" type="text" disabled="true" >
+            </div>
+            <div class="col-md-offset-8">
+                <label>Impuesto</label>
+                <input class="form-control" type="text" disabled="true" value="{{impuesto}}">
+            </div>
+            <div class="col-md-offset-8">
+                <label>Total</label>
+                <input class="form-control" type="text" disabled="true" >
             </div>
         </div>
         <div class="col-md-12 text-center">

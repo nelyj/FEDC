@@ -5,8 +5,9 @@ from django.conf import settings
 from django.forms import ModelForm
 from django.forms.fields import CharField
 from django.forms.widgets import PasswordInput, Textarea
-from .models import *
 from conectores.models import Compania
+from utils.constantes import FORMA_DE_PAGO
+from .models import *
 
 
 
@@ -97,12 +98,23 @@ class FormNotaCredito(ModelForm):
         self.fields['track_id'].required = False
 
 class FormCreateNotaCredito(ModelForm):
+    """!
+    Formulario para gestionar las notas de credito
 
+    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @date 13-09-2019
+    @version 1.0.0
+    """
+    
     class Meta:
         model = notaCredito
         fields = ['numero_factura','senores','transporte','despachar','observaciones',
                     'giro','rut','fecha','guia','orden_compra','nota_venta',
                     'productos','ciudad_receptora','comuna', 'region']
+
+    forma_pago = forms.ChoiceField(
+        widget=forms.Select(attrs={'class':'form-control'}),
+        choices=FORMA_DE_PAGO)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -131,7 +143,7 @@ class FormCreateNotaCredito(ModelForm):
         self.fields['nota_venta'].widget.attrs.update({'class': 'form-control'})
         self.fields['nota_venta'].required = False
         self.fields['productos'].widget.attrs.update({'class': 'form-control', 'style':'display:none'})
-        self.fields['productos'].required = True
+        self.fields['productos'].required = False
         self.fields['ciudad_receptora'].widget.attrs.update({'class': 'form-control'})
         self.fields['ciudad_receptora'].required = True
         self.fields['comuna'].widget.attrs.update({'class': 'form-control'})
