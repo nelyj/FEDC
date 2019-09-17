@@ -612,6 +612,10 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
         Método si el formulario es válido
         """
         dict_post = dict(self.request.POST.lists())
+        if 'codigo' not in self.request.POST or 'nombre' not in self.request.POST\
+            or 'cantidad' not in self.request.POST or 'precio' not in self.request.POST:
+            messages.error(self.request, "Debe cargar al menos un producto")
+            return super().form_invalid(form)
         if(len(dict_post['codigo']) == 0 or len(dict_post['nombre']) == 0\
             or len(dict_post['cantidad']) == 0 or len(dict_post['precio']) == 0):
             messages.error(self.request, "Debe cargar al menos un producto")

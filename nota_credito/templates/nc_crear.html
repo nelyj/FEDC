@@ -79,7 +79,9 @@
             </div>
             <div class="col-md-12">
                 <h4>Productos <i class="fa fa-star" aria-hidden="true"></i></h4> 
-                <a class="btn btn-success" onclick="appendRow('#myTable')"> <i class="fa fa-plus" aria-hidden="true"></i> </a>
+                <a class="btn btn-success" onclick="appendRow('#myTable')"> 
+                    Agregar Producto <i class="fa fa-plus" aria-hidden="true"></i> 
+                </a>
                 <table id="myTable" class="table">
                     <thead>
                         <tr>
@@ -99,7 +101,7 @@
         <div class="row">
             <div class="col-md-offset-8">
                 <label>Neto</label>
-                <input class="form-control" type="text" disabled="true" >
+                <input class="form-control" type="text" disabled="true" id="out_neto">
             </div>
             <div class="col-md-offset-8">
                 <label>Impuesto</label>
@@ -107,11 +109,14 @@
             </div>
             <div class="col-md-offset-8">
                 <label>Total</label>
-                <input class="form-control" type="text" disabled="true" >
+                <input class="form-control" type="text" disabled="true" id="out_total">
             </div>
         </div>
         <div class="col-md-12 text-center">
             <button type="submit" class="btn btn-success">Guardar</button>
         </div>
     </form>
+<script type="text/javascript">
+    var impuesto = {{impuesto}}
+</script>
 {% endblock content_center %}

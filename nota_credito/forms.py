@@ -123,6 +123,7 @@ class FormCreateNotaCredito(ModelForm):
         self.fields['numero_factura'].label = "Número"
         self.fields['senores'].widget.attrs.update({'class': 'form-control'})
         self.fields['senores'].required = True
+        self.fields['senores'].label = "Cliente"
         self.fields['transporte'].widget.attrs.update({'class': 'form-control'})
         self.fields['transporte'].required = False
         self.fields['despachar'].widget.attrs.update({'class': 'form-control'})
@@ -150,3 +151,4 @@ class FormCreateNotaCredito(ModelForm):
         self.fields['comuna'].required = True
         self.fields['region'].widget.attrs.update({'class': 'form-control'})
         self.fields['region'].required = True
+        self.fields['region'].label = "Dirección"
