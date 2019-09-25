@@ -22,7 +22,7 @@
     </div>
 </div>
 {% endif %}
-<table id="myTable" class="display" style="width:100%">
+<table id="datatable" class="display" style="width:100%">
     <thead>
         <tr>
             <th>N°</th>
@@ -31,36 +31,14 @@
             <th>Acciones</th>
         </tr>
     </thead>
-    <tbody>
-        {%for factura in object_list%}
-        <tr>
-            <td> <a href="#">{{factura.numero_factura}}</a></td>
-            <td>{{factura.compania.razon_social}}</td>
-            <td>{{ factura.n_folio }}</td>
-            <td>
-                {% if sistema %}
-                    <a href="{% url 'nota_credito:ver_estado_nc' factura.compania.pk factura.numero_factura %}"  class="btn btn-success">Enviar al Sii</a>
-                {% else %}
-                <a href="{% url 'nota_credito:ver_estado_nc' factura.compania.pk factura.numero_factura %}"  class="btn btn-success">Ver Estado</a>
-                <a  id="edit_foo" href="{% url 'nota_credito:imprimir_nc' factura.compania.pk factura.numero_factura 'NOTA_CRE_ELEC' %}" target="_blank" class="btn btn-info">Imprimir</a>
-                <a  id="edit_foo" href="{% url 'facturas:imprimir_factura' factura.compania.pk factura.numero_factura 'NOTA_CRE_ELEC' %}?impre=cont" target="_blank" class="btn btn-warning">Impresion continua</a>
-                {% endif %}
-            </td>
-        </tr>
-        {%endfor%}
-    </tbody>
-    <tfoot>
-        <tr>
-            <th>Factura</th>
-            <th>Compañía</th>
-            <th>N° de folio</th>
-            <th>Acciones</th>
-        </tr>
-    </tfoot>
 </table>
-    <script type="text/javascript">
-        $(document).ready( function () {
-          $('#myTable').DataTable();
-      });
-  </script>
+    
 {% endblock content_center %}
+{% block custom_js%}
+<script type="text/javascript">
+// Objeto Json lista de nota de credito
+var URL = "{% url 'base:ajax_list_dte' compania 'NOTA_CRE_ELEC'%}?sistema={{sistema}}";
+</script>
+
+<script type="text/javascript" src="{% static 'custom_datatable/listDataTable.js' %}" ></script>
+{% endblock custom_js%}

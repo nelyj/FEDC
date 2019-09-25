@@ -15,7 +15,7 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 from lxml import etree
 
-from .views import DecodeEncodeChain
+from utils.views import DecodeEncodeChain
 
 
 class SII_SDK():

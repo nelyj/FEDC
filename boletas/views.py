@@ -15,10 +15,9 @@ from conectores.forms import FormCompania
 from conectores.models import *
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
-from utils.utils import sendToSii
 
 from .models import *
-from .forms import * 
+from .forms import *
 from .tasks import massshippingBoletas
 
 

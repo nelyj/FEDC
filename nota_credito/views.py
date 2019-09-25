@@ -1,5 +1,6 @@
 import OpenSSL.crypto
 import codecs, dicttoxml, json, os, requests
+from collections import OrderedDict
 from requests import Request, Session
 from django.conf import settings
 from django.contrib import messages
@@ -16,16 +17,23 @@ from django.views.generic.base import TemplateView, View
 from django.views.generic import ListView, CreateView
 from django.template.loader import render_to_string
 from django_weasyprint import WeasyTemplateResponseMixin
+
+from base.constants import NOMB_DOC, LIST_DOC
+
 from conectores.models import *
 from conectores.forms import FormCompania
 from conectores.models import *
+from conectores.models import Compania
+
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
+
 from utils.SIISdk import SII_SDK
 from utils.utils import validarModelPorDoc
+
 from .models import notaCredito
 from .forms import *
-from facturas.constants import NOMB_DOC, LIST_DOC
+
 
 class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
     template_name = 'seleccionar_empresa_NC.html'
@@ -425,14 +433,18 @@ class SendInvoice(LoginRequiredMixin, FormView):
             print(e)
             return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
 
-class NotaCreditoEnviadasView(LoginRequiredMixin, ListView):
+class NotaCreditoEnviadasView(LoginRequiredMixin, TemplateView):
     template_name = 'NC_enviadas.html'
 
 
-    def get_queryset(self):
+    def get_context_data(self, *args, **kwargs): 
+        """
+        Método para colocar contexto en la vista
+        """
+        context = super().get_context_data(*args, **kwargs)
+        context['compania'] = self.kwargs.get('pk')
+        return context
 
-        compania = self.kwargs.get('pk')
-        return notaCredito.objects.filter(compania=compania).exclude(track_id='').order_by('-created')
 
 class ImprimirNC(LoginRequiredMixin, TemplateView,WeasyTemplateResponseMixin):
     """!
@@ -450,7 +462,7 @@ class ImprimirNC(LoginRequiredMixin, TemplateView,WeasyTemplateResponseMixin):
         compania = self.kwargs['pk']
         tipo_doc = self.kwargs['doc']
         if tipo_doc in LIST_DOC:
-            self.model = validarModelPorDoc(tipo_doc) 
+            self.model = validarModelPorDoc(tipo_doc)
             try:
                 factura = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
                 return super().dispatch(request, *args, **kwargs)
@@ -551,7 +563,7 @@ class VerEstadoNC(LoginRequiredMixin, TemplateView):
             print(e)
             return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
 
-class NotaCreditoSistemaView(LoginRequiredMixin, ListView):
+class NotaCreditoSistemaView(LoginRequiredMixin, TemplateView):
     """!
     Clase para ver el listado de notas del sistema
 
@@ -569,14 +581,6 @@ class NotaCreditoSistemaView(LoginRequiredMixin, ListView):
         context['sistema'] = True
         context['compania'] = self.kwargs.get('pk')
         return context
-
-    def get_queryset(self):
-        """
-        Método para establecer la consulta
-        """
-        compania = self.kwargs.get('pk')
-        return notaCredito.objects.filter(compania=compania,track_id='').order_by('-created')
-
 
 class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
     """!
@@ -596,4 +600,178 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
         """
         context = super().get_context_data(*args, **kwargs)
         context['compania'] = self.kwargs.get('pk')
+        context['impuesto'] = Compania.objects.get(pk=self.kwargs.get('pk')).tasa_de_iva
+        if(self.request.method == 'POST'):
+            dict_post = dict(self.request.POST.lists())
+            productos = self.transform_product(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'])
+            context['productos'] = productos
         return context
+
+    def get_success_url(self):
+        """
+        Método para retornar la url de éxito
+        """
+        return reverse_lazy('nota_credito:nota_sistema_crear', kwargs={'pk': self.kwargs['pk']})
+
+    def form_valid(self, form, **kwargs):
+        """
+        Método si el formulario es válido
+        """
+
+        dict_post = dict(self.request.POST.lists())
+        datetime_object = datetime.datetime.now()
+        fecha = datetime.datetime.strptime(dict_post['fecha'][0], '%d/%m/%Y')
+        if 'codigo' not in self.request.POST or 'nombre' not in self.request.POST\
+            or 'cantidad' not in self.request.POST or 'precio' not in self.request.POST:
+            messages.error(self.request, "Debe cargar al menos un producto")
+            return super().form_invalid(form)
+        if(len(dict_post['codigo']) == 0 or len(dict_post['nombre']) == 0\
+            or len(dict_post['cantidad']) == 0 or len(dict_post['precio']) == 0):
+            messages.error(self.request, "Debe cargar al menos un producto")
+            return super().form_invalid(form)
+        if(len(dict_post['codigo']) != len(dict_post['nombre']) or\
+            len(dict_post['cantidad']) != len(dict_post['precio']) or\
+            len(dict_post['codigo']) != len(dict_post['cantidad']) or\
+            len(dict_post['cantidad']) != len(dict_post['nombre'])):
+            messages.error(self.request, "Faltan valores por llenar en la tabla")
+            return super().form_invalid(form)
+
+        if fecha > datetime_object:
+            messages.error(self.request, "La fecha no puede ser mayor a la fecha actual, por favor verifica nuevamente la fecha")
+
+        valid_r = self.validateProduct(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'])
+        if(not valid_r['valid']):
+            messages.error(self.request, valid_r['msg'])
+            return super().form_invalid(form)
+        productos = self.transform_product(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'])
+        compania = Compania.objects.get(pk=self.kwargs.get('pk'))
+        pass_certificado = compania.pass_certificado
+        diccionario_general = self.load_product(productos,compania)
+        self.object = form.save(commit=False)
+        diccionario_general['rut'] = self.object.rut
+        diccionario_general['numero_factura'] = self.object.numero_factura
+        diccionario_general['senores'] = self.object.senores
+        diccionario_general['giro'] = self.object.giro
+        diccionario_general['direccion'] = self.object.region
+        diccionario_general['comuna'] = self.object.comuna
+        diccionario_general['ciudad_receptora'] = self.object.ciudad_receptora
+        diccionario_general['forma_pago'] = form.cleaned_data['forma_pago']
+        # Se verifica el folio
+        try:
+            folio = Folio.objects.filter(empresa=self.kwargs.get('pk'),is_active=True,vencido=False,tipo_de_documento=33).order_by('fecha_de_autorizacion').first()
+            if not folio:
+                raise Folio.DoesNotExist
+        except Folio.DoesNotExist:  
+            messages.error(self.request, "No posee folios para asignacion de timbre")
+            return super().form_invalid(form)
+        try:
+            folio.verificar_vencimiento()
+        except ElCAFSenEncuentraVencido:
+            messages.error(self.request, "El CAF se encuentra vencido")
+            return super().form_invalid(form)
+        try:
+            self.object.recibir_folio(folio)
+        except (ElCafNoTieneMasTimbres, ValueError):
+            messages.error(self.request, "Ya ha consumido todos sus timbres")
+            return super().form_invalid(form)
+        self.object.productos = json.dumps(diccionario_general['productos'])
+        # Se generan los XML
+        response_dd = notaCredito._firmar_dd(diccionario_general, folio, self.object)
+        documento_firmado = notaCredito.firmar_documento(response_dd,diccionario_general,folio, compania, self.object, pass_certificado)
+        documento_final_firmado = notaCredito.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
+        caratula_firmada = notaCredito.generar_documento_final(compania,documento_final_firmado,pass_certificado)
+        self.object.dte_xml = caratula_firmada
+        self.object.neto = diccionario_general['neto']
+        self.object.total = diccionario_general['total']
+        self.object.iva = compania.tasa_de_iva
+        self.object.compania = compania
+        self.object.save()
+        # Se crea el arhivo del xml
+        try:
+            xml_dir = settings.MEDIA_ROOT +'notas_de_credito'+'/'+self.object.numero_factura
+            if(not os.path.isdir(xml_dir)):
+                os.makedirs(xml_dir)
+            f = open(xml_dir+'/'+self.object.numero_factura+'.xml','w')
+            f.write(caratula_firmada)
+            f.close()
+        except Exception as e:
+            messages.error(self.request, 'Ocurrio el siguiente Error: '+str(e))
+            return super().form_valid(form)
+        messages.success(self.request, "Se creó el documento con éxito")
+        return super().form_valid(form)
+
+    def form_invalid(self, form, **kwargs):
+        """
+        Método si el formulario es válido
+        """
+        return super().form_invalid(form)
+
+    def transform_product(self, code, name, qty, price):
+        """
+        Método para transformar los productos en listas de diccionarios
+        @param code Recibe la lista con los códigos
+        @param name Recibe la lista con los nombres
+        @param qty Recibe la lista con las cantidades
+        @param price Recibe la lista con los precios
+        @return retorna los productos como lista de diccionarios
+        """
+        products = []
+        for i in range(len(code)):
+            new_prod = {}
+            new_prod['nombre'] = name[i]
+            new_prod['codigo'] = code[i]
+            new_prod['cantidad'] = int(qty[i])
+            new_prod['precio'] = float(price[i])
+            products.append(new_prod)
+        return products
+
+    def load_product(self, prod_dict, compania):
+        """
+        Método para armar el json de producto
+        @param prod_dict Recibe el diccionarios de productos
+        @param compania Recibe el objecto de la compañia
+        @return retorna la data en un diccionario
+        """
+        total = 0
+        products = []
+        for producto in prod_dict:
+            new_prod = OrderedDict()
+            new_prod['item_name'] = producto['nombre']
+            new_prod['description'] = producto['nombre']
+            new_prod['item_code'] = producto['codigo']
+            new_prod['qty'] = producto['cantidad']
+            new_prod['base_net_rate'] = producto['precio']
+            new_prod['amount'] = new_prod['qty'] * new_prod['base_net_rate']
+            products.append(new_prod)
+            total += new_prod['amount']
+        neto = total - (total*(compania.tasa_de_iva/100))
+        data = OrderedDict()
+        data['productos'] = products
+        data['neto'] = neto
+        data['total'] = total
+        return data
+
+    def validateProduct(self, code, name, qty, price):
+        """
+        Método para validar el producto
+        @param code Recibe la lista con los códigos
+        @param name Recibe la lista con los nombres
+        @param qty Recibe la lista con las cantidades
+        @param price Recibe la lista con los precios
+        @return retorna los productos como lista de diccionarios
+        """
+        for i in range(len(code)):
+            for j in range(i+1,len(code)):
+                if(code[i]==code[j]):
+                    return {'valid':False,'msg':'No pueden existir códigos dúplicados'}
+        for q in qty:
+            try:
+                int(q)
+            except Exception as e:
+                return {'valid':False,'msg':'Las cantidades deben ser enteras'}
+        for p in price:
+            try:
+                float(p)
+            except Exception as e:
+                return {'valid':False,'msg':'El precio debe ser un número'}
+        return {'valid':True}

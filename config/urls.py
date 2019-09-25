@@ -38,6 +38,7 @@ urlpatterns = [
         ResetPassSuccess.as_view(),
         name='pass_done',
     ),
+    path('', include('base.urls',namespace="base")),
     path('', include('utils.urls', namespace="utils")),
     path('', include('users.urls', namespace="users")),
     path('', include('conectores.urls', namespace="conectores")),

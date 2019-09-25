@@ -16,21 +16,27 @@ from django.shortcuts import (
 from django.views.generic.base import TemplateView, View
 from django.views.generic import ListView
 from django.template.loader import render_to_string
-from django_weasyprint import WeasyTemplateResponseMixin
+
+from base.constants import NOMB_DOC, LIST_DOC
+
 from conectores.forms import FormCompania
 from conectores.models import *
+
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
+
 from utils.SIISdk import SII_SDK
-from utils.utils import validarModelPorDoc, sendToSii
+from utils.views import sendToSii
+from utils.utils import validarModelPorDoc
+
 from .forms import *
 from .models import Factura
-from .constants import NOMB_DOC, LIST_DOC
 
-class SeleccionarEmpresaView(LoginRequiredMixin,TemplateView):
+
+class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
     template_name = 'seleccionar_empresa.html'
 
-    def get_context_data(self, *args, **kwargs): 
+    def get_context_data(self, *args, **kwargs):
 
         context = super().get_context_data(*args, **kwargs)
         context['empresas'] = Compania.objects.filter(owner=self.request.user)
@@ -435,67 +441,6 @@ class FacturasEnviadasView(LoginRequiredMixin, ListView):
 
         compania = self.kwargs.get('pk')
         return Factura.objects.filter(compania=compania).order_by('-created')
-
-
-
-class ImprimirFactura(LoginRequiredMixin, TemplateView,WeasyTemplateResponseMixin):
-    """!
-    Class para imprimir la factura en PDF
-
-    @author Rodrigo Boet (rudmanmrrod at gmail.com)
-    @date 21-03-2019
-    @version 1.0.0
-    """
-    template_name = "pdf/factura.pdf.html"
-    model = Factura
-
-    def dispatch(self, request, *args, **kwargs):
-        num_factura = self.kwargs['slug']
-        compania = self.kwargs['pk']
-        tipo_doc = self.kwargs['doc']
-        impre_cont = request.GET.get('impre')
-        print(impre_cont)
-        if impre_cont == 'cont':
-            self.template_name = "pdf/impresion.continua.pdf.html"
-        if tipo_doc in LIST_DOC:
-            self.model = validarModelPorDoc(tipo_doc) 
-            try:
-                factura = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
-                return super().dispatch(request, *args, **kwargs)
-            except Exception as e:
-                factura = self.model.objects.select_related().filter(numero_factura=num_factura, compania=compania)
-                if len(factura) > 1:
-                    messages.error(self.request, 'Existe mas de un registro con el mismo numero de factura: {0}'.format(num_factura))
-                    return redirect(reverse_lazy('facturas:lista-enviadas', kwargs={'pk': compania}))
-                else:
-                    messages.error(self.request, "No se encuentra registrada esta factura: {0}".format(str(num_factura)))
-                    return redirect(reverse_lazy('facturas:lista-enviadas', kwargs={'pk': compania}))
-        else:
-            messages.error(self.request, "No existe este tipo de documento: {0}".format(str(tipo_doc)))
-            return redirect(reverse_lazy('facturas:lista-enviadas', kwargs={'pk': compania}))
-
-    def get_context_data(self, *args, **kwargs):
-        """!
-        Method to handle data on get
-
-        @date 21-03-2019
-        @return Returns dict with data
-        """
-        context = super().get_context_data(*args, **kwargs)
-        num_factura = self.kwargs['slug']
-        compania = self.kwargs['pk']
-        tipo_doc = self.kwargs['doc']
-        
-        context['factura'] = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
-        context['nombre_documento'] = NOMB_DOC[tipo_doc]
-        etiqueta=self.kwargs['slug'].replace('º','')
-        context['etiqueta'] = etiqueta
-        prod = context['factura'].productos.replace('\'{','{').replace('}\'','}').replace('\'',"\"")
-        productos = json.loads(prod)
-        context['productos'] = productos
-        ruta = settings.STATIC_URL +'facturas'+'/'+etiqueta+'/timbre.jpg'
-        context['ruta']=ruta
-        return context
 
 
 class VerEstadoFactura(LoginRequiredMixin, TemplateView):

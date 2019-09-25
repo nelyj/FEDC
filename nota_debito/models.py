@@ -113,7 +113,7 @@ class notaDebito(CreationModificationDateMixin):
 		try:
 			xml_dir = settings.MEDIA_ROOT +'notas_de_debito'+'/'+carpeta
 			if(not os.path.isdir(xml_dir)):
-				os.makedirs(settings.MEDIA_ROOT +'notas_de_credito'+'/'+carpeta)
+				os.makedirs(settings.MEDIA_ROOT +'notas_de_debito'+'/'+carpeta)
 			codes = encode(sin_aplanar,columns=10, security_level=5)
 			image = render_image(codes,scale=1, ratio=1)
 			image.save(xml_dir+'/timbre'+'.jpg')

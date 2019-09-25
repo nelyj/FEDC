@@ -16,21 +16,27 @@ from django.views.generic.base import TemplateView, View
 from django.views.generic import ListView
 from django.template.loader import render_to_string
 from django_weasyprint import WeasyTemplateResponseMixin
+
+from base.constants import NOMB_DOC, LIST_DOC
+
 from conectores.models import *
 from conectores.forms import FormCompania
 from conectores.models import *
+
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
+
 from utils.SIISdk import SII_SDK
 from utils.utils import validarModelPorDoc
+
 from .forms import *
 from .models import guiaDespacho
-from facturas.constants import NOMB_DOC, LIST_DOC
 
-class SeleccionarEmpresaView(LoginRequiredMixin,TemplateView):
+
+class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
     template_name = 'seleccionar_empresa_guias.html'
 
-    def get_context_data(self, *args, **kwargs): 
+    def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['empresas'] = Compania.objects.filter(owner=self.request.user)
         if Compania.objects.filter(owner=self.request.user).exists():

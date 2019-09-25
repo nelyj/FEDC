@@ -1,12 +1,130 @@
 {% extends "utils_start.html" %}
-{% load staticfiles %}
 {% block titulo %}Crear Notas de Crédito{% endblock titulo %}
+{% load staticfiles %}
+{% block extras_css %}
+<link rel="stylesheet" href="{% static 'DataTables/media/css/jquery.dataTables.min.css' %}">
+{% endblock extras_css %}
+{% block extras_js %}
+<script src="{% static 'DataTables/media/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'dte/nota_credito.js' %}"></script>
+{% endblock extras_js %}
 {% block content_center %}
     <a href="{% url 'nota_credito:nota_sistema_listado' compania %}" class="btn btn-info">
         Regresar
     </a>
     <h1 class="text-center">Nota de Crédito</h1>
-    <form>
-        {{ form.as_p }}
+    <form method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6">
+                <label>{{ form.numero_factura.label }} </label> <i class="red asterisc">*</i>
+                {{ form.numero_factura }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.senores.label }}</label> <i class="red asterisc">*</i>
+                {{ form.senores }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.giro.label }}</label> <i class="red asterisc">*</i>
+                {{ form.giro }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.rut.label }}</label> <i class="red asterisc">*</i>
+                {{ form.rut }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.fecha.label }}</label> <i class="red asterisc">*</i>
+                {{ form.fecha }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.ciudad_receptora.label }}</label> <i class="red asterisc">*</i>
+                {{ form.ciudad_receptora }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.comuna.label }}</label> <i class="red asterisc">*</i>
+                {{ form.comuna }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.region.label }}</label> <i class="red asterisc">*</i>
+                {{ form.region }}
+            </div>
+            <div class="col-md-12">
+                <label>{{ form.forma_pago.label }}</label> 
+                <i class="red asterisc">*</i>
+                {{ form.forma_pago }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.transporte.label }}</label>
+                {{ form.transporte }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.despachar.label }}</label>
+                {{ form.despachar }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.guia.label }}</label>
+                {{ form.guia }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.orden_compra.label }}</label>
+                {{ form.orden_compra }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.nota_venta.label }}</label>
+                {{ form.nota_venta }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.observaciones.label }}</label>
+                {{ form.observaciones }}
+            </div>
+            <div class="col-md-12">
+                <h4>Productos <i class="red asterisc">*</i></h4> 
+                <a class="btn btn-success" onclick="appendRow('#myTable')"> 
+                    Agregar Producto <i class="fa fa-plus" aria-hidden="true"></i> 
+                </a>
+                <table id="myTable" class="table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                            <th>Total</th>
+                            <th>Opciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-offset-8">
+                <label>Neto</label>
+                <input class="form-control" type="text" disabled="true" id="out_neto">
+            </div>
+            <div class="col-md-offset-8">
+                <label>Impuesto</label>
+                <input class="form-control" type="text" disabled="true" value="{{impuesto}}">
+            </div>
+            <div class="col-md-offset-8">
+                <label>Total</label>
+                <input class="form-control" type="text" disabled="true" id="out_total">
+            </div>
+        </div>
+        <div class="col-md-12 text-center">
+            <button type="submit" class="btn btn-success">Guardar</button>
+        </div>
     </form>
+<script type="text/javascript">
+
+    var impuesto = {{impuesto}}
+    var today = new Date()
+    
+    $("#id_fecha").datepicker({
+        format: "dd/mm/yyyy",
+        endDate: today+1,
+        autoclose: true
+    })
+</script>
 {% endblock content_center %}
