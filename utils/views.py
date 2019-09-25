@@ -190,6 +190,7 @@ def sendToSii(compania,invoice, pass_certificado):
     @param pass_certificado recibe la contraseña del certificado
     @return dict con la respuesta
     """
+    from .SIISdk import SII_SDK
     try:
         sii_sdk = SII_SDK(settings.SII_PRODUCTION)
         seed = sii_sdk.getSeed()

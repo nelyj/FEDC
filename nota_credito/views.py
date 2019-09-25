@@ -17,7 +17,6 @@ from django.views.generic.base import TemplateView, View
 from django.views.generic import ListView, CreateView
 from django.template.loader import render_to_string
 from django_weasyprint import WeasyTemplateResponseMixin
-from django_datatables_view.base_datatable_view import BaseDatatableView
 
 from base.constants import NOMB_DOC, LIST_DOC
 
@@ -776,83 +775,3 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
             except Exception as e:
                 return {'valid':False,'msg':'El precio debe ser un número'}
         return {'valid':True}
-
-
-class AjaxGenericListDTETable(LoginRequiredMixin, BaseDatatableView):
-    """!
-    Prepara la data para mostrar en el datatable
-
-    @author Rodrigo A. Boet (rodrigo.b at timgla.com)
-    @date 19-09-2019
-    @version 1.0.0
-    """
-    # The model we're going to show
-    model = Factura
-    columns = ['pk', 'numero_factura', 'compania', 'n_folio']
-    # define column names that will be used in sorting
-    # order is important and should be same as order of columns
-    # displayed by datatables. For non sortable columns use empty
-    # value like ''
-    order_columns = ['pk', 'numero_factura', 'compania', 'n_folio']
-    # set max limit of records returned, this is used to protect our site if someone tries to attack our site
-    # and make it return huge amount of data
-    max_display_length = 500
-
-
-    def __init__(self):
-        super(AjaxGenericListDTETable, self).__init__()
-
-    def get_initial_queryset(self):
-        """!
-        Consulta el modelo Intercambio
-
-        @return: Objeto de la consulta
-        """
-        # return queryset used as base for futher sorting/filtering
-        # these are simply objects displayed in datatable
-        # You should not filter data returned here by any filter values entered by Intercambio. This is because
-        # we need some base queryset to count total number of records.
-        tipo_doc = self.kwargs['dte']
-        self.model = validarModelPorDoc(tipo_doc)
-        if self.request.GET.get(u'sistema', None) == 'True':
-            return self.model.objects.filter(compania=self.kwargs['pk'], track_id=None)
-        return self.model.objects.filter(compania=self.kwargs['pk']).exclude(track_id=None)
-
-    def filter_queryset(self, qs):
-        # use parameters passed in GET request to filter queryset
-
-        search = self.request.GET.get(u'search[value]', None)
-        if search:
-            qs_params = None
-            q = Q(pk__istartswith=search)|Q(compania__razon_social__icontains=search)|Q(n_folio__icontains=search)|Q(numero_factura__icontains=search)
-            qs_params = qs_params | q if qs_params else q
-            qs = qs.filter(qs_params)
-        return qs
-
-    def prepare_results(self, qs):
-        """!
-        Prepara la data para mostrar en el datatable
-        @return: Objeto json con los datos del DTE
-        """
-        # prepare list with output column data
-        json_data = []
-        for item in qs:
-            if self.request.GET.get(u'sistema', None) == 'True':
-                boton_enviar_sii = '<a href="{0}"\
-                                    class="btn btn-success">Enviar al Sii</a> '.format(reverse_lazy('notaCredito:ver_estado_nc', kwargs={'pk':self.kwargs['pk'], 'slug':item.numero_factura}))
-                botones_acciones = boton_enviar_sii
-            else:
-                boton_estado = '<a href="{0}"\
-                                class="btn btn-success">Ver Estado</a> '.format(reverse_lazy('notaCredito:ver_estado_nc', kwargs={'pk':self.kwargs['pk'], 'slug':item.numero_factura}))
-                boton_imprimir_doc = '<a  id="edit_foo" href="{0}"\
-                                     target="_blank" class="btn btn-info">Imprimir</a> '.format(reverse_lazy('base:imprimir_factura', kwargs={'pk':self.kwargs['pk'], 'slug':item.numero_factura, 'doc':'NOTA_CRE_ELEC'}))
-                boton_imprimir_con = '<a  id="edit_foo" href="{0}?impre=cont"\
-                                     target="_blank" class="btn btn-warning">Impresion continua</a>'.format(reverse_lazy('base:imprimir_factura', kwargs={'pk':self.kwargs['pk'], 'slug':item.numero_factura, 'doc':'NOTA_CRE_ELEC'}))
-                botones_acciones = boton_estado + boton_imprimir_doc + boton_imprimir_con
-            json_data.append([
-                item.numero_factura,
-                item.compania.razon_social,
-                item.n_folio,
-                botones_acciones
-            ])
-        return json_data

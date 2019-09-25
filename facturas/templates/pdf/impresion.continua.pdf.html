@@ -67,7 +67,7 @@
                             </tr>
                             <tr>
                                 <td class="align-right">{{prod.qty}}   X </td>
-                                <td class="align-center">{{prod.rate|default_if_none:0|format_mil}}</td>
+                                <td class="align-center">{{prod.base_net_rate|default_if_none:0|format_mil}}</td>
                                 <td class="align-center">{{prod.amount|default_if_none:0|format_mil}}</td>
                             </tr>
                         {% endfor %}
