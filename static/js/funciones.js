@@ -12,3 +12,22 @@ function showField(field, show){
     $(field).hide()
   }
 }
+
+/*
+ * Función para enviar al sii
+ * @param url Recibe la url de envío
+*/
+function send_to_sii(url){
+	$.ajax({
+    type: 'GET',
+    url: url,
+    success: function(response) {
+      if(response['status']){
+      	alert(response['msg'])
+      }
+      else{
+      	console.log(response['msg'])	
+      }
+    }
+  }) 
+}

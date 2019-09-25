@@ -23,7 +23,27 @@ def validarModelPorDoc(tipo_doc):
         modelo = notaDebito
     elif tipo_doc == 'NOTA_CRE_ELEC':
         modelo = notaCredito
-        url = 'nota_credito:lista-enviadas'
     elif tipo_doc == 'BOLE_ELEC':
         modelo = Boleta
     return modelo
+
+def nombreTimbrePorDoc(tipo_doc):
+    """
+    Funcion para obtener nombre para el timbre
+
+    @author Rodrigo Boet (rudmanmrrod@gmail.com)
+    @date 25-09-2019
+    @param tipo_doc variable que define el tipo de documento
+    @return nombre del objeto
+    """
+    if tipo_doc == 'FACT_ELEC':
+        timbre = 'facturas'
+    elif tipo_doc == 'GUIA_DES_ELEC':
+        timbre = 'guia'
+    elif tipo_doc == 'NOTA_DEB_ELEC':
+        timbre = 'notas_de_debito'
+    elif tipo_doc == 'NOTA_CRE_ELEC':
+        timbre = 'notas_de_credito'
+    elif tipo_doc == 'BOLE_ELEC':
+        timbre = 'boletas'
+    return timbre

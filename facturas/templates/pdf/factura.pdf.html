@@ -183,7 +183,7 @@
                             <td class="align-center">Unidad</td>
                             <td class="align-center">{{prod.item_code}}</td>
                             <td class="align-center">{{prod.item_name}}</td>
-                            <td class="align-right">{{prod.rate|default_if_none:0|format_mil}}</td>
+                            <td class="align-right">{{prod.base_net_rate|default_if_none:0|format_mil}}</td>
                             <td class="align-right">{{prod.discount_percentage}}</td>
                             <td class="align-right">{{prod.amount|default_if_none:0|format_mil}}</td>
                         </tr>
