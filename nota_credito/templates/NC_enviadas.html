@@ -37,7 +37,7 @@
 {% block custom_js%}
 <script type="text/javascript">
 // Objeto Json lista de nota de credito
-var URL = "{% url 'nota_credito:ajax_list_dte' compania 'NOTA_CRE_ELEC'%}?sistema={{sistema}}";
+var URL = "{% url 'nota_credito:ajax_list_dte' compania 'NOTA_CRE_ELEC'%}?sistema={{sistema}}&dte_no_enviado=1";
 </script>
 
 <script type="text/javascript" src="{% static 'custom_datatable/listDataTable.js' %}" ></script>

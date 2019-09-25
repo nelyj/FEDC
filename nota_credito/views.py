@@ -814,7 +814,9 @@ class AjaxGenericListDTETable(LoginRequiredMixin, BaseDatatableView):
         # we need some base queryset to count total number of records.
         tipo_doc = self.kwargs['dte']
         self.model = validarModelPorDoc(tipo_doc)
-        return self.model.objects.filter(compania=self.kwargs['pk'])
+        if self.request.GET.get(u'sistema', None) == 'True':
+            return self.model.objects.filter(compania=self.kwargs['pk'], track_id=None)
+        return self.model.objects.filter(compania=self.kwargs['pk']).exclude(track_id=None)
 
     def filter_queryset(self, qs):
         # use parameters passed in GET request to filter queryset
