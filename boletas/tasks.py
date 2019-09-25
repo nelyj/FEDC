@@ -14,7 +14,7 @@ from conectores.models import *
 
 from folios.models import Folio
 
-from utils.utils import sendToSii
+from utils.views import sendToSii
 
 from .models import Boleta, BoletaSended
 

@@ -17,17 +17,24 @@ from django.views.generic.base import TemplateView, View
 from django.views.generic import ListView, CreateView
 from django.template.loader import render_to_string
 from django_weasyprint import WeasyTemplateResponseMixin
+from django_datatables_view.base_datatable_view import BaseDatatableView
+
+from base.constants import NOMB_DOC, LIST_DOC
+
 from conectores.models import *
 from conectores.forms import FormCompania
 from conectores.models import *
+from conectores.models import Compania
+
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
+
 from utils.SIISdk import SII_SDK
 from utils.utils import validarModelPorDoc
+
 from .models import notaCredito
 from .forms import *
-from facturas.constants import NOMB_DOC, LIST_DOC
-from conectores.models import Compania
+
 
 class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
     template_name = 'seleccionar_empresa_NC.html'
@@ -427,14 +434,18 @@ class SendInvoice(LoginRequiredMixin, FormView):
             print(e)
             return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
 
-class NotaCreditoEnviadasView(LoginRequiredMixin, ListView):
+class NotaCreditoEnviadasView(LoginRequiredMixin, TemplateView):
     template_name = 'NC_enviadas.html'
 
 
-    def get_queryset(self):
+    def get_context_data(self, *args, **kwargs): 
+        """
+        Método para colocar contexto en la vista
+        """
+        context = super().get_context_data(*args, **kwargs)
+        context['compania'] = self.kwargs.get('pk')
+        return context
 
-        compania = self.kwargs.get('pk')
-        return notaCredito.objects.filter(compania=compania).exclude(track_id='').order_by('-created')
 
 class ImprimirNC(LoginRequiredMixin, TemplateView,WeasyTemplateResponseMixin):
     """!
@@ -452,7 +463,7 @@ class ImprimirNC(LoginRequiredMixin, TemplateView,WeasyTemplateResponseMixin):
         compania = self.kwargs['pk']
         tipo_doc = self.kwargs['doc']
         if tipo_doc in LIST_DOC:
-            self.model = validarModelPorDoc(tipo_doc) 
+            self.model = validarModelPorDoc(tipo_doc)
             try:
                 factura = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
                 return super().dispatch(request, *args, **kwargs)
@@ -553,7 +564,7 @@ class VerEstadoNC(LoginRequiredMixin, TemplateView):
             print(e)
             return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
 
-class NotaCreditoSistemaView(LoginRequiredMixin, ListView):
+class NotaCreditoSistemaView(LoginRequiredMixin, TemplateView):
     """!
     Clase para ver el listado de notas del sistema
 
@@ -571,14 +582,6 @@ class NotaCreditoSistemaView(LoginRequiredMixin, ListView):
         context['sistema'] = True
         context['compania'] = self.kwargs.get('pk')
         return context
-
-    def get_queryset(self):
-        """
-        Método para establecer la consulta
-        """
-        compania = self.kwargs.get('pk')
-        return notaCredito.objects.filter(compania=compania,track_id='').order_by('-created')
-
 
 class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
     """!
@@ -599,6 +602,10 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(*args, **kwargs)
         context['compania'] = self.kwargs.get('pk')
         context['impuesto'] = Compania.objects.get(pk=self.kwargs.get('pk')).tasa_de_iva
+        if(self.request.method == 'POST'):
+            dict_post = dict(self.request.POST.lists())
+            productos = self.transform_product(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'])
+            context['productos'] = productos
         return context
 
     def get_success_url(self):
@@ -611,7 +618,10 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
         """
         Método si el formulario es válido
         """
+
         dict_post = dict(self.request.POST.lists())
+        datetime_object = datetime.datetime.now()
+        fecha = datetime.datetime.strptime(dict_post['fecha'][0], '%d/%m/%Y')
         if 'codigo' not in self.request.POST or 'nombre' not in self.request.POST\
             or 'cantidad' not in self.request.POST or 'precio' not in self.request.POST:
             messages.error(self.request, "Debe cargar al menos un producto")
@@ -625,6 +635,14 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
             len(dict_post['codigo']) != len(dict_post['cantidad']) or\
             len(dict_post['cantidad']) != len(dict_post['nombre'])):
             messages.error(self.request, "Faltan valores por llenar en la tabla")
+            return super().form_invalid(form)
+
+        if fecha > datetime_object:
+            messages.error(self.request, "La fecha no puede ser mayor a la fecha actual, por favor verifica nuevamente la fecha")
+
+        valid_r = self.validateProduct(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'])
+        if(not valid_r['valid']):
+            messages.error(self.request, valid_r['msg'])
             return super().form_invalid(form)
         productos = self.transform_product(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'])
         compania = Compania.objects.get(pk=self.kwargs.get('pk'))
@@ -667,6 +685,7 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
         self.object.neto = diccionario_general['neto']
         self.object.total = diccionario_general['total']
         self.object.iva = compania.tasa_de_iva
+        self.object.compania = compania
         self.object.save()
         # Se crea el arhivo del xml
         try:
@@ -686,7 +705,6 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
         """
         Método si el formulario es válido
         """
-        print(form.errors)
         return super().form_invalid(form)
 
     def transform_product(self, code, name, qty, price):
@@ -733,5 +751,106 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
         data['neto'] = neto
         data['total'] = total
         return data
-            
-            
+
+    def validateProduct(self, code, name, qty, price):
+        """
+        Método para validar el producto
+        @param code Recibe la lista con los códigos
+        @param name Recibe la lista con los nombres
+        @param qty Recibe la lista con las cantidades
+        @param price Recibe la lista con los precios
+        @return retorna los productos como lista de diccionarios
+        """
+        for i in range(len(code)):
+            for j in range(i+1,len(code)):
+                if(code[i]==code[j]):
+                    return {'valid':False,'msg':'No pueden existir códigos dúplicados'}
+        for q in qty:
+            try:
+                int(q)
+            except Exception as e:
+                return {'valid':False,'msg':'Las cantidades deben ser enteras'}
+        for p in price:
+            try:
+                float(p)
+            except Exception as e:
+                return {'valid':False,'msg':'El precio debe ser un número'}
+        return {'valid':True}
+
+
+class AjaxGenericListDTETable(LoginRequiredMixin, BaseDatatableView):
+    """!
+    Prepara la data para mostrar en el datatable
+
+    @author Rodrigo A. Boet (rodrigo.b at timgla.com)
+    @date 19-09-2019
+    @version 1.0.0
+    """
+    # The model we're going to show
+    model = Factura
+    columns = ['pk', 'numero_factura', 'compania', 'n_folio']
+    # define column names that will be used in sorting
+    # order is important and should be same as order of columns
+    # displayed by datatables. For non sortable columns use empty
+    # value like ''
+    order_columns = ['pk', 'numero_factura', 'compania', 'n_folio']
+    # set max limit of records returned, this is used to protect our site if someone tries to attack our site
+    # and make it return huge amount of data
+    max_display_length = 500
+
+
+    def __init__(self):
+        super(AjaxGenericListDTETable, self).__init__()
+
+    def get_initial_queryset(self):
+        """!
+        Consulta el modelo Intercambio
+
+        @return: Objeto de la consulta
+        """
+        # return queryset used as base for futher sorting/filtering
+        # these are simply objects displayed in datatable
+        # You should not filter data returned here by any filter values entered by Intercambio. This is because
+        # we need some base queryset to count total number of records.
+        tipo_doc = self.kwargs['dte']
+        self.model = validarModelPorDoc(tipo_doc)
+        return self.model.objects.filter(compania=self.kwargs['pk'])
+
+    def filter_queryset(self, qs):
+        # use parameters passed in GET request to filter queryset
+
+        search = self.request.GET.get(u'search[value]', None)
+        if search:
+            qs_params = None
+            q = Q(pk__istartswith=search)|Q(compania__razon_social__icontains=search)|Q(n_folio__icontains=search)|Q(numero_factura__icontains=search)
+            qs_params = qs_params | q if qs_params else q
+            qs = qs.filter(qs_params)
+        return qs
+
+    def prepare_results(self, qs):
+        """!
+        Prepara la data para mostrar en el datatable
+        @return: Objeto json con los datos del DTE
+        """
+        # prepare list with output column data
+        json_data = []
+        for item in qs:
+            if self.request.GET.get(u'sistema', None) == 'True':
+                boton_enviar_sii = '<a href="{0}"\
+                                    class="btn btn-success">Enviar al Sii</a> '.format(reverse_lazy('notaCredito:ver_estado_nc', kwargs={'pk':self.kwargs['pk'], 'slug':item.numero_factura}))
+                botones_acciones = boton_enviar_sii
+            else:
+                boton_estado = '<a href="{0}"\
+                                class="btn btn-success">Ver Estado</a> '.format(reverse_lazy('notaCredito:ver_estado_nc', kwargs={'pk':self.kwargs['pk'], 'slug':item.numero_factura}))
+                boton_imprimir_doc = '<a  id="edit_foo" href="{0}"\
+                                     target="_blank" class="btn btn-info">Imprimir</a> '.format(reverse_lazy('base:imprimir_factura', kwargs={'pk':self.kwargs['pk'], 'slug':item.numero_factura, 'doc':'NOTA_CRE_ELEC'}))
+                boton_imprimir_con = '<a  id="edit_foo" href="{0}?impre=cont"\
+                                     target="_blank" class="btn btn-warning">Impresion continua</a>'.format(reverse_lazy('base:imprimir_factura', kwargs={'pk':self.kwargs['pk'], 'slug':item.numero_factura, 'doc':'NOTA_CRE_ELEC'}))
+                botones_acciones = boton_estado + boton_imprimir_doc + boton_imprimir_con
+            json_data.append([
+                item.numero_factura,
+                item.compania.razon_social,
+                item.n_folio,
+                botones_acciones
+            ])
+        return json_data

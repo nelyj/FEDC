@@ -25,7 +25,7 @@ from .models import (
     Intercambio, DteIntercambio
 )
 from utils.views import DecodeEncodeChain
-    
+
 logger = get_task_logger(__name__)
 
 

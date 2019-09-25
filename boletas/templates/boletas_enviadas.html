@@ -31,7 +31,7 @@
             <td>{{factura.status}}</td>
             <td>{{ factura.n_folio }}</td>
             <td>
-                <a  id="edit_foo" href="{% url 'facturas:imprimir_factura' factura.compania.pk factura.numero_factura 'BOLE_ELEC' %}?impre=cont" target="_blank" class="btn btn-warning">Impresion continua</a>
+                <a  id="edit_foo" href="{% url 'base:imprimir_factura' factura.compania.pk factura.numero_factura 'BOLE_ELEC' %}?impre=cont" target="_blank" class="btn btn-warning">Impresion continua</a>
             </td>
         </tr>
         {%endfor%}

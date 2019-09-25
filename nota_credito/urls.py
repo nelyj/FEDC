@@ -14,7 +14,6 @@ urlpatterns = [
     path('estado-nc/<int:pk>/<str:slug>/',VerEstadoNC.as_view(),name="ver_estado_nc"),
     path('sistema-nc/<int:pk>', NotaCreditoSistemaView.as_view(),name="nota_sistema_listado"),
     path('crear-nc/<int:pk>', NotaCreditoCreateView.as_view(),name="nota_sistema_crear"),
+    path('listar-dte/<int:pk>/<str:dte>', AjaxGenericListDTETable.as_view(),name="ajax_list_dte"),
+    
 ]
-
-
-

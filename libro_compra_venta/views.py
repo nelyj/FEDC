@@ -23,7 +23,7 @@ from nota_credito.models import notaCredito
 
 from nota_debito.models import notaDebito
 
-from utils.utils import sendToSii
+from utils.views import sendToSii
 from utils.CustomMixin import SeleccionarEmpresaView
 
 from .forms import *

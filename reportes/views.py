@@ -15,7 +15,7 @@ from facturas.models import Factura
 from nota_credito.models import notaCredito
 from nota_debito.models import notaDebito
 from utils.SIISdk import SII_SDK
-from utils.utils import sendToSii
+from utils.views import sendToSii
 from .forms import ReporteCreateForm
 from .models import Reporte
 
