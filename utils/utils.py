@@ -1,4 +1,3 @@
-from django.conf import settings
 from boletas.models import Boleta
 from facturas.models import Factura
 from guia_despacho.models import guiaDespacho
@@ -17,15 +16,21 @@ def validarModelPorDoc(tipo_doc):
     """
     if tipo_doc == 'FACT_ELEC':
         modelo = Factura
+        url = 'facturas:lista-enviadas'
     elif tipo_doc == 'GUIA_DES_ELEC':
         modelo = guiaDespacho
+        url = 'guia_despacho:lista-guias-enviadas'
     elif tipo_doc == 'NOTA_DEB_ELEC':
         modelo = notaDebito
+        url = 'nota_debito:lista-enviadas'
     elif tipo_doc == 'NOTA_CRE_ELEC':
         modelo = notaCredito
+        url = 'nota_credito:lista-enviadas'
     elif tipo_doc == 'BOLE_ELEC':
         modelo = Boleta
-    return modelo
+        url = 'boletas:lista-boletas-enviadas'
+    return modelo, url
+
 
 def nombreTimbrePorDoc(tipo_doc):
     """

@@ -30,24 +30,20 @@ from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
 
 from utils.SIISdk import SII_SDK
 from utils.utils import validarModelPorDoc
+from utils.CustomMixin import SeleccionarEmpresaView
 
 from .models import notaCredito
 from .forms import *
 
 
-class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
-    template_name = 'seleccionar_empresa_NC.html'
+class StartNotaCredito(SeleccionarEmpresaView):
+    """
+    Selecciona la empresa
 
-    def get_context_data(self, *args, **kwargs): 
-
-        context = super().get_context_data(*args, **kwargs)
-        context['empresas'] = Compania.objects.filter(owner=self.request.user)
-        if Compania.objects.filter(owner=self.request.user).exists():
-            context['tiene_empresa'] = True
-        else:
-            messages.info(self.request, "Registre una empresa para continuar")
-            context['tiene_empresa'] = False
-        return context
+    @author Rodrigo A. Boet (rodrigo.b at timgla.com)
+    @date 12-08-2019
+    @version 1.0.0
+    """
 
     def post(self, request):
         enviadas = self.request.GET.get('enviadas', None)
@@ -66,6 +62,7 @@ class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
                     return HttpResponseRedirect(reverse_lazy('notaCredito:lista_nota_credito', kwargs={'pk':empresa}))
         else:
             return HttpResponseRedirect('/')
+
 
 class ListaNotaCreditoViews(LoginRequiredMixin, TemplateView):
     template_name = 'lista_NC.html'
@@ -445,61 +442,6 @@ class NotaCreditoEnviadasView(LoginRequiredMixin, TemplateView):
         context['compania'] = self.kwargs.get('pk')
         return context
 
-
-class ImprimirNC(LoginRequiredMixin, TemplateView,WeasyTemplateResponseMixin):
-    """!
-    Class para imprimir la factura en PDF
-
-    @author Rodrigo Boet (rudmanmrrod at gmail.com)
-    @date 21-03-2019
-    @version 1.0.0
-    """
-    template_name = "pdf/factura.pdf.html"
-    model = notaCredito
-
-    def dispatch(self, request, *args, **kwargs):
-        num_factura = self.kwargs['slug']
-        compania = self.kwargs['pk']
-        tipo_doc = self.kwargs['doc']
-        if tipo_doc in LIST_DOC:
-            self.model = validarModelPorDoc(tipo_doc)
-            try:
-                factura = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
-                return super().dispatch(request, *args, **kwargs)
-            except Exception as e:
-                factura = self.model.objects.select_related().filter(numero_factura=num_factura, compania=compania)
-                if len(factura) > 1:
-                    messages.error(self.request, 'Existe mas de un registro con el mismo numero de factura: {0}'.format(num_factura))
-                    return redirect(reverse_lazy('nota_credito:lista-enviadas', kwargs={'pk': compania}))
-                else:
-                    messages.error(self.request, "No se encuentra registrada esta factura: {0}".format(str(num_factura)))
-                    return redirect(reverse_lazy('nota_credito:lista-enviadas', kwargs={'pk': compania}))
-        else:
-            messages.error(self.request, "No existe este tipo de documento: {0}".format(str(tipo_doc)))
-            return redirect(reverse_lazy('nota_credito:lista-enviadas', kwargs={'pk': compania}))
-
-    def get_context_data(self, *args, **kwargs):
-        """!
-        Method to handle data on get
-
-        @date 21-03-2019
-        @return Returns dict with data
-        """
-        context = super().get_context_data(*args, **kwargs)
-        num_factura = self.kwargs['slug']
-        compania = self.kwargs['pk']
-        tipo_doc = self.kwargs['doc']
-        
-        context['factura'] = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
-        context['nombre_documento'] = NOMB_DOC[tipo_doc]
-        etiqueta=self.kwargs['slug'].replace('º','')
-        context['etiqueta'] = etiqueta
-        prod = context['factura'].productos.replace('\'{','{').replace('}\'','}').replace('\'',"\"")
-        productos = json.loads(prod)
-        context['productos'] = productos
-        ruta = settings.STATIC_URL +'notas_de_credito'+'/'+etiqueta+'/timbre.jpg'
-        context['ruta']=ruta
-        return context
 
 class VerEstadoNC(LoginRequiredMixin, TemplateView):
     """!

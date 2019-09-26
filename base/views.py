@@ -36,7 +36,7 @@ class SendToSiiView(LoginRequeridoPerAuth, View):
         """
         print(kwargs['pk'])
         print(kwargs['dte'])
-        model = validarModelPorDoc(kwargs['dte'])
+        model, url = validarModelPorDoc(kwargs['dte'])
         model = model.objects.get(pk=kwargs['pk'])
         send_sii = sendToSii(model.compania,model.dte_xml,model.compania.pass_certificado)
         if(not send_sii['estado']):
@@ -82,7 +82,7 @@ class AjaxGenericListDTETable(LoginRequiredMixin, BaseDatatableView):
         # You should not filter data returned here by any filter values entered by Intercambio. This is because
         # we need some base queryset to count total number of records.
         tipo_doc = self.kwargs['dte']
-        self.model = validarModelPorDoc(tipo_doc)
+        self.model, url = validarModelPorDoc(tipo_doc)
         if self.request.GET.get(u'sistema', None) == 'True':
             return self.model.objects.filter(compania=self.kwargs['pk'], track_id=None)
         return self.model.objects.filter(compania=self.kwargs['pk']).exclude(track_id=None)
@@ -147,7 +147,7 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView, WeasyTemplateResponseMix
         if impre_cont == 'cont':
             self.template_name = "pdf/impresion.continua.pdf.html"
         if tipo_doc in LIST_DOC:
-            self.model = validarModelPorDoc(tipo_doc)
+            self.model, url = validarModelPorDoc(tipo_doc)
             try:
                 factura = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
                 return super().dispatch(request, *args, **kwargs)
@@ -156,13 +156,13 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView, WeasyTemplateResponseMix
                 factura = self.model.objects.select_related().filter(numero_factura=num_factura, compania=compania)
                 if len(factura) > 1:
                     messages.error(self.request, 'Existe mas de un registro con el mismo numero de factura: {0}'.format(num_factura))
-                    return redirect(reverse_lazy('facturas:lista-enviadas', kwargs={'pk': compania}))
+                    return redirect(reverse_lazy(url, kwargs={'pk': compania}))
                 else:
                     messages.error(self.request, "No se encuentra registrada esta factura: {0}".format(str(num_factura)))
-                    return redirect(reverse_lazy('facturas:lista-enviadas', kwargs={'pk': compania}))
+                    return redirect(reverse_lazy(url, kwargs={'pk': compania}))
         else:
             messages.error(self.request, "No existe este tipo de documento: {0}".format(str(tipo_doc)))
-            return redirect(reverse_lazy('facturas:lista-enviadas', kwargs={'pk': compania}))
+            return redirect(reverse_lazy(url, kwargs={'pk': compania}))
 
     def get_context_data(self, *args, **kwargs):
         """!

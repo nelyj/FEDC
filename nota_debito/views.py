@@ -26,39 +26,41 @@ from conectores.models import *
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
 
+from utils.CustomMixin import SeleccionarEmpresaView
 from utils.SIISdk import SII_SDK
 from utils.utils import validarModelPorDoc
 
 from .models import notaDebito
 from .forms import *
 
-class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
-    template_name = 'seleccionar_empresa_ND.html'
 
-    def get_context_data(self, *args, **kwargs): 
+class StartNotaCredito(SeleccionarEmpresaView):
+    """
+    Selecciona la empresa
 
-        context = super().get_context_data(*args, **kwargs)
-        context['empresas'] = Compania.objects.filter(owner=self.request.user)
-        if Compania.objects.filter(owner=self.request.user).exists():
-            context['tiene_empresa'] = True
-        else:
-            messages.info(self.request, "Registre una empresa para continuar")
-            context['tiene_empresa'] = False
-        return context
+    @author Rodrigo A. Boet (rodrigo.b at timgla.com)
+    @date 12-08-2019
+    @version 1.0.0
+    """
 
     def post(self, request):
         enviadas = self.request.GET.get('enviadas', None)
+        sistema = self.request.GET.get('sistema', None)
         empresa = int(request.POST.get('empresa'))
         if not empresa:
             return HttpResponseRedirect('/')
         empresa_obj = Compania.objects.get(pk=empresa)
         if empresa_obj and self.request.user == empresa_obj.owner:
-            if enviadas == "1":
-                return HttpResponseRedirect(reverse_lazy('notaDebito:lista-enviadas', kwargs={'pk':empresa}))
+            if sistema:
+                return HttpResponseRedirect(reverse_lazy('notaDebito:nota_sistema_listado', kwargs={'pk':empresa}))
             else:
-                return HttpResponseRedirect(reverse_lazy('notaDebito:lista_nota_debito', kwargs={'pk':empresa}))
+                if enviadas == "1":
+                    return HttpResponseRedirect(reverse_lazy('notaDebito:lista-enviadas', kwargs={'pk':empresa}))
+                else:
+                    return HttpResponseRedirect(reverse_lazy('notaDebito:lista_nota_debito', kwargs={'pk':empresa}))
         else:
             return HttpResponseRedirect('/')
+
 
 class ListaNotaDebitoViews(LoginRequiredMixin, TemplateView):
     template_name = 'lista_ND.html'
@@ -434,64 +436,6 @@ class NotaDebitoEnviadasView(LoginRequiredMixin, ListView):
         compania = self.kwargs.get('pk')
         return notaDebito.objects.filter(compania=compania).order_by('-created')
 
-class ImprimirND(LoginRequiredMixin, TemplateView,WeasyTemplateResponseMixin):
-    """!
-    Class para imprimir la factura en PDF
-
-    @author Rodrigo Boet (rudmanmrrod at gmail.com)
-    @date 21-03-2019
-    @version 1.0.0
-    """
-    template_name = "pdf/factura.pdf.html"
-    model = notaDebito
-
-    def dispatch(self, request, *args, **kwargs):
-        num_factura = self.kwargs['slug']
-        compania = self.kwargs['pk']
-        tipo_doc = self.kwargs['doc']
-        print('factura ', num_factura)
-        print('compania ', compania)
-        print('tipo_doc ', tipo_doc)
-        if tipo_doc in LIST_DOC:
-            self.model = validarModelPorDoc(tipo_doc) 
-            try:
-                factura = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
-                return super().dispatch(request, *args, **kwargs)
-            except Exception as e:
-                factura = self.model.objects.select_related().filter(numero_factura=num_factura, compania=compania)
-                print(len(factura))
-                if len(factura) > 1:
-                    messages.error(self.request, 'Existe mas de un registro con el mismo numero de factura: {0}'.format(num_factura))
-                    return redirect(reverse_lazy('nota_debito:lista-enviadas', kwargs={'pk': compania}))
-                else:
-                    messages.error(self.request, "No se encuentra registrada esta factura: {0}".format(str(num_factura)))
-                    return redirect(reverse_lazy('nota_debito:lista-enviadas', kwargs={'pk': compania}))
-        else:
-            messages.error(self.request, "No existe este tipo de documento: {0}".format(str(tipo_doc)))
-            return redirect(reverse_lazy('nota_debito:lista-enviadas', kwargs={'pk': compania}))
-
-    def get_context_data(self, *args, **kwargs):
-        """!
-        Method to handle data on get
-
-        @date 21-03-2019
-        @return Returns dict with data
-        """
-        context = super().get_context_data(*args, **kwargs)
-        num_factura = self.kwargs['slug']
-        compania = self.kwargs['pk']
-        tipo_doc = self.kwargs['doc']
-        
-        context['factura'] = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
-        context['nombre_documento'] = NOMB_DOC[tipo_doc]
-        etiqueta=self.kwargs['slug'].replace('º','')
-        context['etiqueta'] = etiqueta
-        prod = context['factura'].productos.replace('\'{','{').replace('}\'','}').replace('\'',"\"")
-        productos = json.loads(prod)
-        context['productos'] = productos
-        ruta = settings.STATIC_URL +'notas_de_debito'+'/'+etiqueta+'/timbre.jpg'
-        context['ruta']=ruta
-        return context
 
 class VerEstadoND(LoginRequiredMixin, TemplateView):
     """!
@@ -554,3 +498,23 @@ class VerEstadoND(LoginRequiredMixin, TemplateView):
         except Exception as e:
             print(e)
             return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
+
+
+class NotaDebitoSistemaView(LoginRequiredMixin, TemplateView):
+    """!
+    Clase para ver el listado de notas del sistema
+
+    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @date 13-09-2019
+    @version 1.0.0
+    """
+    template_name = 'ND_enviadas.html'
+
+    def get_context_data(self, *args, **kwargs): 
+        """
+        Método para colocar contexto en la vista
+        """
+        context = super().get_context_data(*args, **kwargs)
+        context['sistema'] = True
+        context['compania'] = self.kwargs.get('pk')
+        return context

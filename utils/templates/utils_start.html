@@ -65,6 +65,9 @@
             </li>
             <div class="collapse" id="notasDebito-collapse">
                 <ul class="submenu" id="marketing_services">
+                    <li><a href="{% url 'notaDebito:seleccionar-empresa' %}?sistema=1">
+                        Crear ND
+                    </a></li>
                     <li><a href="{% url 'notaDebito:seleccionar-empresa' %}">ND no enviadas</a></li>
                     <li><a href="{% url 'notaDebito:seleccionar-empresa' %}?enviadas=1">ND enviadas</a></li>
                 </ul>
