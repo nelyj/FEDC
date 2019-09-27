@@ -580,7 +580,7 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
 
         if fecha > datetime_object:
             messages.error(self.request, "La fecha no puede ser mayor a la fecha actual, por favor verifica nuevamente la fecha")
-
+            return super().form_invalid(form)
         valid_r = self.validateProduct(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'])
         if(not valid_r['valid']):
             messages.error(self.request, valid_r['msg'])
@@ -596,7 +596,10 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
         diccionario_general['giro'] = self.object.giro
         diccionario_general['direccion'] = self.object.region
         diccionario_general['comuna'] = self.object.comuna
-        diccionario_general['ciudad_receptora'] = self.object.ciudad_receptora
+        try:
+            diccionario_general['ciudad_receptora'] = self.object.ciudad_receptora
+        except:
+            pass
         diccionario_general['forma_pago'] = form.cleaned_data['forma_pago']
         # Se verifica el folio
         try:
