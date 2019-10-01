@@ -622,10 +622,10 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
             return super().form_invalid(form)
         self.object.productos = json.dumps(diccionario_general['productos'])
         # Se generan los XML
-        response_dd = notaCredito._firmar_dd(diccionario_general, folio, self.object)
-        documento_firmado = notaCredito.firmar_documento(response_dd,diccionario_general,folio, compania, self.object, pass_certificado)
-        documento_final_firmado = notaCredito.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
-        caratula_firmada = notaCredito.generar_documento_final(compania,documento_final_firmado,pass_certificado)
+        response_dd = self.model._firmar_dd(diccionario_general, folio, self.object)
+        documento_firmado = self.model.firmar_documento(response_dd,diccionario_general,folio, compania, self.object, pass_certificado)
+        documento_final_firmado = self.model.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
+        caratula_firmada = self.model.generar_documento_final(compania,documento_final_firmado,pass_certificado)
         self.object.dte_xml = caratula_firmada
         self.object.neto = diccionario_general['neto']
         self.object.total = diccionario_general['total']
