@@ -554,7 +554,7 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
         """
         Método para retornar la url de éxito
         """
-        return reverse_lazy(self.succes_url, kwargs={'pk': self.kwargs['pk']})
+        return reverse_lazy(self.success_url, kwargs={'pk': self.kwargs['pk']})
 
     def form_valid(self, form, **kwargs):
         """
