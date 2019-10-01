@@ -535,6 +535,7 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
     template_name = "nc_crear.html"
     model = notaCredito
     form_class = FormCreateNotaCredito
+    success_url = 'nota_credito:nota_sistema_crear'
 
     def get_context_data(self, *args, **kwargs): 
         """
@@ -553,7 +554,7 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
         """
         Método para retornar la url de éxito
         """
-        return reverse_lazy('nota_credito:nota_sistema_crear', kwargs={'pk': self.kwargs['pk']})
+        return reverse_lazy(self.succes_url, kwargs={'pk': self.kwargs['pk']})
 
     def form_valid(self, form, **kwargs):
         """

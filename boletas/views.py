@@ -48,7 +48,7 @@ class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
         empresa_obj = Compania.objects.get(pk=empresa)
         if empresa_obj and self.request.user == empresa_obj.owner:
             if enviadas == "1":
-                return HttpResponseRedirect(reverse_lazy('boletas:lista-boletas-enviadas', kwargs={'pk':empresa}))
+                return HttpResponseRedirect(reverse_lazy('boletas:lista-enviadas', kwargs={'pk':empresa}))
             else:
                 return HttpResponseRedirect(reverse_lazy('boletas:lista_boletas', kwargs={'pk':empresa}))
         else:

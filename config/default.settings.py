@@ -53,6 +53,7 @@ DJANGO_APPS = [
 
 PROJECT_APPS = [
     'utils',
+    'base',
     'users',
     'conectores',
     'facturas',

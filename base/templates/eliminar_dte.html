@@ -1,0 +1,14 @@
+<div class="tab-content">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h1 class="panel-title">{{object.numero_factura}}</h1>
+        </div>      
+        
+        <div class="panel-body">
+            <form method="post" id="form_delete">{% csrf_token %}
+                <p>Vas a eliminar el DTE "{{ object.numero_factura }}"?</p>
+                <input type="submit" class='btn btn-danger' value="Confirmar">
+            </form>
+        </div>
+    </div>
+</div>

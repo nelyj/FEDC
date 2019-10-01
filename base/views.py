@@ -7,9 +7,14 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic.base import TemplateView
+from django.views.generic.edit import (
+    UpdateView, DeleteView
+)
 
 from django_datatables_view.base_datatable_view import BaseDatatableView
 from django_weasyprint import WeasyTemplateResponseMixin
+
+from conectores.models import Compania
 
 from facturas.models import Factura
 
@@ -104,13 +109,23 @@ class AjaxGenericListDTETable(LoginRequiredMixin, BaseDatatableView):
         @return: Objeto json con los datos del DTE
         """
         # prepare list with output column data
+        tipo_doc = self.kwargs['dte']
+        self.model, url_model = validarModelPorDoc(tipo_doc)
         json_data = []
         for item in qs:
             if self.request.GET.get(u'sistema', None) == 'True':
                 url = str(reverse_lazy('base:send_sii', kwargs={'pk':item.pk, 'dte':self.kwargs['dte']}))
-                boton_enviar_sii = '<a href="#" onclick=send_to_sii("'+url+'")\
+                boton_enviar_sii = '<a href="#" onclick=send_to_sii("'+url_model+'lista-enviadas'+'")\
                                     class="btn btn-success">Enviar al Sii</a> '
-                botones_acciones = boton_enviar_sii
+                url_eliminar = str(reverse_lazy(url_model+'eliminar_dte', kwargs={'pk':item.pk}))
+                boton_eliminar = "<a data-toggle='modal' data-target='#myModal' \
+                    class='btn btn-danger' \
+                    onclick=eliminar_dte('"+url_eliminar+"')>Eliminar</a>\
+                     "
+                boton_editar = '<a href="{0}" \
+                                    class="btn btn-info">Editar</a> '.format(reverse_lazy(url_model+'actualizar', 
+                                                                                          kwargs={'pk':item.pk, 'comp':self.kwargs['pk']}))
+                botones_acciones = boton_enviar_sii + boton_editar +boton_eliminar
             else:
                 boton_estado = '<a href="{0}"\
                                 class="btn btn-success">Ver Estado</a> '.format(reverse_lazy('notaCredito:ver_estado_nc', kwargs={'pk':self.kwargs['pk'], 'slug':item.numero_factura}))
@@ -126,6 +141,7 @@ class AjaxGenericListDTETable(LoginRequiredMixin, BaseDatatableView):
                 botones_acciones
             ])
         return json_data
+
 
 class ImprimirFactura(LoginRequiredMixin, TemplateView, WeasyTemplateResponseMixin):
     """!
@@ -143,11 +159,10 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView, WeasyTemplateResponseMix
         compania = self.kwargs['pk']
         tipo_doc = self.kwargs['doc']
         impre_cont = request.GET.get('impre')
-
+        self.model, url_model = validarModelPorDoc(tipo_doc)
         if impre_cont == 'cont':
             self.template_name = "pdf/impresion.continua.pdf.html"
         if tipo_doc in LIST_DOC:
-            self.model, url = validarModelPorDoc(tipo_doc)
             try:
                 factura = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
                 return super().dispatch(request, *args, **kwargs)
@@ -156,13 +171,13 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView, WeasyTemplateResponseMix
                 factura = self.model.objects.select_related().filter(numero_factura=num_factura, compania=compania)
                 if len(factura) > 1:
                     messages.error(self.request, 'Existe mas de un registro con el mismo numero de factura: {0}'.format(num_factura))
-                    return redirect(reverse_lazy(url, kwargs={'pk': compania}))
+                    return redirect(reverse_lazy(url_model+'lista-enviadas', kwargs={'pk': compania}))
                 else:
                     messages.error(self.request, "No se encuentra registrada esta factura: {0}".format(str(num_factura)))
-                    return redirect(reverse_lazy(url, kwargs={'pk': compania}))
+                    return redirect(reverse_lazy(url_model+'lista-enviadas', kwargs={'pk': compania}))
         else:
             messages.error(self.request, "No existe este tipo de documento: {0}".format(str(tipo_doc)))
-            return redirect(reverse_lazy(url, kwargs={'pk': compania}))
+            return redirect(reverse_lazy(url_model+'lista-enviadas', kwargs={'pk': compania}))
 
     def get_context_data(self, *args, **kwargs):
         """!
@@ -175,12 +190,12 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView, WeasyTemplateResponseMix
         num_factura = self.kwargs['slug']
         compania = self.kwargs['pk']
         tipo_doc = self.kwargs['doc']
-        
+
         context['factura'] = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
         context['nombre_documento'] = NOMB_DOC[tipo_doc]
         etiqueta=self.kwargs['slug'].replace('º','')
         context['etiqueta'] = etiqueta
-        
+
         prod = context['factura'].productos.replace('\'{','{').replace('}\'','}').replace('\'',"\"")
 
         productos = json.loads(prod)
@@ -189,3 +204,29 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView, WeasyTemplateResponseMix
         ruta = settings.STATIC_URL +nombre_timbre+'/'+etiqueta+'/timbre.jpg'
         context['ruta']=ruta
         return context
+
+
+class UpdateDTEView(LoginRequiredMixin, UpdateView):
+    """
+    """
+    model = Factura
+
+    def get_context_data(self, *args, **kwargs):
+        """
+        Método para colocar contexto en la vista
+        """
+        context = super().get_context_data(*args, **kwargs)
+        context['compania'] = self.kwargs.get('comp')
+        context['impuesto'] = Compania.objects.get(pk=self.kwargs.get('comp')).tasa_de_iva
+        if(self.request.method == 'POST'):
+            dict_post = dict(self.request.POST.lists())
+            productos = self.transform_product(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'])
+            context['productos'] = productos
+        return context
+
+
+class DeleteDTEView(LoginRequiredMixin, DeleteView):
+    """
+    """
+    model = Factura
+    template_name = "eliminar_dte.html"

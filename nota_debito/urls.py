@@ -1,6 +1,13 @@
 from django.contrib import admin
-from django.urls import path, include, re_path
+from django.urls import (
+    path, include, 
+    re_path, reverse_lazy
+)
 from django.views.generic.base import TemplateView
+
+from base.views import (
+    UpdateDTEView, DeleteDTEView
+)
 
 from nota_credito.views import NotaCreditoCreateView
 
@@ -20,6 +27,7 @@ urlpatterns = [
     path('crear-nd/<int:pk>',
          NotaCreditoCreateView.as_view(
           form_class=FormCreateNotaDebito, model=notaDebito,
-          template_name='nd_crear.html'
+          template_name='nd_crear.html',
+          success_url = 'nota_debito:nota_sistema_crear'
           ), name="nota_sistema_crear"),
 ]

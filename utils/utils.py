@@ -16,19 +16,19 @@ def validarModelPorDoc(tipo_doc):
     """
     if tipo_doc == 'FACT_ELEC':
         modelo = Factura
-        url = 'facturas:lista-enviadas'
+        url = 'facturas:'
     elif tipo_doc == 'GUIA_DES_ELEC':
         modelo = guiaDespacho
-        url = 'guia_despacho:lista-guias-enviadas'
+        url = 'guia_despacho:'
     elif tipo_doc == 'NOTA_DEB_ELEC':
         modelo = notaDebito
-        url = 'nota_debito:lista-enviadas'
+        url = 'nota_debito:'
     elif tipo_doc == 'NOTA_CRE_ELEC':
         modelo = notaCredito
-        url = 'nota_credito:lista-enviadas'
+        url = 'nota_credito:'
     elif tipo_doc == 'BOLE_ELEC':
         modelo = Boleta
-        url = 'boletas:lista-boletas-enviadas'
+        url = 'boletas:'
     return modelo, url
 
 
