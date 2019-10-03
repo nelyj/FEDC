@@ -115,7 +115,7 @@ class AjaxGenericListDTETable(LoginRequiredMixin, BaseDatatableView):
         for item in qs:
             if self.request.GET.get(u'sistema', None) == 'True':
                 url = str(reverse_lazy('base:send_sii', kwargs={'pk':item.pk, 'dte':self.kwargs['dte']}))
-                boton_enviar_sii = '<a href="#" onclick=send_to_sii("'+url_model+'lista-enviadas'+'")\
+                boton_enviar_sii = '<a href="#" onclick=send_to_sii("'+url+'")\
                                     class="btn btn-success">Enviar al Sii</a> '
                 url_eliminar = str(reverse_lazy(url_model+'eliminar_dte', kwargs={'pk':item.pk}))
                 boton_eliminar = "<a data-toggle='modal' data-target='#myModal' \
