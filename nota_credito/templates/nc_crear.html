@@ -118,13 +118,17 @@
     </form>
 <script type="text/javascript">
 
-    var impuesto = {{impuesto}}
-    var today = new Date()
+    var impuesto = {{impuesto}};
+    var today = new Date();
     
     $("#id_fecha").datepicker({
         format: "dd/mm/yyyy",
         endDate: today+1,
         autoclose: true
     })
+    {% for prod in productos %}
+        appendRow('#myTable', {{prod|safe}});
+        generalTotal('#myTable')
+    {% endfor %}
 </script>
 {% endblock content_center %}

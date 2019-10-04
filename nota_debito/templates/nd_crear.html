@@ -122,5 +122,9 @@
         endDate: today+1,
         autoclose: true
     })
+    {% for prod in productos %}
+        appendRow('#myTable', {{prod|safe}});
+        generalTotal('#myTable')
+    {% endfor %}
 </script>
 {% endblock content_center %}

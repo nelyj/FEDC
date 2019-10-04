@@ -33,7 +33,8 @@ urlpatterns = [
     path('actualizar-dte-nd/<int:pk>/<int:comp>/',
          UpdateDTEView.as_view(
           form_class=FormCreateNotaDebito, model=notaDebito,
-          template_name='nc_crear.html'), name="actualizar"),
+          template_name='nd_crear.html',
+          success_url ='nota_debito:actualizar'), name="actualizar"),
     path('eliminar-dte-nd/<int:pk>',
          DeleteDTEView.as_view(model=notaDebito,
          success_url=reverse_lazy('notaDebito:seleccionar-empresa')), name="eliminar_dte"),
