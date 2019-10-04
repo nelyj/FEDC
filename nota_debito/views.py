@@ -61,6 +61,23 @@ class StartNotaCredito(SeleccionarEmpresaView):
         else:
             return HttpResponseRedirect('/')
 
+class NotaDebitoEnviadasView(LoginRequiredMixin, TemplateView):
+    """!
+    Clase para ver el listado de notas del sistema
+
+    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @date 13-09-2019
+    @version 1.0.0
+    """
+    template_name = 'ND_enviadas.html'
+
+    def get_context_data(self, *args, **kwargs): 
+        """
+        Método para colocar contexto en la vista
+        """
+        context = super().get_context_data(*args, **kwargs)
+        context['compania'] = self.kwargs.get('pk')
+        return context
 
 class ListaNotaDebitoViews(LoginRequiredMixin, TemplateView):
     template_name = 'lista_ND.html'
@@ -426,16 +443,6 @@ class SendInvoice(LoginRequiredMixin, FormView):
         except Exception as e:
             print(e)
             return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
-
-class NotaDebitoEnviadasView(LoginRequiredMixin, ListView):
-    template_name = 'ND_enviadas.html'
-
-
-    def get_queryset(self):
-
-        compania = self.kwargs.get('pk')
-        return notaDebito.objects.filter(compania=compania).order_by('-created')
-
 
 class VerEstadoND(LoginRequiredMixin, TemplateView):
     """!

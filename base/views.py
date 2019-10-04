@@ -133,9 +133,9 @@ class AjaxGenericListDTETable(LoginRequiredMixin, BaseDatatableView):
                 boton_estado = '<a href="{0}"\
                                 class="btn btn-success">Ver Estado</a> '.format(reverse_lazy('notaCredito:ver_estado_nc', kwargs={'pk':self.kwargs['pk'], 'slug':item.numero_factura}))
                 boton_imprimir_doc = '<a  id="edit_foo" href="{0}"\
-                                     target="_blank" class="btn btn-info">Imprimir</a> '.format(reverse_lazy('base:imprimir_factura', kwargs={'pk':self.kwargs['pk'], 'slug':item.numero_factura, 'doc':'NOTA_CRE_ELEC'}))
+                                     target="_blank" class="btn btn-info">Imprimir</a> '.format(reverse_lazy('base:imprimir_factura', kwargs={'pk':self.kwargs['pk'], 'slug':item.numero_factura, 'doc':tipo_doc}))
                 boton_imprimir_con = '<a  id="edit_foo" href="{0}?impre=cont"\
-                                     target="_blank" class="btn btn-warning">Impresion continua</a>'.format(reverse_lazy('base:imprimir_factura', kwargs={'pk':self.kwargs['pk'], 'slug':item.numero_factura, 'doc':'NOTA_CRE_ELEC'}))
+                                     target="_blank" class="btn btn-warning">Impresion continua</a>'.format(reverse_lazy('base:imprimir_factura', kwargs={'pk':self.kwargs['pk'], 'slug':item.numero_factura, 'doc':tipo_doc}))
                 botones_acciones = boton_estado + boton_imprimir_doc + boton_imprimir_con
             json_data.append([
                 item.numero_factura,
