@@ -106,7 +106,7 @@ class FormCreateNotaDebito(ModelForm):
         model = notaDebito
         fields = ['numero_factura','senores','transporte','despachar','observaciones',
                     'giro','rut','fecha','guia','orden_compra','nota_venta',
-                    'productos', 'comuna', 'region']
+                    'productos', 'comuna', 'region','ciudad_receptora']
 
     forma_pago = forms.ChoiceField(
         widget=forms.Select(attrs={'class':'form-control'}),
@@ -141,6 +141,8 @@ class FormCreateNotaDebito(ModelForm):
         self.fields['nota_venta'].required = False
         self.fields['productos'].widget.attrs.update({'class': 'form-control', 'style':'display:none'})
         self.fields['productos'].required = False
+        self.fields['ciudad_receptora'].widget.attrs.update({'class': 'form-control'})
+        self.fields['ciudad_receptora'].required = True
         self.fields['comuna'].widget.attrs.update({'class': 'form-control'})
         self.fields['comuna'].required = True
         self.fields['region'].widget.attrs.update({'class': 'form-control'})
