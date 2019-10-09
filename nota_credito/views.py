@@ -704,7 +704,8 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
         data['exento'] = exento
         data['iva'] = neto*(compania.tasa_de_iva/100)
         if(exento):
-            exento = neto * (exento/100)
+            data['exento'] = float(exento)
+            exento = neto * (data['exento']/100)
             data['total'] = exento + neto + data['iva']
         else:
             data['total'] = neto + (neto*(compania.tasa_de_iva/100))
