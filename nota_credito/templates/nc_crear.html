@@ -74,6 +74,10 @@
                 {{ form.nota_venta }}
             </div>
             <div class="col-md-6">
+                <label>{{ form.exento.label }}</label>
+                {{ form.exento }}
+            </div>
+            <div class="col-md-6">
                 <label>{{ form.observaciones.label }}</label>
                 {{ form.observaciones }}
             </div>
@@ -89,6 +93,7 @@
                             <th>Nombre</th>
                             <th>Cantidad</th>
                             <th>Precio</th>
+                            <th>Descuento</th>
                             <th>Total</th>
                             <th>Opciones</th>
                         </tr>

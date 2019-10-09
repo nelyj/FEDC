@@ -7,6 +7,7 @@ function appendRow(table_id, product={codigo:'', nombre:'', cantidad:'', precio:
 	html += '<td><input type="text" name="nombre" value="'+product.nombre+'"></td>'
 	html += '<td><input type="number" name="cantidad" id="cantidad" oninput="changeTotal(this,\''+table_id+'\')" value="'+product.cantidad+'"></td>'
 	html += '<td><input type="number" name="precio" oninput="changeTotal(this,\''+table_id+'\')" id="precio" step="0.01" value="'+product.precio+'"></td>'
+	html += '<td><input type="number" name="descuento" oninput="changeTotal(this,\''+table_id+'\')" id="descuento" value="'+product.descuento+'"></td>'
 	html += '<td><input type="text" name="total" readonly="readonly" id="total" value="'+product.cantidad*product.precio+'"></td>'
 	html += '<td><a class="btn btn-danger" onclick="remove_row(this,\''+table_id+'\')"> <i class="fa fa-minus" aria-hidden="true"></i></a></td></tr>'
 	$(table_id+' tbody').append(html)
@@ -31,9 +32,15 @@ function changeTotal(element, table_id){
 	var parent = $(element).parent().parent()
 	var cantidad = parent.find('#cantidad')[0].value
 	var precio = parent.find('#precio')[0].value
+	var descuento = parent.find('#descuento')[0].value
 	if(cantidad && precio){
 		var total = parent.find('#total')[0]
-		total.value = precio * cantidad
+		if(descuento){
+			var f_total = precio * cantidad
+			total.value = f_total - (f_total*(descuento/100))
+		}else{
+			total.value = precio * cantidad
+		}
 		generalTotal(table_id)
 	}
 }
@@ -43,11 +50,11 @@ function changeTotal(element, table_id){
  * @param table_id Recibe el identificador de la tabla
 */
 function generalTotal(table_id){
-	var totales = 0
+	var neto = 0
 	$.each($(table_id+' #total'),function(key,value){
-		totales += parseFloat(value.value)
+		neto += parseFloat(value.value)
 	})
-	var neto = totales - (totales * (impuesto/100) )
+	var total = neto + (neto * (impuesto/100) )
 	$('#out_neto').val(neto)
-	$('#out_total').val(totales)
+	$('#out_total').val(total)
 }

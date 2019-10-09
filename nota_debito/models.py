@@ -150,6 +150,10 @@ class notaDebito(CreationModificationDateMixin):
 			producto['qty'] = str(abs(producto['qty']))
 			producto['base_net_rate'] = str(producto['base_net_rate'])
 			producto['amount'] = round(abs(producto['amount']))
+			if(producto['discount']):
+				producto['discount'] = round(abs(producto['discount']))
+				discount_amount = int(producto['base_net_rate']) * (producto['discount']/100)
+				producto['discount_amount'] = round(abs(discount_amount))
 
 		# Ajustados valores para el xml
 		if('k' in folio.rut):
@@ -161,6 +165,8 @@ class notaDebito(CreationModificationDateMixin):
 		datos['numero_factura'] = datos['numero_factura'].replace('º','')
 		datos['neto']=str(round(abs(float(datos['neto']))))
 		datos['total']=str(round(abs(float(datos['total']))))
+		if(datos['exento']!=0):
+			datos['monto_exento'] = abs(datos['neto']*(datos['exento']/100))
 
 		# Llena los datos de la plantilla Documento_tag.xml con la informacion pertinente
 		documento_sin_aplanar = render_to_string(
