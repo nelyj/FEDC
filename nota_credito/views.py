@@ -546,7 +546,7 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
         context['impuesto'] = Compania.objects.get(pk=self.kwargs.get('pk')).tasa_de_iva
         if(self.request.method == 'POST'):
             dict_post = dict(self.request.POST.lists())
-            productos = self.transform_product(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'])
+            productos = self.transform_product(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'],dict_post['descuento'])
             context['productos'] = productos
         return context
 
@@ -582,14 +582,14 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
         if fecha > datetime_object:
             messages.error(self.request, "La fecha no puede ser mayor a la fecha actual, por favor verifica nuevamente la fecha")
             return super().form_invalid(form)
-        valid_r = self.validateProduct(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'])
+        valid_r = self.validateProduct(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'],dict_post['descuento'])
         if(not valid_r['valid']):
             messages.error(self.request, valid_r['msg'])
             return super().form_invalid(form)
-        productos = self.transform_product(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'])
+        productos = self.transform_product(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'],dict_post['descuento'])
         compania = Compania.objects.get(pk=self.kwargs.get('pk'))
         pass_certificado = compania.pass_certificado
-        diccionario_general = self.load_product(productos,compania)
+        diccionario_general = self.load_product(productos,compania,form.cleaned_data['exento'])
         self.object = form.save(commit=False)
         diccionario_general['rut'] = self.object.rut
         diccionario_general['numero_factura'] = self.object.numero_factura
@@ -652,13 +652,14 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
         """
         return super().form_invalid(form)
 
-    def transform_product(self, code, name, qty, price):
+    def transform_product(self, code, name, qty, price, discount):
         """
         Método para transformar los productos en listas de diccionarios
         @param code Recibe la lista con los códigos
         @param name Recibe la lista con los nombres
         @param qty Recibe la lista con las cantidades
         @param price Recibe la lista con los precios
+        @param discount Recibe la lista con los descuentos
         @return retorna los productos como lista de diccionarios
         """
         products = []
@@ -668,17 +669,19 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
             new_prod['codigo'] = code[i]
             new_prod['cantidad'] = int(qty[i])
             new_prod['precio'] = float(price[i])
+            new_prod['descuento'] = int(discount[i]) if discount[i] else discount[i]
             products.append(new_prod)
         return products
 
-    def load_product(self, prod_dict, compania):
+    def load_product(self, prod_dict, compania, exento):
         """
         Método para armar el json de producto
         @param prod_dict Recibe el diccionarios de productos
         @param compania Recibe el objecto de la compañia
+        @param exento Recibe si tiene un porcentaje exento
         @return retorna la data en un diccionario
         """
-        total = 0
+        neto = 0
         products = []
         for producto in prod_dict:
             new_prod = OrderedDict()
@@ -687,23 +690,35 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
             new_prod['item_code'] = producto['codigo']
             new_prod['qty'] = producto['cantidad']
             new_prod['base_net_rate'] = producto['precio']
-            new_prod['amount'] = new_prod['qty'] * new_prod['base_net_rate']
+            new_prod['discount'] = producto['descuento']
+            if(producto['descuento']):
+                f_total = new_prod['qty'] * new_prod['base_net_rate']
+                new_prod['amount'] = f_total - (f_total*(producto['descuento']/100))
+            else:
+                new_prod['amount'] = new_prod['qty'] * new_prod['base_net_rate']
             products.append(new_prod)
-            total += new_prod['amount']
-        neto = total - (total*(compania.tasa_de_iva/100))
+            neto += new_prod['amount']
         data = OrderedDict()
         data['productos'] = products
         data['neto'] = neto
-        data['total'] = total
+        data['exento'] = exento
+        data['iva'] = neto*(compania.tasa_de_iva/100)
+        if(exento):
+            data['exento'] = float(exento)
+            exento = neto * (data['exento']/100)
+            data['total'] = exento + neto + data['iva']
+        else:
+            data['total'] = neto + (neto*(compania.tasa_de_iva/100))
         return data
 
-    def validateProduct(self, code, name, qty, price):
+    def validateProduct(self, code, name, qty, price, discount):
         """
         Método para validar el producto
         @param code Recibe la lista con los códigos
         @param name Recibe la lista con los nombres
         @param qty Recibe la lista con las cantidades
         @param price Recibe la lista con los precios
+        @param discount Recibe la lista con descuentos
         @return retorna los productos como lista de diccionarios
         """
         for i in range(len(code)):
@@ -720,4 +735,15 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
                 float(p)
             except Exception as e:
                 return {'valid':False,'msg':'El precio debe ser un número'}
+        for d in discount:
+            if(d):
+                try:
+                    d = int(d)
+                    if(d<0):
+                        return {'valid':False,'msg':'El descuento no puede ser negativo'}
+                    elif(d>=100):
+                        return {'valid':False,'msg':'El descuento no puede ser mayor o igual 100%'}
+                except Exception as e:
+                    print(e)
+                    return {'valid':False,'msg':'Los descuentos deben ser enteros'}
         return {'valid':True}

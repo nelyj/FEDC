@@ -20,11 +20,13 @@ urlpatterns = [
     path('estado-nc/<int:pk>/<str:slug>/',VerEstadoNC.as_view(),name="ver_estado_nc"),
     path('sistema-nc/<int:pk>', NotaCreditoSistemaView.as_view(),name="nota_sistema_listado"),
     path('crear-nc/<int:pk>', NotaCreditoCreateView.as_view(),name="nota_sistema_crear"),
-    path('eliminar-dte-nc/<int:pk>',
-         DeleteDTEView.as_view(model=notaCredito,
-         success_url=reverse_lazy('notaCredito:seleccionar-empresa')), name="eliminar_dte"),
     path('actualizar-dte-nc/<int:pk>/<int:comp>/',
          UpdateDTEView.as_view(
           form_class=FormCreateNotaCredito, model=notaCredito,
-          template_name='nc_crear.html'), name="actualizar"),
+          template_name='nc_crear.html',
+          success_url ='nota_credito:actualizar'
+          ), name="actualizar",),
+    path('eliminar-dte-nc/<int:pk>',
+         DeleteDTEView.as_view(model=notaCredito,
+         success_url=reverse_lazy('notaCredito:seleccionar-empresa')), name="eliminar_dte"),
 ]

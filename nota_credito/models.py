@@ -52,7 +52,7 @@ class notaCredito(CreationModificationDateMixin):
 	productos = models.TextField(blank=True, null=True)
 	monto_palabra = models.CharField(max_length=128, blank=True, null=True)
 	neto = models.CharField(max_length=128, blank=True, null=True)
-	excento = models.CharField(max_length=128, blank=True, null=True)
+	exento = models.CharField(max_length=128, blank=True, null=True)
 	iva = models.CharField(max_length=128, blank=True, null=True)
 	total = models.CharField(max_length=128, blank=True, null=True)
 	n_folio = models.IntegerField(null=True, default=0)
@@ -142,6 +142,10 @@ class notaCredito(CreationModificationDateMixin):
 
 		# Ajustados los montos de productos para el xml
 		for producto in datos['productos']:
+			if(producto['discount']):
+				producto['discount'] = round(abs(producto['discount']))
+				discount_amount = producto['base_net_rate'] * (producto['discount']/100)
+				producto['discount_amount'] = round(abs(discount_amount))
 			producto['qty'] = str(abs(producto['qty']))
 			producto['base_net_rate'] = str(producto['base_net_rate'])
 			producto['amount'] = round(abs(producto['amount']))
@@ -156,6 +160,11 @@ class notaCredito(CreationModificationDateMixin):
 		datos['numero_factura'] = datos['numero_factura'].replace('º','')
 		datos['neto']=str(round(abs(float(datos['neto']))))
 		datos['total']=str(round(abs(float(datos['total']))))
+		if(datos['exento']):
+			if(datos['exento']>0):
+				datos['monto_exento'] = str(round(abs(float(datos['neto'])*(datos['exento']/100))))
+
+		datos['iva']=str(round(abs(int(datos['iva']))))
 
 		# Llena los datos de la plantilla Documento_tag.xml con la informacion pertinente
 		documento_sin_aplanar = render_to_string(

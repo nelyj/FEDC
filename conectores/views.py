@@ -177,7 +177,7 @@ class CompaniaUpdate(LoginRequiredMixin, UpdateView):
         
         compania = get_object_or_404(self.model, pk=self.kwargs['pk'])
         
-        if not str(form.cleaned_data['logo']) == str(compania.logo):
+        if not str(form.cleaned_data['logo']) == str(compania.logo) and str(compania.logo) != '':
             files = self.request.FILES
             ruta_archivo = settings.MEDIA_ROOT+str(compania.logo)
             ruta = '/'.join(ruta_archivo.split('/')[:-1])
@@ -196,12 +196,10 @@ class CompaniaUpdate(LoginRequiredMixin, UpdateView):
 
         if form.cleaned_data['pass_certificado'] != '':
             try:
-
                 instance = form.save(commit=False)
                 pfx = instance.certificado.read()
                 clave_privada, certificado, clave_publica  = \
                 Compania.validar_certificado(pfx, form.cleaned_data['pass_certificado'])
-
             except ContrasenaDeCertificadoIncorrecta:
 
                 messages.error(self.request, "Contraseña del certificado incorrecta")
@@ -222,7 +220,7 @@ class CompaniaUpdate(LoginRequiredMixin, UpdateView):
             msg = "Ocurrio un problema al guardar la información: "+str(e)
             messages.error(self.request, msg)
         return super().form_invalid(form)
-    
+
     def form_invalid(self, form):
         """!
         Form Invalid Method

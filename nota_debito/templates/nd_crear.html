@@ -37,6 +37,10 @@
                 {{ form.fecha }}
             </div>
             <div class="col-md-6">
+                <label>{{ form.ciudad_receptora.label }}</label> <i class="red asterisc">*</i>
+                {{ form.ciudad_receptora }}
+            </div>
+            <div class="col-md-6">
                 <label>{{ form.comuna.label }}</label> <i class="red asterisc">*</i>
                 {{ form.comuna }}
             </div>
@@ -122,5 +126,9 @@
         endDate: today+1,
         autoclose: true
     })
+    {% for prod in productos %}
+        appendRow('#myTable', {{prod|safe}});
+        generalTotal('#myTable')
+    {% endfor %}
 </script>
 {% endblock content_center %}
