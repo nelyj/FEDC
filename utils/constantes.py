@@ -9,3 +9,10 @@ FORMA_DE_PAGO = (
 	(2,'Credito'),
 	(3,'Sin costo')
 )
+
+TIPO_DOCUMENTO = (
+  (33, 'Factura electrónica'),
+  (52, 'Guía de despacho electrónica')
+  (56, 'Nota de débito electrónica')
+  (61, 'Nota de crédito electrónica')
+)
