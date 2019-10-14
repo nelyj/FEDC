@@ -6,7 +6,6 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect
-from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.http import FileResponse
 from django.views.generic.edit import FormView
@@ -16,14 +15,11 @@ from django.shortcuts import (
 from django.views.generic.base import TemplateView, View
 from django.views.generic import ListView, CreateView
 from django.template.loader import render_to_string
-from django_weasyprint import WeasyTemplateResponseMixin
 
 from base.constants import NOMB_DOC, LIST_DOC
 
 from conectores.models import *
 from conectores.forms import FormCompania
-from conectores.models import *
-from conectores.models import Compania
 
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
