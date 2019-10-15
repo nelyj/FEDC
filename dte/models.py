@@ -62,8 +62,8 @@ class DTE(CreationModificationDateMixin):
     total = models.CharField(max_length=128, blank=True, null=True)
     n_folio = models.IntegerField(null=True, default=0)
     status = models.CharField(max_length=128,blank=True, null=True)
-    tipo_dte = models.CharField(max_length=2,choices=TIPO_DOCUMENTO,default=TIPO_DOCUMENTO[0][0])
-    forma_pago = models.CharField(max_length=1,choices=FORMA_DE_PAGO,default=FORMA_DE_PAGO[0][0])
+    tipo_dte = models.CharField(max_length=2)
+    forma_pago = models.CharField(max_length=1)
     dte_xml = models.TextField(null=True, blank=True)
     track_id = models.CharField(max_length=32, blank=True, null=True)
     
@@ -224,7 +224,7 @@ class DTE(CreationModificationDateMixin):
         # Incorpora todo el documento firmado al la presentacion final y elimina 
         # las tabulaciones.
 
-        documento_final = render_to_string('dte.xml', {'set_DTE':etiqueta_SetDte})
+        documento_final = render_to_string('snippets/dte.xml', {'set_DTE':etiqueta_SetDte})
 
         # Se firmó el archivo xml
         sii_sdk = SII_SDK(settings.SII_PRODUCTION)

@@ -19,10 +19,6 @@ class FormCreateDte(ModelForm):
                     'giro','rut','fecha','tipo_dte', 'forma_pago',
                     'productos','ciudad_receptora','comuna', 'region','exento']
 
-    forma_pago = forms.ChoiceField(
-        widget=forms.Select(attrs={'class':'form-control'}),
-        choices=FORMA_DE_PAGO)
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['numero_factura'].widget.attrs.update({'class': 'form-control'})
