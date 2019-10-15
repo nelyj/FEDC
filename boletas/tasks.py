@@ -1,7 +1,7 @@
 """!
 Controlador para el manejo de tareas de modulo boletas
 
-@author Rodrigo A. Boet (rudmanmrrod at gmail.com)
+@author Rodrigo A. Boet (rodrigo.b at timgla.com)
 @date 01-08-2019
 @version 1.0.0
 """

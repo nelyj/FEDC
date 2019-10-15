@@ -1,7 +1,7 @@
 """!
 Controlador para el manejo de tareas de modulo intercambio
 
-@author Rodrigo A. Boet (rudmanmrrod at gmail.com)
+@author Rodrigo A. Boet (rodrigo.b at timgla.com)
 @date 15-07-2019
 @version 1.0.0
 """
@@ -32,7 +32,7 @@ def updateInbox():
     """
     Funcion que permite ejecutar una tarea para actualizar los correos de la bandeja de entrada.
 
-    @author Rodrigo A. Boet (rudmanmrrod at gmail.com)
+    @author Rodrigo A. Boet (rodrigo.b at timgla.com)
     @date 15-07-2019
     @version 1.0.0
     @return True o False

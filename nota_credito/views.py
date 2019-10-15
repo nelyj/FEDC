@@ -443,7 +443,7 @@ class VerEstadoNC(LoginRequiredMixin, TemplateView):
     """!
     Clase para ver el estado de envio de una factura
 
-    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @author Rodrigo Boet (rodrigo.b at timgla.com)
     @date 04-04-2019
     @version 1.0.0
     """
@@ -505,7 +505,7 @@ class NotaCreditoSistemaView(LoginRequiredMixin, TemplateView):
     """!
     Clase para ver el listado de notas del sistema
 
-    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @author Rodrigo Boet (rodrigo.b at timgla.com)
     @date 13-09-2019
     @version 1.0.0
     """
@@ -524,7 +524,7 @@ class NotaCreditoCreateView(LoginRequiredMixin, CreateView):
     """!
     Clase para generar una nota de crédito por el sistema
 
-    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @author Rodrigo Boet (rodrigo.b at timgla.com)
     @date 13-09-2019
     @version 1.0.0
     """

@@ -46,7 +46,7 @@ class DteSistemaView(LoginRequiredMixin, TemplateView):
     """!
     Clase para ver el listado de notas del sistema
 
-    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @author Rodrigo Boet (rodrigo.b at timgla.com)
     @date 14-10-2019
     @version 1.0.0
     """
@@ -65,7 +65,7 @@ class DteCreateView(LoginRequiredMixin, CreateView):
     """!
     Clase para generar una nota de crédito por el sistema
 
-    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @author Rodrigo Boet (rodrigo.b at timgla.com)
     @date 14-10-2019
     @version 1.0.0
     """

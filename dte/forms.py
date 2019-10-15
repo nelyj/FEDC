@@ -8,7 +8,7 @@ class FormCreateDte(ModelForm):
     """!
     Formulario para gestionar los dte
 
-    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @author Rodrigo Boet (rodrigo.b at timgla.com)
     @date 15-10-2019
     @version 1.0.0
     """

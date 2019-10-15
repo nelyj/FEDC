@@ -448,7 +448,7 @@ class VerEstadoGuia(LoginRequiredMixin, TemplateView):
     """!
     Clase para ver el estado de envio de una factura
 
-    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @author Rodrigo Boet (rodrigo.b at timgla.com)
     @date 04-04-2019
     @version 1.0.0
     """

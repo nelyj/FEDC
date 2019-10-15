@@ -32,7 +32,7 @@ class SendToSiiView(LoginRequeridoPerAuth, View):
     """!
     Envia el documento al sii
 
-    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @author Rodrigo Boet (rodrigo.b at timgla.com)
     @date 24-09-2019
     @version 1.0.0
     """
@@ -150,7 +150,7 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView, WeasyTemplateResponseMix
     """!
     Class para imprimir la factura en PDF
 
-    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @author Rodrigo Boet (rodrigo.b at timgla.com)
     @date 21-03-2019
     @version 1.0.0
     """

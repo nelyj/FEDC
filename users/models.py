@@ -59,7 +59,7 @@ class UserProfile(models.Model):
 class TwoFactToken(models.Model):
     """!
     Class for store Two Fact Token from user
-    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @author Rodrigo Boet (rodrigo.b at timgla.com)
     @author Ing. Luis Barrios (nikeven at gmail.com)
     @date 16-04-2017
     @version 1.0.0

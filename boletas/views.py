@@ -393,7 +393,7 @@ class EnvioMasivo(LoginRequiredMixin, View):
     Class that allows to send massive document of Boletas
 
     @author Ing. Luis Barrios (nikeven at gmail.com)
-    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @author Rodrigo Boet (rodrigo.b at timgla.com)
     @date 22-04-2019
     @version 1.0.0
     """

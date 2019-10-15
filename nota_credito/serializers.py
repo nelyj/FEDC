@@ -8,7 +8,7 @@ class ProductSerializer(serializers.Serializer):
   """!
   Serializer de Producto
 
-  @author Rodrigo Boet (rudmanmrrod at gmail.com)
+  @author Rodrigo Boet (rodrigo.b at timgla.com)
   @date 08-10-2019
   @version 1.0.0
   """
@@ -21,7 +21,7 @@ class notaCreditoSerializer(serializers.ModelSerializer):
   """!
   Serializer de Nota de Credito
 
-  @author Rodrigo Boet (rudmanmrrod at gmail.com)
+  @author Rodrigo Boet (rodrigo.b at timgla.com)
   @date 08-10-2019
   @version 1.0.0
   """

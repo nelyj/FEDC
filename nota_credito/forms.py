@@ -101,7 +101,7 @@ class FormCreateNotaCredito(ModelForm):
     """!
     Formulario para gestionar las notas de credito
 
-    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @author Rodrigo Boet (rodrigo.b at timgla.com)
     @date 13-09-2019
     @version 1.0.0
     """
