@@ -21,7 +21,7 @@ from facturas.models import *
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres
 from mixins.models import CreationModificationDateMixin
-from utils.constantes import TIPO_DOCUMENTO
+from utils.constantes import TIPO_DOCUMENTO, FORMA_DE_PAGO
 from utils.SIISdk import SII_SDK
 
 def validate_number_range(value):
@@ -44,7 +44,7 @@ class DTE(CreationModificationDateMixin):
     Modelo DTE
     """
     compania = models.ForeignKey(Compania, on_delete=models.CASCADE)
-    ref_factura = models.ForeignKey(Factura, on_delete=models.CASCADE, blank=True, null=True)
+    ref_factura = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
     numero_factura = models.CharField(max_length=128, db_index=True)
     senores = models.CharField(max_length=128)
     direccion = models.CharField(max_length=128)
@@ -63,6 +63,7 @@ class DTE(CreationModificationDateMixin):
     n_folio = models.IntegerField(null=True, default=0)
     status = models.CharField(max_length=128,blank=True, null=True)
     tipo_dte = models.CharField(max_length=2,choices=TIPO_DOCUMENTO,default=TIPO_DOCUMENTO[0][0])
+    forma_pago = models.CharField(max_length=1,choices=FORMA_DE_PAGO,default=FORMA_DE_PAGO[0][0])
     dte_xml = models.TextField(null=True, blank=True)
     track_id = models.CharField(max_length=32, blank=True, null=True)
     
@@ -225,4 +226,4 @@ class DTE(CreationModificationDateMixin):
         sii_sdk = SII_SDK(settings.SII_PRODUCTION)
         set_dte_sin_aplanar = sii_sdk.multipleSign(compania,documento_final,pass_certificado,1)
 
-        return '<?xml version="1.0" encoding="ISO-8859-1"?>\n'+set_dte_sin_aplanarfrom django.db import models
+        return '<?xml version="1.0" encoding="ISO-8859-1"?>\n'+set_dte_sin_aplanar

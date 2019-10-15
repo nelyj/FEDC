@@ -38,6 +38,15 @@
             </li>
             {% endif %}
             <li>
+                <a data-toggle="collapse" href="#notasDebito-collapse" aria-expanded="false" aria-controls="notasDebito-collapse">DTE<span class="caret "></a>
+            </li>
+            <div class="collapse" id="notasDebito-collapse">
+                <ul class="submenu" id="marketing_services">
+                    <li><a href="{% url 'dte:seleccionar_empresa' %}">Crear DTE</a></li>
+                    <li><a href="{% url 'dte:seleccionar_empresa' %}?enviadas=1">DTE enviados</a></li>
+                </ul>
+            </div>
+            <li>
                 <a data-toggle="collapse" href="#facturas-collapse" aria-expanded="false" aria-controls="facturas-collapse">Facturas<span class="caret "></a>
             </li>
             <div class="collapse" id="facturas-collapse">
@@ -51,9 +60,6 @@
             </li>
             <div class="collapse" id="notasCredito-collapse">
                 <ul class="submenu" id="marketing_services">
-                    <li><a href="{% url 'notaCredito:seleccionar-empresa' %}?sistema=1">
-                        Crear NC
-                    </a></li>
                     <li><a href="{% url 'notaCredito:seleccionar-empresa' %}">NC no enviadas</a></li>
                     <li><a href="{% url 'notaCredito:seleccionar-empresa' %}?enviadas=1"
                         >NC enviadas
@@ -65,9 +71,6 @@
             </li>
             <div class="collapse" id="notasDebito-collapse">
                 <ul class="submenu" id="marketing_services">
-                    <li><a href="{% url 'notaDebito:seleccionar-empresa' %}?sistema=1">
-                        Crear ND
-                    </a></li>
                     <li><a href="{% url 'notaDebito:seleccionar-empresa' %}">ND no enviadas</a></li>
                     <li><a href="{% url 'notaDebito:seleccionar-empresa' %}?enviadas=1">ND enviadas</a></li>
                 </ul>

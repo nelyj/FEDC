@@ -19,8 +19,8 @@ from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
 from utils.utils import validarModelPorDoc
 from utils.CustomMixin import SeleccionarEmpresaView
 
-from .models import notaCredito
-from .forms import *
+from .models import DTE
+from .forms import FormCreateDte
 
 class StartDte(SeleccionarEmpresaView):
     """
@@ -32,20 +32,13 @@ class StartDte(SeleccionarEmpresaView):
     """
 
     def post(self, request):
-        enviadas = self.request.GET.get('enviadas', None)
-        sistema = self.request.GET.get('sistema', None)
         empresa = int(request.POST.get('empresa'))
+        print(empresa)
         if not empresa:
             return HttpResponseRedirect('/')
         empresa_obj = Compania.objects.get(pk=empresa)
         if empresa_obj and self.request.user == empresa_obj.owner:
-            if sistema:
-                return HttpResponseRedirect(reverse_lazy('notaCredito:nota_sistema_listado', kwargs={'pk':empresa}))
-            else:
-                if enviadas == "1":
-                    return HttpResponseRedirect(reverse_lazy('notaCredito:lista-enviadas', kwargs={'pk':empresa}))
-                else:
-                    return HttpResponseRedirect(reverse_lazy('notaCredito:lista_nota_credito', kwargs={'pk':empresa}))
+            return HttpResponseRedirect(reverse_lazy('dte:lista_dte', kwargs={'pk':empresa}))
         else:
             return HttpResponseRedirect('/')
 
@@ -57,7 +50,7 @@ class DteSistemaView(LoginRequiredMixin, TemplateView):
     @date 14-10-2019
     @version 1.0.0
     """
-    template_name = 'NC_enviadas.html'
+    template_name = 'dte_enviadas.html'
 
     def get_context_data(self, *args, **kwargs): 
         """
@@ -76,10 +69,10 @@ class DteCreateView(LoginRequiredMixin, CreateView):
     @date 14-10-2019
     @version 1.0.0
     """
-    template_name = "nc_crear.html"
-    model = notaCredito
-    form_class = FormCreateNotaCredito
-    success_url = 'nota_credito:nota_sistema_crear'
+    template_name = "crear_dte.html"
+    model = DTE
+    form_class = FormCreateDte
+    success_url = 'dte:lista_dte'
 
     def get_context_data(self, *args, **kwargs): 
         """

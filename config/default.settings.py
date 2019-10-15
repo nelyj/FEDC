@@ -56,6 +56,7 @@ PROJECT_APPS = [
     'base',
     'users',
     'conectores',
+    'dte',
     'facturas',
     'folios',
     'boletas',

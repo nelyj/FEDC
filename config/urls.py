@@ -42,6 +42,7 @@ urlpatterns = [
     path('', include('utils.urls', namespace="utils")),
     path('', include('users.urls', namespace="users")),
     path('', include('conectores.urls', namespace="conectores")),
+    path('', include('dte.urls', namespace="dte")),
     path('', include('facturas.urls', namespace="facturas")),
     path('', include('folios.urls', namespace="folios")),
     path('', include('boletas.urls',namespace="boletas")),
