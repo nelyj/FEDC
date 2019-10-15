@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import ModelForm
+from conectores.constantes import COMUNAS
 from utils.constantes import FORMA_DE_PAGO, TIPO_DOCUMENTO
 from .models import *
 
@@ -29,7 +30,7 @@ class FormCreateDte(ModelForm):
         self.fields['numero_factura'].label = "Número"
         self.fields['senores'].widget.attrs.update({'class': 'form-control'})
         self.fields['senores'].required = True
-        self.fields['senores'].label = "Cliente"
+        self.fields['senores'].label = "Señor(es)"
         self.fields['observaciones'].widget = forms.Textarea()
         self.fields['observaciones'].widget.attrs.update({'class': 'form-control'})
         self.fields['observaciones'].required = False
@@ -43,7 +44,8 @@ class FormCreateDte(ModelForm):
         self.fields['productos'].required = False
         self.fields['ciudad_receptora'].widget.attrs.update({'class': 'form-control'})
         self.fields['ciudad_receptora'].required = True
-        self.fields['comuna'].widget.attrs.update({'class': 'form-control'})
+        self.fields['comuna'].widget = forms.Select(attrs={'class':'form-control'})
+        self.fields['comuna'].choices = COMUNAS
         self.fields['comuna'].required = True
         self.fields['region'].widget.attrs.update({'class': 'form-control'})
         self.fields['region'].required = True

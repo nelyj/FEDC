@@ -48,7 +48,7 @@
     <Referencia>
       <NroLinRef>1</NroLinRef>
       <TpoDocRef>{{ folio.tipo_de_documento }}</TpoDocRef>
-      <FolioRef>{{datos.orden_compra}}</FolioRef>
+      <FolioRef>{{ instance.n_folio }}</FolioRef>
       <FchRef>{% now "Y-m-d" %}</FchRef>
     </Referencia>
     <Referencia>

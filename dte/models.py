@@ -101,7 +101,7 @@ class DTE(CreationModificationDateMixin):
         data['neto']=str(round(float(data['neto'])))
         data['total']=str(round(abs(float(data['total']))))
 
-        sin_aplanar = render_to_string('snippets/ddtag.xml', {'data':data,'folio':folio, 'instance':instance, 'timestamp':timestamp})
+        sin_aplanar = render_to_string('snippets/dd_tag.xml', {'data':data,'folio':folio, 'instance':instance, 'timestamp':timestamp})
         digest_string = sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
         RSAprivatekey = RSA.importKey(folio.pem_private)
         private_signer = PKCS1_v1_5.new(RSAprivatekey)
@@ -124,7 +124,7 @@ class DTE(CreationModificationDateMixin):
         return sin_aplanar
 
     
-    def firmar_documento(etiqueta_DD, datos, folio, compania, instance,pass_certificado):
+    def firmar_documento(etiqueta_DD, datos, folio, compania, instance, pass_certificado):
 
         """
         Llena los campos de la etiqueta <Documento>, y la firma usando la 
@@ -169,9 +169,13 @@ class DTE(CreationModificationDateMixin):
 
         datos['iva']=str(round(abs(int(datos['iva']))))
 
+        if(instance.tipo_dte==56 or instance.tipo_dte==61):
+            documento_tag = 'snippets/documento_tag_ncd.xml'
+        else:
+            documento_tag = 'snippets/documento_tag.xml'
         # Llena los datos de la plantilla Documento_tag.xml con la informacion pertinente
         documento_sin_aplanar = render_to_string(
-            'snippets/Documento_tag_nc.xml', {
+            documento_tag, {
                 'datos':datos,
                 'folio':folio, 
                 'compania':compania, 
@@ -198,9 +202,9 @@ class DTE(CreationModificationDateMixin):
         if('k' in compania.rut):
             compania.rut = compania.rut.replace('k','K')
 
-        # LLena la plantilla set_DTE_tag.xml con los datos correspondientes
+        # LLena la plantilla dte_base.xml con los datos correspondientes
         set_dte_sin_aplanar = render_to_string(
-            'snippets/set_DTE_tag.xml', {
+            'snippets/dte_base.xml', {
                 'compania':compania, 
                 'folio':folio, 
                 'timestamp_firma':timestamp_firma,
@@ -220,7 +224,7 @@ class DTE(CreationModificationDateMixin):
         # Incorpora todo el documento firmado al la presentacion final y elimina 
         # las tabulaciones.
 
-        documento_final = render_to_string('dte_base.xml', {'set_DTE':etiqueta_SetDte})
+        documento_final = render_to_string('dte.xml', {'set_DTE':etiqueta_SetDte})
 
         # Se firmó el archivo xml
         sii_sdk = SII_SDK(settings.SII_PRODUCTION)
