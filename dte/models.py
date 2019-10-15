@@ -62,8 +62,8 @@ class DTE(CreationModificationDateMixin):
     total = models.CharField(max_length=128, blank=True, null=True)
     n_folio = models.IntegerField(null=True, default=0)
     status = models.CharField(max_length=128,blank=True, null=True)
-    tipo_dte = models.CharField(max_length=2)
-    forma_pago = models.CharField(max_length=1)
+    tipo_dte = models.PositiveSmallIntegerField(choices=TIPO_DOCUMENTO)
+    forma_pago = models.PositiveSmallIntegerField(choices=FORMA_DE_PAGO)
     dte_xml = models.TextField(null=True, blank=True)
     track_id = models.CharField(max_length=32, blank=True, null=True)
     
