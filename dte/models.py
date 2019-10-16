@@ -66,7 +66,7 @@ class DTE(CreationModificationDateMixin):
     forma_pago = models.PositiveSmallIntegerField(choices=FORMA_DE_PAGO)
     dte_xml = models.TextField(null=True, blank=True)
     track_id = models.CharField(max_length=32, blank=True, null=True)
-    
+
     class Meta:
         ordering = ('numero_factura',)
         verbose_name = 'DTE'

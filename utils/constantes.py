@@ -17,3 +17,5 @@ TIPO_DOCUMENTO = (
   (56, 'Nota de débito electrónica'),
   (61, 'Nota de crédito electrónica'),
 )
+
+documentos_dict = dict((key, value) for key, value in TIPO_DOCUMENTO)

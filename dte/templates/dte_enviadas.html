@@ -26,6 +26,7 @@
             <th>N°</th>
             <th>Compañía</th>
             <th>N° de folio</th>
+            <th>Tipo de documento (DTE)</th>
             <th>Acciones</th>
         </tr>
     </thead>
@@ -35,7 +36,7 @@
 {% block custom_js%}
 <script type="text/javascript">
 // Objeto Json lista de nota de credito
-var URL = "{% url 'base:ajax_list_dte' compania 'NOTA_CRE_ELEC'%}?sistema={{sistema}}";
+var URL = "{% url 'dte:ajax_list_dte' compania %}?sistema={{sistema}}";
 </script>
 <script type="text/javascript" src="{% static 'custom_datatable/listDataTable.js' %}" ></script>
 <script type="text/javascript" src="{% static 'start/modals.js' %}"></script>
