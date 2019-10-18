@@ -58,13 +58,18 @@
                 <i class="red asterisc">*</i>
                 {{ form.forma_pago }}
             </div>
-            <div class="col-md-6">
-                <label>{{ form.exento.label }}</label>
-                {{ form.exento }}
+            <h3>Descuento global</h3>
+            <div class="col-md-4">
+                <label>{{ form.descuento_global.label }}</label>
+                {{ form.descuento_global }}
             </div>
-            <div class="col-md-6">
-                <label>{{ form.observaciones.label }}</label>
-                {{ form.observaciones }}
+            <div class="col-md-4">
+                <label>{{ form.tipo_descuento.label }}</label>
+                {{ form.tipo_descuento }}
+            </div>
+            <div class="col-md-4">
+                <label>{{ form.glosa_descuento.label }}</label>
+                {{ form.glosa_descuento }}
             </div>
             <div class="col-md-12 table-responsive">
                 <h4>Productos <i class="red asterisc">*</i></h4> 
@@ -79,6 +84,7 @@
                             <th>Cantidad</th>
                             <th>Precio</th>
                             <th>Descuento</th>
+                            <th>Exento</th>
                             <th>Total</th>
                             <th>Opciones</th>
                         </tr>
@@ -92,6 +98,10 @@
             <div class="col-md-offset-8">
                 <label>Neto</label>
                 <input class="form-control" type="text" disabled="true" id="out_neto">
+            </div>
+            <div class="col-md-offset-8">
+                <label>Exento</label>
+                <input class="form-control" type="text" disabled="true" id="out_exento">
             </div>
             <div class="col-md-offset-8">
                 <label>Impuesto</label>

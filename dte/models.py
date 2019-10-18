@@ -21,23 +21,8 @@ from facturas.models import *
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres
 from mixins.models import CreationModificationDateMixin
-from utils.constantes import TIPO_DOCUMENTO, FORMA_DE_PAGO
+from utils.constantes import TIPO_DOCUMENTO, FORMA_DE_PAGO, VALOR_DESCUENTO
 from utils.SIISdk import SII_SDK
-
-def validate_number_range(value):
-    if value is not None:
-        try:
-            valor = float(value)
-            if not (valor >= 0 and valor <= 99):
-                raise ValidationError(
-                    '%(value)s el valor no se encuentra en el rango de 0 - 99',
-                    params={'value': value},
-                )
-        except ValueError:
-            raise ValidationError(
-                '%(value)s no es un numero valido',
-                params={'value': value},
-            )
 
 class DTE(CreationModificationDateMixin):
     """!
@@ -51,19 +36,20 @@ class DTE(CreationModificationDateMixin):
     comuna = models.CharField(max_length=128, choices=COMUNAS)
     region = models.CharField(max_length=128)
     ciudad_receptora = models.CharField(max_length=128)
-    observaciones = models.CharField(max_length=255, blank=True, null=True)
     giro = models.CharField(max_length=128)
     rut = models.CharField(max_length=128)
     fecha = models.DateField(blank=True)
     productos = models.TextField(blank=True, null=True)
     neto = models.CharField(max_length=128, blank=True, null=True)
-    exento = models.CharField(max_length=128, blank=True, null=True, validators=[validate_number_range])
     iva = models.CharField(max_length=128, blank=True, null=True)
     total = models.CharField(max_length=128, blank=True, null=True)
     n_folio = models.IntegerField(null=True, default=0)
     status = models.CharField(max_length=128,blank=True, null=True)
     tipo_dte = models.PositiveSmallIntegerField(choices=TIPO_DOCUMENTO)
     forma_pago = models.PositiveSmallIntegerField(choices=FORMA_DE_PAGO)
+    descuento_global = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    glosa_descuento = models.CharField(max_length=45, blank=True, null=True)
+    tipo_descuento = models.CharField(max_length=45, blank=True, null=True, choices=VALOR_DESCUENTO)
     dte_xml = models.TextField(null=True, blank=True)
     track_id = models.CharField(max_length=32, blank=True, null=True)
     

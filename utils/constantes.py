@@ -17,3 +17,8 @@ TIPO_DOCUMENTO = (
   (56, 'Nota de débito electrónica'),
   (61, 'Nota de crédito electrónica'),
 )
+
+VALOR_DESCUENTO = (
+  ('%','%'),
+  ('$','$')
+)

@@ -2,12 +2,13 @@
  * Función para agregar una fila a la tabla
  * @param table_id Recibe el identificador de la tabla
 */
-function appendRow(table_id, product={codigo:'', nombre:'', cantidad:'', precio:''}){
+function appendRow(table_id, product={codigo:'', nombre:'', cantidad:'', precio:'',exento:false}){
 	var html = '<tr><td><input type="text" name="codigo" value="'+product.codigo+'"></td>'
 	html += '<td><input type="text" name="nombre" value="'+product.nombre+'"></td>'
 	html += '<td><input type="number" name="cantidad" id="cantidad" oninput="changeTotal(this,\''+table_id+'\')" value="'+product.cantidad+'"></td>'
 	html += '<td><input type="number" name="precio" oninput="changeTotal(this,\''+table_id+'\')" id="precio" step="0.01" value="'+product.precio+'"></td>'
 	html += '<td><input type="number" name="descuento" oninput="changeTotal(this,\''+table_id+'\')" id="descuento" value="'+product.descuento+'"></td>'
+	html += '<td><input type="checkbox" name="exento" oninput="changeTotal(this,\''+table_id+'\')" id="exento" value="'+product.exento+'"></td>'
 	html += '<td><input type="text" name="total" readonly="readonly" id="total" value="'+product.cantidad*product.precio+'"></td>'
 	html += '<td><a class="btn btn-danger" onclick="remove_row(this,\''+table_id+'\')"> <i class="fa fa-minus" aria-hidden="true"></i></a></td></tr>'
 	$(table_id+' tbody').append(html)
@@ -51,10 +52,16 @@ function changeTotal(element, table_id){
 */
 function generalTotal(table_id){
 	var neto = 0
+	var exento = 0
 	$.each($(table_id+' #total'),function(key,value){
-		neto += parseFloat(value.value)
+		if($(value).parent().parent().find("#exento")[0].checked){
+			exento += parseFloat(value.value)
+		}else{
+			neto += parseFloat(value.value)
+		}
 	})
-	var total = neto + (neto * (impuesto/100) )
+	var total = (neto + (neto * (impuesto/100) )) + exento
 	$('#out_neto').val(neto)
 	$('#out_total').val(total)
+	$('#out_exento').val(exento)
 }
