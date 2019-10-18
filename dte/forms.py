@@ -44,7 +44,7 @@ class FormCreateDte(ModelForm):
         self.fields['glosa_descuento'].widget.attrs.update({'class': 'form-control'})
         self.fields['region'].label = "Glosa de Descuento"
         self.fields['tipo_descuento'].widget = forms.Select(attrs={'class':'form-control'})
-        self.fields['region'].label = "Tipo de Descuento"
+        self.fields['tipo_descuento'].label = "Tipo de Descuento"
         self.fields['tipo_descuento'].choices = VALOR_DESCUENTO
 
     def clean(self):

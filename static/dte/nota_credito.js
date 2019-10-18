@@ -37,7 +37,7 @@ function changeTotal(element, table_id){
 	var descuento = parent.find('#descuento')[0].value
 	if(cantidad && precio){
 		var total = parent.find('#total')[0]
-		if(descuento){
+		if(descuento=="1"){
 			var f_total = precio * cantidad
 			total.value = f_total - (f_total*(descuento/100))
 		}else{

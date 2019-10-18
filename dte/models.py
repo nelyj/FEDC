@@ -1,6 +1,4 @@
-import datetime
-import re
-import os
+import datetime, os
 
 from base64 import b64encode
 from collections import defaultdict

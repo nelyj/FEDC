@@ -43,7 +43,8 @@
       <PrcItem>{{prod.base_net_rate}}</PrcItem>{% autoescape off %}{% if prod.discount %}
       <DescuentoPct>{{prod.discount}}</DescuentoPct>
       <DescuentoMonto>{{prod.discount_amount}}</DescuentoMonto>{% endif %}{% endautoescape %}
-      <MontoItem>{{prod.amount}}</MontoItem>
+      <MontoItem>{{prod.amount}}</MontoItem>{% if prod.exento %}
+      <IndExe>1</IndExe>{% endif %}
     </Detalle>{%endfor%}{% if instance.descuento_global %}
     <DscRcgGlobal>
       <NroLinDR>1</NroLinDR>
