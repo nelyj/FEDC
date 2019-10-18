@@ -37,7 +37,7 @@ function changeTotal(element, table_id){
 	var descuento = parent.find('#descuento')[0].value
 	if(cantidad && precio){
 		var total = parent.find('#total')[0]
-		if(descuento=="1"){
+		if(descuento){
 			var f_total = precio * cantidad
 			total.value = f_total - (f_total*(descuento/100))
 		}else{
@@ -55,7 +55,7 @@ function generalTotal(table_id){
 	var neto = 0
 	var exento = 0
 	$.each($(table_id+' #total'),function(key,value){
-		if($(value).parent().parent().find("#exento")[0].value){
+		if($(value).parent().parent().find("#exento")[0].value==1){
 			exento += parseFloat(value.value)
 		}else{
 			neto += parseFloat(value.value)
