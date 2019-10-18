@@ -1,4 +1,4 @@
-import os, datetime, json
+import os, datetime, json, decimal
 from collections import OrderedDict
 
 from django.contrib import messages
@@ -83,7 +83,7 @@ class DteCreateView(LoginRequiredMixin, CreateView):
         context['impuesto'] = Compania.objects.get(pk=self.kwargs.get('pk')).tasa_de_iva
         if(self.request.method == 'POST'):
             dict_post = dict(self.request.POST.lists())
-            productos = self.transform_product(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'],dict_post['descuento'])
+            productos = self.transform_product(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'],dict_post['descuento'],dict_post['exento'])
             context['productos'] = productos
         return context
 
@@ -123,10 +123,14 @@ class DteCreateView(LoginRequiredMixin, CreateView):
         if(not valid_r['valid']):
             messages.error(self.request, valid_r['msg'])
             return super().form_invalid(form)
-        productos = self.transform_product(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'],dict_post['descuento'])
+        productos = self.transform_product(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'],dict_post['descuento'],dict_post['exento'])
         compania = Compania.objects.get(pk=self.kwargs.get('pk'))
         pass_certificado = compania.pass_certificado
-        diccionario_general = self.load_product(productos,compania,form.cleaned_data['exento'])
+        descuento_global = {
+            'descuento': form.cleaned_data['descuento_global'],
+            'tipo_descuento': form.cleaned_data['tipo_descuento']
+        }
+        diccionario_general = self.load_product(productos,compania,descuento_global)
         self.object = form.save(commit=False)
         diccionario_general['rut'] = self.object.rut
         diccionario_general['numero_factura'] = self.object.numero_factura
@@ -178,7 +182,7 @@ class DteCreateView(LoginRequiredMixin, CreateView):
         """
         return super().form_invalid(form)
 
-    def transform_product(self, code, name, qty, price, discount):
+    def transform_product(self, code, name, qty, price, discount, exempt):
         """
         Método para transformar los productos en listas de diccionarios
         @param code Recibe la lista con los códigos
@@ -186,6 +190,7 @@ class DteCreateView(LoginRequiredMixin, CreateView):
         @param qty Recibe la lista con las cantidades
         @param price Recibe la lista con los precios
         @param discount Recibe la lista con los descuentos
+        @param exempt Recibe la lista con los productos exentos
         @return retorna los productos como lista de diccionarios
         """
         products = []
@@ -196,18 +201,20 @@ class DteCreateView(LoginRequiredMixin, CreateView):
             new_prod['cantidad'] = int(qty[i])
             new_prod['precio'] = float(price[i])
             new_prod['descuento'] = int(discount[i]) if discount[i] else discount[i]
+            new_prod['exento'] = int(exempt[i])
             products.append(new_prod)
         return products
 
-    def load_product(self, prod_dict, compania, exento):
+    def load_product(self, prod_dict, compania, descuento):
         """
         Método para armar el json de producto
         @param prod_dict Recibe el diccionarios de productos
         @param compania Recibe el objecto de la compañia
-        @param exento Recibe si tiene un porcentaje exento
+        @param descuento Recibe si tiene descuento global
         @return retorna la data en un diccionario
         """
         neto = 0
+        exento = 0
         products = []
         for producto in prod_dict:
             new_prod = OrderedDict()
@@ -217,24 +224,29 @@ class DteCreateView(LoginRequiredMixin, CreateView):
             new_prod['qty'] = producto['cantidad']
             new_prod['base_net_rate'] = producto['precio']
             new_prod['discount'] = producto['descuento']
+            new_prod['exento'] = producto['exento']
             if(producto['descuento']):
                 f_total = new_prod['qty'] * new_prod['base_net_rate']
                 new_prod['amount'] = f_total - (f_total*(producto['descuento']/100))
             else:
                 new_prod['amount'] = new_prod['qty'] * new_prod['base_net_rate']
             products.append(new_prod)
-            neto += new_prod['amount']
+            if(new_prod['exento']):
+                exento += new_prod['amount']
+            else:
+                neto += new_prod['amount']
         data = OrderedDict()
         data['productos'] = products
-        data['neto'] = neto
-        data['exento'] = exento
-        data['iva'] = neto*(compania.tasa_de_iva/100)
-        if(exento):
-            data['exento'] = float(exento)
-            exento = neto * (data['exento']/100)
-            data['total'] = exento + neto + data['iva']
-        else:
-            data['total'] = neto + (neto*(compania.tasa_de_iva/100))
+        data['neto'] = decimal.Decimal(neto)
+        data['exento'] = decimal.Decimal(exento)
+        data['iva'] = decimal.Decimal(neto*(compania.tasa_de_iva/100))
+        if(descuento['descuento']):
+            nuevo_exento = descuento['descuento']
+            if(descuento['tipo_descuento']=="%"):
+                nuevo_exento = decimal.Decimal(data['neto']) * (descuento['descuento']/100)
+            data['neto'] -= nuevo_exento
+            data['exento'] += nuevo_exento
+        data['total'] = data['exento'] + data['neto'] + data['iva']
         return data
 
     def validateProduct(self, code, name, qty, price, discount):

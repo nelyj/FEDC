@@ -8,7 +8,8 @@ function appendRow(table_id, product={codigo:'', nombre:'', cantidad:'', precio:
 	html += '<td><input type="number" name="cantidad" id="cantidad" oninput="changeTotal(this,\''+table_id+'\')" value="'+product.cantidad+'"></td>'
 	html += '<td><input type="number" name="precio" oninput="changeTotal(this,\''+table_id+'\')" id="precio" step="0.01" value="'+product.precio+'"></td>'
 	html += '<td><input type="number" name="descuento" oninput="changeTotal(this,\''+table_id+'\')" id="descuento" value="'+product.descuento+'"></td>'
-	html += '<td><input type="checkbox" name="exento" oninput="changeTotal(this,\''+table_id+'\')" id="exento" value="'+product.exento+'"></td>'
+	html += '<td><select name="exento" onchange="changeTotal(this,\''+table_id+'\')" id="exento">'
+	html += '<option value="0">No</option><option value="1">Si</option></select></td>'
 	html += '<td><input type="text" name="total" readonly="readonly" id="total" value="'+product.cantidad*product.precio+'"></td>'
 	html += '<td><a class="btn btn-danger" onclick="remove_row(this,\''+table_id+'\')"> <i class="fa fa-minus" aria-hidden="true"></i></a></td></tr>'
 	$(table_id+' tbody').append(html)
@@ -54,7 +55,7 @@ function generalTotal(table_id){
 	var neto = 0
 	var exento = 0
 	$.each($(table_id+' #total'),function(key,value){
-		if($(value).parent().parent().find("#exento")[0].checked){
+		if($(value).parent().parent().find("#exento")[0].value){
 			exento += parseFloat(value.value)
 		}else{
 			neto += parseFloat(value.value)

@@ -44,7 +44,14 @@
       <DescuentoPct>{{prod.discount}}</DescuentoPct>
       <DescuentoMonto>{{prod.discount_amount}}</DescuentoMonto>{% endif %}{% endautoescape %}
       <MontoItem>{{prod.amount}}</MontoItem>
-    </Detalle>{%endfor%}
+    </Detalle>{%endfor%}{% if instance.descuento_global %}
+    <DscRcgGlobal>
+      <NroLinDR>1</NroLinDR>
+      <TpoMov>D</TpoMov>
+      <GlosaDR>{{ instance.glosa_descuento }}</GlosaDR>
+      <TpoValor>{{ instance.tipo_descuento }}</TpoValor>
+      <ValorDR>{{ instance.descuento_global }}</ValorDR>
+    </DscRcgGlobal>{% endif %}
     <Referencia>
       <NroLinRef>1</NroLinRef>
       <TpoDocRef>{{ folio.tipo_de_documento }}</TpoDocRef>

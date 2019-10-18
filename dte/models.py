@@ -150,8 +150,7 @@ class DTE(CreationModificationDateMixin):
         datos['neto']=str(round(abs(float(datos['neto']))))
         datos['total']=str(round(abs(float(datos['total']))))
         if(datos['exento']):
-            if(datos['exento']>0):
-                datos['monto_exento'] = str(round(abs(float(datos['neto'])*(datos['exento']/100))))
+            datos['monto_exento'] = str(round(abs(float(datos['exento']))))
 
         datos['iva']=str(round(abs(int(datos['iva']))))
 
