@@ -1,4 +1,6 @@
-import datetime, os
+import datetime
+import re
+import os
 
 from base64 import b64encode
 from collections import defaultdict
@@ -39,13 +41,26 @@ def validate_number_range(value):
                 params={'value': value},
             )
 
+def validate_string_number(value):
+    if value is not None:
+        if not re.match("^[a-zA-Z0-9_]*$", value):
+            raise ValidationError(
+                    '%(value)s el valor no debe contener caracteres especiales ni espacios',
+                    params={'value': value},
+                )
+    else:
+        raise ValidationError(
+                    '%(value)s el valor es requerido',
+                    params={'value': value},
+                )
+
 class DTE(CreationModificationDateMixin):
     """!
     Modelo DTE
     """
     compania = models.ForeignKey(Compania, on_delete=models.CASCADE)
     ref_factura = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
-    numero_factura = models.CharField(max_length=128, db_index=True)
+    numero_factura = models.CharField(max_length=128, db_index=True, validators=[validate_string_number])
     senores = models.CharField(max_length=128)
     direccion = models.CharField(max_length=128)
     comuna = models.CharField(max_length=128, choices=COMUNAS)
