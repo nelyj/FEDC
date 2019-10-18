@@ -1,10 +1,4 @@
-<<<<<<< HEAD
 import os, datetime, json, decimal
-=======
-import datetime
-import json
-
->>>>>>> eafb38eb92a2309d2be90757acd2094fbf652a85
 from collections import OrderedDict
 
 from django.conf import settings
