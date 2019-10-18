@@ -43,9 +43,9 @@ def validate_number_range(value):
 
 def validate_string_number(value):
     if value is not None:
-        if not re.match("^[a-zA-Z0-9_]*$", value):
+        if not re.match("^([a-zA-Z])([a-zA-Z0-9_])*$", value):
             raise ValidationError(
-                    '%(value)s el valor no debe contener caracteres especiales ni espacios',
+                    '%(value)s el valor debe iniciar con una letra y no debe contener caracteres especiales ni espacios',
                     params={'value': value},
                 )
     else:
