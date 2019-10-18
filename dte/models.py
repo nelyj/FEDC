@@ -1,4 +1,6 @@
-import datetime, os
+import datetime
+import re
+import os
 
 from base64 import b64encode
 from collections import defaultdict
@@ -23,6 +25,7 @@ from folios.exceptions import ElCafNoTieneMasTimbres
 from mixins.models import CreationModificationDateMixin
 from utils.constantes import TIPO_DOCUMENTO, FORMA_DE_PAGO, VALOR_DESCUENTO
 from utils.SIISdk import SII_SDK
+from utils.utils import validate_string_number
 
 class DTE(CreationModificationDateMixin):
     """!
@@ -30,7 +33,7 @@ class DTE(CreationModificationDateMixin):
     """
     compania = models.ForeignKey(Compania, on_delete=models.CASCADE)
     ref_factura = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
-    numero_factura = models.CharField(max_length=128, db_index=True)
+    numero_factura = models.CharField(max_length=128, db_index=True, validators=[validate_string_number])
     senores = models.CharField(max_length=128)
     direccion = models.CharField(max_length=128)
     comuna = models.CharField(max_length=128, choices=COMUNAS)
@@ -52,7 +55,7 @@ class DTE(CreationModificationDateMixin):
     tipo_descuento = models.CharField(max_length=45, blank=True, null=True, choices=VALOR_DESCUENTO)
     dte_xml = models.TextField(null=True, blank=True)
     track_id = models.CharField(max_length=32, blank=True, null=True)
-    
+
     class Meta:
         ordering = ('numero_factura',)
         verbose_name = 'DTE'

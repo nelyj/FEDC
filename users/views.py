@@ -826,7 +826,7 @@ class RegisterAccountView(FormView):
     """!
     Register View
 
-    @author Rodrigo Boet (rudmanmrrod@gmail.com)
+    @author Rodrigo Boet (rodrigo.b at timgla.com)
     @author Ing. Luis Barrios (nikeven at gmail.com)
     @date 17-04-2018
     @version 1.0.0

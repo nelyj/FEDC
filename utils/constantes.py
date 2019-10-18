@@ -22,3 +22,5 @@ VALOR_DESCUENTO = (
   ('%','%'),
   ('$','$')
 )
+
+documentos_dict = dict((key, value) for key, value in TIPO_DOCUMENTO)
