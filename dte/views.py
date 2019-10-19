@@ -456,21 +456,11 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
         diccionario_general['forma_pago'] = form.cleaned_data['forma_pago']
         # Se verifica el folio
         try:
-            folio = Folio.objects.filter(empresa=self.kwargs.get('comp'),is_active=True,vencido=False,tipo_de_documento=33).order_by('fecha_de_autorizacion').first()
+            folio = Folio.objects.filter(empresa=self.kwargs.get('comp'), rango_desde__lte=self.object.n_folio, rango_hasta__gte=self.object.n_folio, tipo_de_documento=self.object.tipo_dte).order_by('fecha_de_autorizacion').first()
             if not folio:
                 raise Folio.DoesNotExist
         except Folio.DoesNotExist:  
-            messages.error(self.request, "No posee folios para asignacion de timbre")
-            return super().form_invalid(form)
-        try:
-            folio.verificar_vencimiento()
-        except ElCAFSenEncuentraVencido:
-            messages.error(self.request, "El CAF se encuentra vencido")
-            return super().form_invalid(form)
-        try:
-            self.object.recibir_folio(folio)
-        except (ElCafNoTieneMasTimbres, ValueError):
-            messages.error(self.request, "Ya ha consumido todos sus timbres")
+            messages.error(self.request, "No existe folios con este rango")
             return super().form_invalid(form)
         self.object.productos = json.dumps(diccionario_general['productos'])
         # Se generan los XML
