@@ -2,14 +2,18 @@
  * Función para agregar una fila a la tabla
  * @param table_id Recibe el identificador de la tabla
 */
-function appendRow(table_id, product={codigo:'', nombre:'', cantidad:'', precio:'',exento:false}){
+function appendRow(table_id, product={codigo:'', nombre:'', cantidad:'', precio:'',exento:0}){
 	var html = '<tr><td><input type="text" name="codigo" value="'+product.codigo+'"></td>'
 	html += '<td><input type="text" name="nombre" value="'+product.nombre+'"></td>'
 	html += '<td><input type="number" name="cantidad" id="cantidad" oninput="changeTotal(this,\''+table_id+'\')" value="'+product.cantidad+'"></td>'
 	html += '<td><input type="number" name="precio" oninput="changeTotal(this,\''+table_id+'\')" id="precio" step="0.01" value="'+product.precio+'"></td>'
 	html += '<td><input type="number" name="descuento" oninput="changeTotal(this,\''+table_id+'\')" id="descuento" value="'+product.descuento+'"></td>'
 	html += '<td><select name="exento" onchange="changeTotal(this,\''+table_id+'\')" id="exento">'
-	html += '<option value="0">No</option><option value="1">Si</option></select></td>'
+	if (product.exento == 1)
+		html += '<option value="0">No</option><option value="1" selected>Si</option>'
+	else
+		html += '<option value="0" selected>No</option><option value="1">Si</option>'
+	html += '</select></td>'
 	html += '<td><input type="text" name="total" readonly="readonly" id="total" value="'+product.cantidad*product.precio+'"></td>'
 	html += '<td><a class="btn btn-danger" onclick="remove_row(this,\''+table_id+'\')"> <i class="fa fa-minus" aria-hidden="true"></i></a></td></tr>'
 	$(table_id+' tbody').append(html)
