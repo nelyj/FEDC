@@ -322,19 +322,22 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
         context['impuesto'] = Compania.objects.get(pk=self.kwargs.get('comp')).tasa_de_iva
         if(self.request.method == 'POST'):
             dict_post = dict(self.request.POST.lists())
-            productos = self.class_create.transform_product(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'], dict_post['descuento'])
+            productos = self.class_create.transform_product(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'], dict_post['descuento'], dict_post['exento'])
             context['productos'] = productos
 
             return context
 
         prod = context['form']['productos'].value().replace('\'{','{').replace('}\'','}').replace('\'',"\"")
-
+        descuento_global = {
+            'descuento': context['form']['descuento_global'].value(),
+            'tipo_descuento': context['form']['tipo_descuento'].value()
+        }
         productos = json.loads(prod)
         productos = productos
         productos = self.reverse_product(
                     productos,
                     Compania.objects.get(pk=self.kwargs.get('comp')),
-                    context['form']['exento'].value()
+                    descuento_global
                     )
         productos = self.dict_product(productos['productos'])
 
@@ -355,10 +358,11 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
             new_prod['cantidad'] = int(producto['amount'])
             new_prod['precio'] = float(producto['precio'])
             new_prod['descuento'] = float(producto['descuento'])
+            new_prod['exento'] = int(producto['exento'])
             products.append(new_prod)
         return products
 
-    def reverse_product(self, prod_dict, compania, exento):
+    def reverse_product(self, prod_dict, compania, descuento):
         """
         Método para armar el json de producto
         @param prod_dict Recibe el diccionarios de productos
@@ -366,6 +370,7 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
         @return retorna la data en un diccionario
         """
         neto = 0
+        exento = 0
         products = []
         for producto in prod_dict:
             new_prod = OrderedDict()
@@ -375,24 +380,29 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
             new_prod['cantidad'] = producto['qty']
             new_prod['precio'] = producto['base_net_rate']
             new_prod['descuento'] = producto['discount']
+            new_prod['exento'] = producto['exento']
             if(new_prod['descuento']):
                 f_total = producto['qty'] * producto['base_net_rate']
                 new_prod['amount'] = f_total - (f_total*(producto['discount']/100))
             else:
                 new_prod['amount'] = producto['qty'] * producto['base_net_rate']
             products.append(new_prod)
-            neto += new_prod['amount']
+            if(new_prod['exento']):
+                exento += new_prod['amount']
+            else:
+                neto += new_prod['amount']
         data = OrderedDict()
         data['productos'] = products
-        data['neto'] = neto
-        data['exento'] = exento
-        data['iva'] = neto*(compania.tasa_de_iva/100)
-        if(exento):
-            data['exento'] = float(exento)
-            exento = neto * (data['exento']/100)
-            data['total'] = exento + neto + data['iva']
-        else:
-            data['total'] = neto + (neto*(compania.tasa_de_iva/100))
+        data['neto'] = decimal.Decimal(neto)
+        data['exento'] = decimal.Decimal(exento)
+        data['iva'] = decimal.Decimal(neto*(compania.tasa_de_iva/100))
+        if(descuento['descuento']):
+            nuevo_exento = descuento['descuento']
+            if(descuento['tipo_descuento']=="%"):
+                nuevo_exento = decimal.Decimal(data['neto']) * (descuento['descuento']/100)
+            data['neto'] -= nuevo_exento
+            data['exento'] += nuevo_exento
+        data['total'] = data['exento'] + data['neto'] + data['iva']
         return data
 
 
@@ -426,10 +436,14 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
         if(not valid_r['valid']):
             messages.error(self.request, valid_r['msg'])
             return super().form_invalid(form)
-        productos = self.class_create.transform_product(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'], dict_post['descuento'])
+        productos = self.class_create.transform_product(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'], dict_post['descuento'], dict_post['exento'])
         compania = Compania.objects.get(pk=self.kwargs.get('comp'))
         pass_certificado = compania.pass_certificado
-        diccionario_general = self.class_create.load_product(productos,compania, form.cleaned_data['exento'])
+        descuento_global = {
+            'descuento': form.cleaned_data['descuento_global'],
+            'tipo_descuento': form.cleaned_data['tipo_descuento']
+        }
+        diccionario_general = self.class_create.load_product(productos,compania, descuento_global)
         self.object = form.save(commit=False)
         diccionario_general['rut'] = self.object.rut
         diccionario_general['numero_factura'] = self.object.numero_factura
@@ -444,21 +458,11 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
         diccionario_general['forma_pago'] = form.cleaned_data['forma_pago']
         # Se verifica el folio
         try:
-            folio = Folio.objects.filter(empresa=self.kwargs.get('comp'),is_active=True,vencido=False,tipo_de_documento=33).order_by('fecha_de_autorizacion').first()
+            folio = Folio.objects.filter(empresa=self.kwargs.get('comp'), rango_desde__lte=self.object.n_folio, rango_hasta__gte=self.object.n_folio, tipo_de_documento=self.object.tipo_dte).order_by('fecha_de_autorizacion').first()
             if not folio:
                 raise Folio.DoesNotExist
         except Folio.DoesNotExist:  
-            messages.error(self.request, "No posee folios para asignacion de timbre")
-            return super().form_invalid(form)
-        try:
-            folio.verificar_vencimiento()
-        except ElCAFSenEncuentraVencido:
-            messages.error(self.request, "El CAF se encuentra vencido")
-            return super().form_invalid(form)
-        try:
-            self.object.recibir_folio(folio)
-        except (ElCafNoTieneMasTimbres, ValueError):
-            messages.error(self.request, "Ya ha consumido todos sus timbres")
+            messages.error(self.request, "No existe folios con este rango")
             return super().form_invalid(form)
         self.object.productos = json.dumps(diccionario_general['productos'])
         # Se generan los XML
