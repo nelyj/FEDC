@@ -70,3 +70,17 @@ function generalTotal(table_id){
 	$('#out_total').val(total)
 	$('#out_exento').val(exento)
 }
+
+/**
+ * Función para mostrar los campos requeridos de nota
+ * crédito y débito
+ * @param select_value Recibe el valor del id
+*/
+function show_dte_fields(select_value){
+	var val = $(select_value).val()
+	if(val == 56 || val == 63){
+		$('#dte_hidden').show()
+	}else{
+		$('#dte_hidden').hide()
+	}
+}

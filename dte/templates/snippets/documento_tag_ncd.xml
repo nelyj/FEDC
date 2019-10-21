@@ -36,7 +36,8 @@
       <CdgItem>
         <TpoCodigo>INT1</TpoCodigo>
         <VlrCodigo>{{prod.item_code}}</VlrCodigo>
-      </CdgItem>
+      </CdgItem>{% if prod.exento %}
+      <IndExe>1</IndExe>{% endif %}
       <NmbItem>{{prod.description}}</NmbItem>
       <DscItem/>
       <QtyItem>{{prod.qty}}</QtyItem>

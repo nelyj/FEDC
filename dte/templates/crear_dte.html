@@ -25,6 +25,16 @@
                 <label>{{ form.numero_factura.label }} </label> <i class="red asterisc">*</i>
                 {{ form.numero_factura }}
             </div>
+            <div id="dte_hidden" style="display: none">
+                <div class="col-md-6">
+                    <label>{{ form.cod_ref.label }}</label> <i class="red asterisc">*</i>
+                    {{ form.cod_ref }}
+                </div>
+                    <div class="col-md-6">
+                    <label>{{ form.razon_ref.label }}</label> <i class="red asterisc">*</i>
+                    {{ form.razon_ref }}
+                </div>
+            </div>
             <div class="col-md-6">
                 <label>{{ form.senores.label }}</label> <i class="red asterisc">*</i>
                 {{ form.senores }}
