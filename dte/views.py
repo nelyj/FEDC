@@ -4,9 +4,10 @@ from collections import OrderedDict
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import CreateView
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import (
@@ -24,6 +25,7 @@ from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
 
 from utils.constantes import documentos_dict
 from utils.CustomMixin import SeleccionarEmpresaView
+from utils.views import sendToSii
 
 from .models import DTE
 from .forms import FormCreateDte
@@ -621,7 +623,7 @@ class AjaxGenericListDTETable(LoginRequiredMixin, BaseDatatableView):
         json_data = []
         for item in qs:
             if self.request.GET.get(u'sistema', None) == 'True':
-                url = str(reverse_lazy('base:send_sii', kwargs={'pk':item.pk, 'dte':item.tipo_dte}))
+                url = str(reverse_lazy('dte:send_sii', kwargs={'pk':item.pk}))
                 boton_enviar_sii = '<a href="#" onclick=send_to_sii("'+url+'")\
                                     class="btn btn-success">Enviar al Sii</a> '
                 url_eliminar = str(reverse_lazy('dte:eliminar_dte', kwargs={'pk':item.pk}))
@@ -649,3 +651,25 @@ class AjaxGenericListDTETable(LoginRequiredMixin, BaseDatatableView):
                 botones_acciones
             ])
         return json_data
+
+class SendToSiiView(LoginRequiredMixin, View):
+    """!
+    Envia el documento al sii
+
+    @author Rodrigo Boet (rodrigo.b at timgla.com)
+    @date 24-09-2019
+    @version 1.0.0
+    """
+
+    def get(self, request, **kwargs):
+        """
+        Método para manejar la petición post
+        """
+        model = DTE.objects.get(pk=kwargs['pk'])
+        send_sii = sendToSii(model.compania,model.dte_xml,model.compania.pass_certificado)
+        if(not send_sii['estado']):
+            return JsonResponse({'status':send_sii['estado'], 'msg':send_sii['msg']})
+        else:
+            model.track_id = send_sii['track_id']
+            model.save()
+            return JsonResponse({'status':send_sii['estado'], 'msg':'Envíado con éxito'})

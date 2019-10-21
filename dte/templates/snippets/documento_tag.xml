@@ -36,15 +36,15 @@
       <CdgItem>
         <TpoCodigo>INT1</TpoCodigo>
         <VlrCodigo>{{prod.item_code}}</VlrCodigo>
-      </CdgItem>
+      </CdgItem>{% if prod.exento %}
+      <IndExe>1</IndExe>{% endif %}
       <NmbItem>{{prod.description}}</NmbItem>
       <DscItem/>
       <QtyItem>{{prod.qty}}</QtyItem>
       <PrcItem>{{prod.base_net_rate}}</PrcItem>{% autoescape off %}{% if prod.discount %}
       <DescuentoPct>{{prod.discount}}</DescuentoPct>
       <DescuentoMonto>{{prod.discount_amount}}</DescuentoMonto>{% endif %}{% endautoescape %}
-      <MontoItem>{{prod.amount}}</MontoItem>{% if prod.exento %}
-      <IndExe>1</IndExe>{% endif %}
+      <MontoItem>{{prod.amount}}</MontoItem>
     </Detalle>{%endfor%}{% if instance.descuento_global %}
     <DscRcgGlobal>
       <NroLinDR>1</NroLinDR>

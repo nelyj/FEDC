@@ -17,4 +17,6 @@ urlpatterns = [
          ImprimirFactura.as_view(), name="imprimir_dte"),
     path('listar-dte/<int:pk>/',
          AjaxGenericListDTETable.as_view(), name="ajax_list_dte"),
+    path('send_sii/<int:pk>/',
+       SendToSiiView.as_view(), name="send_sii"),
 ]
