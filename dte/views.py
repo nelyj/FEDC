@@ -523,11 +523,12 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView, WeasyTemplateResponseMix
         if impre_cont == 'cont':
             self.template_name = "pdf/impresion.continua.pdf.html"
         #if tipo_doc in LIST_DOC:
+        print(type(num_factura), compania)
         try:
-            factura = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
+            factura = self.model.objects.select_related().get(numero_factura=num_factura, compania=int(compania))
             return super().dispatch(request, *args, **kwargs)
         except Exception as e:
-            print(e)
+            print(e, '*'*6)
             factura = self.model.objects.select_related().filter(numero_factura=num_factura, compania=compania)
             if len(factura) > 1:
                 messages.error(self.request, 'Existe mas de un registro con el mismo numero de factura: {0}'.format(num_factura))
@@ -560,7 +561,7 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView, WeasyTemplateResponseMix
         productos = json.loads(prod)
         context['productos'] = productos
 
-        ruta = settings.STATIC_URL + context['factura'].compania.rut + '/' + etiqueta +'/timbre.jpg'
+        ruta = settings.STATIC_URL + context['factura'].numero_factura + '/timbre.jpg'
         context['ruta']=ruta
         return context
 
