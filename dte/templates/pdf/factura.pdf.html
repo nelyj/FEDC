@@ -77,18 +77,21 @@
                         <td>
                             {{factura.comuna|default_if_none:""|upper}}
                         </td>
+                        {% comment %}
                         <td>
                             Cond. de venta:
                         </td>
                         <td>
                             {{factura.condicion_venta|default_if_none:""|upper}}
                         </td>
+                        
                         <td>
                             Guía: 
                         </td>
                         <td>
                             {{factura.guia|default_if_none:""|upper}}
                         </td>
+                        {% endcomment %}
                     </tr>
                     <tr>
                         <td>
@@ -97,6 +100,7 @@
                         <td>
                             {{factura.region|default_if_none:""|upper}}
                         </td>
+                        {% comment %}
                         <td>
                             Vencimiento:
                         </td>
@@ -109,7 +113,9 @@
                         <td>
                             {{factura.orden_compra|default_if_none:""|upper}}
                         </td>
+                        {% endcomment %}
                     </tr>
+                    {% comment %}
                     <tr>
                         <td>
                             Transporte:
@@ -130,6 +136,7 @@
                             {{factura.nota_venta|default_if_none:""|upper}}
                         </td>
                     </tr>
+
                     <tr>
                         <td>
                             Despachar A:
@@ -146,6 +153,7 @@
                             {{factura.observaciones|default_if_none:""|upper}}
                         </td>
                     </tr>
+                    {% endcomment %}
                 </table>
             </div>
             <div>
@@ -193,9 +201,13 @@
                     <tfoot>
                         <!--Tr final de la tabla-->
                         <tr class="border_footer">
+
                             <td colspan="5" rowspan="4">
+                                {% comment %}
                                 SON: {{factura.monto_palabra|default_if_none:" "}}
+                                {% endcomment %}
                             </td>
+
                             <td>
                                 <b>NETO</b>
                             </td>
