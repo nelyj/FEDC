@@ -554,6 +554,8 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView, WeasyTemplateResponseMix
         etiqueta=self.kwargs['slug'].replace('º','')
         context['etiqueta'] = etiqueta
 
+        context['referencia'] = context['factura'].ref_factura
+
         prod = context['factura'].productos.replace('\'{','{').replace('}\'','}').replace('\'',"\"")
 
         productos = json.loads(prod)

@@ -1,5 +1,6 @@
 {% load staticfiles %}
 {% load format_miles %}
+{% load tipo_dte %}
 <!DOCTYPE html>
 <html>
     <head>
@@ -241,6 +242,51 @@
                         </tr>                        
                     </tfoot>
                 </table>
+            </div>
+            <br>
+            <div>
+                
+                {% if referencia %}
+                    <table class="table-factura">
+                        <thead>
+                        <tr>
+                            <th colspan="3">
+                                Referencia a otros documentos
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                Tipo de Documento
+                            </th>
+                            <th>
+                                Folio
+                            </th>
+                            <th>
+                                Fecha
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                {{referencia.tipo_dte|tipo_dte}}
+                            </td>
+                            <td>
+                                {{referencia.n_folio}}
+                            </td>
+                            <td>
+                                {{referencia.fecha}}
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr class="border_footer">
+                            <td colspan="3">
+                            </td>
+                        </tr>
+                    </tfoot>
+                    </table>
+                {% endif %}
             </div>
             <div class="timbre">
                 <img src="{{ruta}}">
