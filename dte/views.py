@@ -1,6 +1,7 @@
 import os, datetime, json, decimal
 from collections import OrderedDict
 
+from django.core import serializers
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -99,6 +100,14 @@ class DteCreateView(LoginRequiredMixin, CreateView):
             productos = self.transform_product(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'],dict_post['descuento'],dict_post['exento'])
             context['productos'] = productos
         return context
+
+    def get_form_kwargs(self):
+        """
+        Método para pasar datos al formulario
+        """
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'compania': self.kwargs.get('pk')})
+        return kwargs
 
     def get_success_url(self):
         """
@@ -677,3 +686,34 @@ class SendToSiiView(LoginRequiredMixin, View):
             model.track_id = send_sii['track_id']
             model.save()
             return JsonResponse({'status':send_sii['estado'], 'msg':'Envíado con éxito'})
+
+
+class GetDteDataView(LoginRequiredMixin, View):
+    """!
+    Carga los datos del dte
+
+    @author Rodrigo Boet (rodrigo.b at timgla.com)
+    @date 22-10-2019
+    @version 1.0.0
+    """
+    def get(self, request, **kwargs):
+        """
+        Método para manejar la petición post
+        """
+        try:
+            dte = DTE.objects.filter(pk=kwargs['pk']).get()
+            compania = dte.compania
+            if(compania.owner==self.request.user):
+                serialized_dte = serializers.serialize('json',
+                    [dte], fields=['numero_factura', 'senores',
+                        'direccion', 'comuna', 'region', 'ciudad_receptora',
+                        'giro', 'rut', 'fecha', 'productos', 'total',
+                        'forma_pago', 'descuento_global', 'glosa_descuento',
+                        'tipo_descuento'])
+                dte_object = json.loads(serialized_dte)
+                return JsonResponse({'success':True, 'data':dte_object})
+            else:
+                return JsonResponse({'success':False, 'msg':'No puedes hacer eso'})
+        except Exception as e:
+            print(e)
+            return JsonResponse({'success':False, 'msg':str(e)})

@@ -26,10 +26,14 @@ class FormCreateDte(ModelForm):
         fields = ['numero_factura','senores', 'giro',
                     'rut','fecha','tipo_dte', 'forma_pago',
                     'productos','ciudad_receptora','comuna', 'region', 
-                    'descuento_global', 'glosa_descuento', 'tipo_descuento']
+                    'descuento_global', 'glosa_descuento', 'tipo_descuento', 'ref_factura']
 
     def __init__(self, *args, **kwargs):
+        compania = kwargs.pop('compania')
         super().__init__(*args, **kwargs)
+        self.fields['ref_factura'].widget.attrs.update({'class': 'form-control','onchange':'load_dte_info(this.value)'})
+        self.fields['ref_factura'].queryset = DTE.objects.filter(compania_id=compania,track_id=None)
+        self.fields['ref_factura'].empty_label = "Seleccione..."
         self.fields['numero_factura'].widget.attrs.update({'class': 'form-control'})
         self.fields['numero_factura'].label = "Número"
         self.fields['senores'].widget.attrs.update({'class': 'form-control'})

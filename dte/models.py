@@ -58,8 +58,9 @@ class DTE(CreationModificationDateMixin):
         ordering = ('numero_factura',)
         verbose_name = 'DTE'
         verbose_name_plural = 'DTE'
-        def __str__(self):
-            return self.numero_factura
+    
+    def __str__(self):
+        return self.numero_factura
 
     def recibir_folio(self, folio):
         if isinstance(folio, Folio):

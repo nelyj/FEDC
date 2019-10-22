@@ -2,7 +2,7 @@
  * Función para agregar una fila a la tabla
  * @param table_id Recibe el identificador de la tabla
 */
-function appendRow(table_id, product={codigo:'', nombre:'', cantidad:'', precio:'',exento:0}){
+function appendRow(table_id, product={codigo:'', nombre:'', cantidad:'', precio:'',exento:0, descuento:''}){
 	var html = '<tr><td><input type="text" name="codigo" value="'+product.codigo+'"></td>'
 	html += '<td><input type="text" name="nombre" value="'+product.nombre+'"></td>'
 	html += '<td><input type="number" name="cantidad" id="cantidad" oninput="changeTotal(this,\''+table_id+'\')" value="'+product.cantidad+'"></td>'
@@ -83,4 +83,73 @@ function show_dte_fields(select_value){
 	}else{
 		$('#dte_hidden').hide()
 	}
+}
+
+/**
+ * Función para cargar la información del dte
+ * @param dte_value Recibe el id del dte
+*/
+function load_dte_info(dte_value){
+	if(dte_value){
+		$.ajax({
+	    type: 'GET',
+	    url: LOAD_DTE.replace(0,dte_value),
+	    success: function(response) {
+	      if(response.success){
+	      	let data = response.data[0]
+	      	loadData(data.fields)
+	      }else{
+	      	alert(response.msg)
+	      }
+	    }	
+	  });
+  }
+}
+
+/**
+ * Función para parsear y modelar la data cargada
+ * @param data Recibe el objeto de la data
+*/
+function loadData(data){
+	$('#myTable tbody').html("")
+	let keys = Object.keys(data)
+	for(let value of keys){
+		if(value!='productos'){
+			$('#id_'+value).val(data[value])
+			$('#id_'+value).attr('readonly',true)
+		}
+	}
+	let productos = JSON.parse(data['productos'])
+	for(let item of productos){
+		let new_item = {
+			codigo:item.item_code, 
+			nombre:item.item_name, 
+			cantidad:item.qty, 
+			precio:item.amount,
+			exento:item.exento,
+			descuento:item.discount
+		}
+		appendRow('#myTable',new_item)
+	}
+	ei_table('#myTable',true)
+	generalTotal('#myTable')
+}
+
+/**
+ * Función para colocar en modo lectura o no
+ * los input de la tabla
+ * @param table_name Recibe el nombre de la tabla
+ * @param disable Recibe si el se habilita o no el campo
+*/
+function ei_table(table_name, disable){
+	$.each($(table_name+' tbody input'),function(key,value){
+		if($(value).attr('name')!='total'){
+			if(disable){
+				$(value).attr('readonly',true)
+			}
+			else{
+				$(value).removeAttr('readonly')
+			}
+		}
+	})
 }

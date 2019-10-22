@@ -21,19 +21,23 @@
                 <i class="red asterisc">*</i>
                 {{ form.tipo_dte }}
             </div>
-            <div class="col-md-6">
-                <label>{{ form.numero_factura.label }} </label> <i class="red asterisc">*</i>
-                {{ form.numero_factura }}
-            </div>
             <div id="dte_hidden" style="display: none">
+                <div class="col-md-12">
+                    <label>{{ form.ref_factura.label }}</label> <i class="red asterisc">*</i>
+                    {{ form.ref_factura }}
+                </div>
                 <div class="col-md-6">
                     <label>{{ form.cod_ref.label }}</label> <i class="red asterisc">*</i>
                     {{ form.cod_ref }}
                 </div>
-                    <div class="col-md-6">
+                <div class="col-md-6">
                     <label>{{ form.razon_ref.label }}</label> <i class="red asterisc">*</i>
                     {{ form.razon_ref }}
                 </div>
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.numero_factura.label }} </label> <i class="red asterisc">*</i>
+                {{ form.numero_factura }}
             </div>
             <div class="col-md-6">
                 <label>{{ form.senores.label }}</label> <i class="red asterisc">*</i>
@@ -68,7 +72,9 @@
                 <i class="red asterisc">*</i>
                 {{ form.forma_pago }}
             </div>
-            <h3>Descuento global</h3>
+            <div class="col-md-12">
+                <h3>Descuento global</h3>
+            </div>
             <div class="col-md-4">
                 <label>{{ form.descuento_global.label }}</label>
                 {{ form.descuento_global }}
@@ -127,7 +133,7 @@
         </div>
     </form>
 <script type="text/javascript">
-
+    const LOAD_DTE = "{% url 'dte:get_dte_data' 0 %}" ;
     var impuesto = {{impuesto}};
     var today = new Date();
     
@@ -140,5 +146,8 @@
         appendRow('#myTable', {{prod|safe}});
         generalTotal('#myTable')
     {% endfor %}
+    $(document).ready(function(){
+        show_dte_fields($('#id_tipo_dte'))
+    })
 </script>
 {% endblock content_center %}
