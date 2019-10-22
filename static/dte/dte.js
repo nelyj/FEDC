@@ -78,10 +78,12 @@ function generalTotal(table_id){
 */
 function show_dte_fields(select_value){
 	var val = $(select_value).val()
-	if(val == 56 || val == 63){
+	if(val == 56 || val == 61){
 		$('#dte_hidden').show()
+		disable_dte_table_buttons(true)
 	}else{
 		$('#dte_hidden').hide()
+		disable_dte_table_buttons(false)
 	}
 }
 
@@ -132,7 +134,9 @@ function loadData(data){
 		appendRow('#myTable',new_item)
 	}
 	ei_table('#myTable',true)
+	disable_dte_table_buttons(true)
 	generalTotal('#myTable')
+	enable_dte_fields($('#id_cod_ref').val())
 }
 
 /**
@@ -150,6 +154,61 @@ function ei_table(table_name, disable){
 			else{
 				$(value).removeAttr('readonly')
 			}
+		}
+	})
+}
+
+/**
+ * Función para colocar editables algunos
+ * campos dependiendo del código de referencia
+ * @param value Recibe el valor del código de referencia
+*/
+function enable_dte_fields(value){
+	if(value==1){
+		dte_fields(false)
+		ei_table('#myTable',true)
+	}
+	else if(value==2){
+		dte_fields(true)
+		ei_table('#myTable',true)
+	}
+	else if(value==3){
+		dte_fields(false)
+		ei_table('#myTable',false)
+	}
+}
+
+/**
+ * Función para habilitar/deshabilitar
+ * campos del dte
+ * @param enable Recibe si se activan o no
+*/
+function dte_fields(enable){
+	const fields = ['numero_factura', 'senores','direccion', 'comuna', 
+		'region', 'ciudad_receptora','giro', 'rut', 'fecha', 
+		'forma_pago', 'descuento_global', 'glosa_descuento']
+	for(let value of fields){
+		if(enable){
+			$('#id_'+value).removeAttr('readonly')
+		}
+		else{
+			$('#id_'+value).attr('readonly',true)
+		}
+	}
+}
+
+/**
+ * Función para habilitar/deshabilitar
+ * los botones de la tabla
+ * @param disable Recibe si se activan o no
+*/
+function disable_dte_table_buttons(disable){
+	$.each($('.table-responsive a'),function(key,value){
+		if(disable){
+			$(value).attr('disabled',true)
+		}
+		else{
+			$(value).removeAttr('disabled')
 		}
 	})
 }

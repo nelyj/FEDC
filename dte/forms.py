@@ -25,7 +25,8 @@ class FormCreateDte(ModelForm):
     def __init__(self, *args, **kwargs):
         compania = kwargs.pop('compania')
         super().__init__(*args, **kwargs)
-        self.fields['ref_factura'].widget.attrs.update({'class': 'form-control','onchange':'load_dte_info(this.value)'})
+        self.fields['ref_factura'].widget.attrs.update({'class': 'form-control',
+            'onchange':'load_dte_info(this.value)'})
         self.fields['ref_factura'].queryset = DTE.objects.filter(compania_id=compania,track_id=None)
         self.fields['ref_factura'].empty_label = "Seleccione..."
         self.fields['numero_factura'].widget.attrs.update({'class': 'form-control'})
@@ -53,7 +54,8 @@ class FormCreateDte(ModelForm):
         self.fields['tipo_descuento'].widget = forms.Select(attrs={'class':'form-control'})
         self.fields['tipo_descuento'].label = "Tipo de Descuento"
         self.fields['tipo_descuento'].choices = VALOR_DESCUENTO
-        self.fields['cod_ref'].widget = forms.Select(attrs={'class':'form-control'})
+        self.fields['cod_ref'].widget = forms.Select(attrs={'class':'form-control',
+            'onchange':'enable_dte_fields(this.value)'})
         self.fields['cod_ref'].label = label="Código de Referencia"
         self.fields['cod_ref'].choices = (('','Seleccione...'),) +CODIGO_REFERENCIA
         self.fields['razon_ref'].widget.attrs.update({'class': 'form-control'})
