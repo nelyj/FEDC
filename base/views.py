@@ -27,34 +27,6 @@ from utils.views import (
 )
 from .constants import NOMB_DOC, LIST_DOC
 
-
-class SendToSiiView(LoginRequeridoPerAuth, View):
-    """!
-    Envia el documento al sii
-
-    @author Rodrigo Boet (rodrigo.b at timgla.com)
-    @date 24-09-2019
-    @version 1.0.0
-    """
-    group_required = [u"Super Admin", u"Admin", u"Invitado"]
-
-    def get(self, request, **kwargs):
-        """
-        Método para manejar la petición post
-        """
-        print(kwargs['pk'])
-        print(kwargs['dte'])
-        model, url = validarModelPorDoc(kwargs['dte'])
-        model = model.objects.get(pk=kwargs['pk'])
-        send_sii = sendToSii(model.compania,model.dte_xml,model.compania.pass_certificado)
-        if(not send_sii['estado']):
-            return JsonResponse({'status':send_sii['estado'], 'msg':send_sii['msg']})
-        else:
-            model.track_id = send_sii['track_id']
-            model.save()
-            return JsonResponse({'status':send_sii['estado'], 'msg':'Envíado con éxito'})
-
-
 class AjaxGenericListDTETable(LoginRequiredMixin, BaseDatatableView):
     """!
     Prepara la data para mostrar en el datatable

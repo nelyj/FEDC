@@ -21,7 +21,9 @@ from facturas.models import *
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres
 from mixins.models import CreationModificationDateMixin
-from utils.constantes import TIPO_DOCUMENTO, FORMA_DE_PAGO, VALOR_DESCUENTO
+from utils.constantes import (TIPO_DOCUMENTO, FORMA_DE_PAGO, 
+    VALOR_DESCUENTO, CODIGO_REFERENCIA
+)
 from utils.SIISdk import SII_SDK
 from utils.utils import validate_string_number
 
@@ -48,6 +50,8 @@ class DTE(CreationModificationDateMixin):
     status = models.CharField(max_length=128,blank=True, null=True)
     tipo_dte = models.PositiveSmallIntegerField(choices=TIPO_DOCUMENTO)
     forma_pago = models.PositiveSmallIntegerField(choices=FORMA_DE_PAGO)
+    cod_ref = models.PositiveSmallIntegerField(choices=CODIGO_REFERENCIA,blank=True, null=True)
+    razon_ref = models.CharField(max_length=128,blank=True, null=True)
     descuento_global = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     glosa_descuento = models.CharField(max_length=45, blank=True, null=True)
     tipo_descuento = models.CharField(max_length=45, blank=True, null=True, choices=VALOR_DESCUENTO)
@@ -58,8 +62,9 @@ class DTE(CreationModificationDateMixin):
         ordering = ('numero_factura',)
         verbose_name = 'DTE'
         verbose_name_plural = 'DTE'
-        def __str__(self):
-            return self.numero_factura
+    
+    def __str__(self):
+        return self.numero_factura
 
     def recibir_folio(self, folio):
         if isinstance(folio, Folio):

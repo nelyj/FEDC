@@ -23,4 +23,10 @@ VALOR_DESCUENTO = (
   ('$','$')
 )
 
+CODIGO_REFERENCIA = (
+  (1,'Anula Documento'),
+  (2,'Corrige Texto del Documento'),
+  (3,'Corrige Montos')
+)
+
 documentos_dict = dict((key, value) for key, value in TIPO_DOCUMENTO)
