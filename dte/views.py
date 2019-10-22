@@ -527,6 +527,7 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView, WeasyTemplateResponseMix
             factura = self.model.objects.select_related().get(numero_factura=num_factura, compania=int(compania))
             return super().dispatch(request, *args, **kwargs)
         except Exception as e:
+            print(e)
             factura = self.model.objects.select_related().filter(numero_factura=num_factura, compania=compania)
             if len(factura) > 1:
                 messages.error(self.request, 'Existe mas de un registro con el mismo numero de factura: {0}'.format(num_factura))
@@ -553,6 +554,8 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView, WeasyTemplateResponseMix
         context['nombre_documento'] = documentos_dict[context['factura'].tipo_dte]
         etiqueta=self.kwargs['slug'].replace('º','')
         context['etiqueta'] = etiqueta
+
+        context['exento'] = abs(float(context['factura'].total) - float(context['factura'].neto) - float(context['factura'].iva))
 
         context['referencia'] = context['factura'].ref_factura
 
