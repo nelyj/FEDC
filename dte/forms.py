@@ -14,19 +14,13 @@ class FormCreateDte(ModelForm):
     @date 15-10-2019
     @version 1.0.0
     """
-    cod_ref = forms.CharField(widget=forms.Select(attrs={'class':'form-control'},
-        choices=(('','Seleccione...'),) +CODIGO_REFERENCIA), required=False, 
-        label="Código de Referencia")
-
-    razon_ref = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}),
-        label="Razon de Referencia", required=False)
-
     class Meta:
         model = DTE
         fields = ['numero_factura','senores', 'giro',
                     'rut','fecha','tipo_dte', 'forma_pago',
                     'productos','ciudad_receptora','comuna', 'region', 
-                    'descuento_global', 'glosa_descuento', 'tipo_descuento', 'ref_factura']
+                    'descuento_global', 'glosa_descuento', 'tipo_descuento', 'ref_factura',
+                    'cod_ref', 'razon_ref']
 
     def __init__(self, *args, **kwargs):
         compania = kwargs.pop('compania')
@@ -59,6 +53,10 @@ class FormCreateDte(ModelForm):
         self.fields['tipo_descuento'].widget = forms.Select(attrs={'class':'form-control'})
         self.fields['tipo_descuento'].label = "Tipo de Descuento"
         self.fields['tipo_descuento'].choices = VALOR_DESCUENTO
+        self.fields['cod_ref'].widget = forms.Select(attrs={'class':'form-control'})
+        self.fields['cod_ref'].label = label="Código de Referencia"
+        self.fields['cod_ref'].choices = (('','Seleccione...'),) +CODIGO_REFERENCIA
+        self.fields['razon_ref'].widget.attrs.update({'class': 'form-control'})
 
     def clean(self):
         cleaned_data = super(FormCreateDte, self).clean()
