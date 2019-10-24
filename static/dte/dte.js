@@ -117,7 +117,13 @@ function loadData(data){
 	let keys = Object.keys(data)
 	for(let value of keys){
 		if(value!='productos'){
-			$('#id_'+value).val(data[value])
+			if(value=='fecha'){
+				let new_date = data[value].split('-')
+				let new_value = new_date[2]+'/'+new_date[1]+'/'+new_date[0]
+				$('#id_'+value).val(new_value)
+			}else{
+				$('#id_'+value).val(data[value])
+			}
 			$('#id_'+value).attr('readonly',true)
 		}
 	}
@@ -127,7 +133,7 @@ function loadData(data){
 			codigo:item.item_code, 
 			nombre:item.item_name, 
 			cantidad:item.qty, 
-			precio:item.amount,
+			precio:item.base_net_rate,
 			exento:item.exento,
 			descuento:item.discount
 		}

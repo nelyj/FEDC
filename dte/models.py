@@ -160,8 +160,10 @@ class DTE(CreationModificationDateMixin):
 
         datos['iva']=str(round(abs(int(datos['iva']))))
 
+        ref = ''
         if(instance.tipo_dte==56 or instance.tipo_dte==61):
             documento_tag = 'snippets/documento_tag_ncd.xml'
+            ref = instance.ref_factura
         else:
             documento_tag = 'snippets/documento_tag.xml'
         # Llena los datos de la plantilla Documento_tag.xml con la informacion pertinente
@@ -172,7 +174,8 @@ class DTE(CreationModificationDateMixin):
                 'compania':compania, 
                 'timestamp':timestamp,
                 'DD':etiqueta_DD,
-                'instance':instance
+                'instance':instance,
+                'ref':ref
             })
 
 

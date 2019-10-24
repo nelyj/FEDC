@@ -353,6 +353,14 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
         context['productos'] = productos
         return context
 
+    def get_form_kwargs(self):
+        """
+        Método para pasar datos al formulario
+        """
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'compania': self.kwargs.get('pk')})
+        return kwargs
+
     def dict_product(self, prod):
         """
         Método para transformar los productos en listas de diccionarios
@@ -614,7 +622,6 @@ class AjaxGenericListDTETable(LoginRequiredMixin, BaseDatatableView):
         # these are simply objects displayed in datatable
         # You should not filter data returned here by any filter values entered by Intercambio. This is because
         # we need some base queryset to count total number of records.
-        print(self.request.GET.get(u'sistema', None))
         if self.request.GET.get(u'sistema', None) == 'True':
             return self.model.objects.filter(compania=self.kwargs['pk'], track_id=None)
         return self.model.objects.filter(compania=self.kwargs['pk']).exclude(track_id=None)

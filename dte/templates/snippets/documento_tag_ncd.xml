@@ -61,11 +61,11 @@
     </Referencia>
     <Referencia>
       <NroLinRef>2</NroLinRef>
-      <TpoDocRef>{{ ref.tipo_de_documento }}</TpoDocRef>
-      <FolioRef>{{ ref.folio }}</FolioRef>
-      <FchRef>{{ ref.fecha}}</FchRef>
-      <CodRef>{{ ref.codigo }}</CodRef>
-      <RazonRef>{{ ref.razon }}</RazonRef>
+      <TpoDocRef>{{ ref.tipo_dte }}</TpoDocRef>
+      <FolioRef>{{ ref.n_folio }}</FolioRef>
+      <FchRef>{{ ref.fecha|date:"Y-m-d" }}</FchRef>
+      <CodRef>{{ instance.cod_ref }}</CodRef>
+      <RazonRef>{{ instance.razon_ref }}</RazonRef>
     </Referencia>
     <TED version="1.0">{% autoescape off %}
       {{ DD }}{% endautoescape %}

@@ -50,7 +50,7 @@ class FormCreateDte(ModelForm):
         self.fields['tipo_dte'].choices = TIPO_DOCUMENTO
         self.fields['descuento_global'].widget.attrs.update({'class': 'form-control'})
         self.fields['glosa_descuento'].widget.attrs.update({'class': 'form-control'})
-        self.fields['region'].label = "Glosa de Descuento"
+        self.fields['glosa_descuento'].label = "Glosa de Descuento"
         self.fields['tipo_descuento'].widget = forms.Select(attrs={'class':'form-control'})
         self.fields['tipo_descuento'].label = "Tipo de Descuento"
         self.fields['tipo_descuento'].choices = VALOR_DESCUENTO
