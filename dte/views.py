@@ -372,10 +372,10 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
             new_prod = {}
             new_prod['nombre'] = producto['nombre']
             new_prod['codigo'] = producto['codigo']
-            new_prod['cantidad'] = int(producto['amount'])
+            new_prod['cantidad'] = int(producto['cantidad'])
             new_prod['precio'] = float(producto['precio'])
             new_prod['descuento'] = float(producto['descuento'])
-            new_prod['exento'] = int(producto['exento'])
+            new_prod['exento'] = int(producto.get('exento', 0))
             products.append(new_prod)
         return products
 
@@ -397,7 +397,7 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
             new_prod['cantidad'] = producto['qty']
             new_prod['precio'] = producto['base_net_rate']
             new_prod['descuento'] = producto['discount']
-            new_prod['exento'] = producto['exento']
+            new_prod['exento'] = producto.get('exento')
             if(new_prod['descuento']):
                 f_total = producto['qty'] * producto['base_net_rate']
                 new_prod['amount'] = f_total - (f_total*(producto['discount']/100))
