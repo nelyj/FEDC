@@ -519,7 +519,13 @@ class DeleteDTEView(LoginRequiredMixin, DeleteView):
     """
     model = DTE
     template_name = "eliminar_dte.html"
-    success_url = reverse_lazy('dte:seleccionar-empresa')
+    success_url = 'dte:lista_dte'
+
+    def get_success_url(self):
+        """
+        Método para retornar la url de éxito
+        """
+        return reverse_lazy(self.success_url, kwargs={'pk': self.kwargs['comp']})
 
 
 
@@ -650,7 +656,7 @@ class AjaxGenericListDTETable(LoginRequiredMixin, BaseDatatableView):
                 url = str(reverse_lazy('dte:send_sii', kwargs={'pk':item.pk}))
                 boton_enviar_sii = '<a href="#" onclick=send_to_sii("'+url+'")\
                                     class="btn btn-success">Enviar al Sii</a> '
-                url_eliminar = str(reverse_lazy('dte:eliminar_dte', kwargs={'pk':item.pk}))
+                url_eliminar = str(reverse_lazy('dte:eliminar_dte', kwargs={'pk':item.pk,'comp':self.kwargs['pk']}))
                 boton_eliminar = "<a data-toggle='modal' data-target='#myModal' \
                     class='btn btn-danger' \
                     onclick=eliminar_dte('"+url_eliminar+"')>Eliminar</a>\

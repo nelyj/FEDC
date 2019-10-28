@@ -11,7 +11,7 @@ urlpatterns = [
          DteCreateView.as_view(), name="crear_dte"),
     path('actualizar-dte/<int:pk>/<int:comp>/',
          UpdateDTEView.as_view(), name="actualizar",),
-    path('eliminar-dte/<int:pk>',
+    path('eliminar-dte/<int:pk>/<int:comp>/',
          DeleteDTEView.as_view(), name="eliminar_dte"),
     path('imprimir-dte/<int:pk>/<str:slug>/',
          ImprimirFactura.as_view(), name="imprimir_dte"),
