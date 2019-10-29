@@ -722,7 +722,7 @@ class GetDteDataView(LoginRequiredMixin, View):
             compania = dte.compania
             if(compania.owner==self.request.user):
                 serialized_dte = serializers.serialize('json',
-                    [dte], fields=['numero_factura', 'senores',
+                    [dte], fields=['senores',
                         'direccion', 'comuna', 'region', 'ciudad_receptora',
                         'giro', 'rut', 'fecha', 'productos', 'total',
                         'forma_pago', 'descuento_global', 'glosa_descuento',

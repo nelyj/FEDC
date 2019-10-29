@@ -72,7 +72,7 @@ class FormCreateDte(ModelForm):
             self.add_error('glosa_descuento', 'Glosa del descuento es requerido')
         if(descuento_global and not tipo_descuento):
             self.add_error('tipo_descuento', 'Tipo de descuento es requerido')
-        if(tipo_dte==56 and cod_ref!='' or tipo_dte==63 and cod_ref!=''):
+        if(tipo_dte==56 and cod_ref=='' or tipo_dte==61 and cod_ref==''):
             self.add_error('cod_ref', 'Código de referencia es requerido')
-        if(tipo_dte==56 and razon_ref!='' or tipo_dte==63 and razon_ref!=''):
-            self.add_error('cod_ref', 'Razon de referencia es requerido')
+        if(tipo_dte==56 and razon_ref=='' or tipo_dte==61 and razon_ref==''):
+            self.add_error('razon_ref', 'Razon de referencia es requerido')

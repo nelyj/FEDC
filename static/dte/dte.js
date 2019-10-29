@@ -116,7 +116,7 @@ function loadData(data){
 	$('#myTable tbody').html("")
 	let keys = Object.keys(data)
 	for(let value of keys){
-		if(value!='productos'){
+		if(value!='productos' || value!='numero_factura'){
 			if(value=='fecha'){
 				let new_date = data[value].split('-')
 				let new_value = new_date[2]+'/'+new_date[1]+'/'+new_date[0]
@@ -190,7 +190,7 @@ function enable_dte_fields(value){
  * @param enable Recibe si se activan o no
 */
 function dte_fields(enable){
-	const fields = ['numero_factura', 'senores','direccion', 'comuna', 
+	const fields = ['senores','direccion', 'comuna', 
 		'region', 'ciudad_receptora','giro', 'rut', 'fecha', 
 		'forma_pago', 'descuento_global', 'glosa_descuento']
 	for(let value of fields){

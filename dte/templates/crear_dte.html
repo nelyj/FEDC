@@ -148,6 +148,7 @@
     {% endfor %}
     $(document).ready(function(){
         show_dte_fields($('#id_tipo_dte'))
+        enable_dte_fields($('#id_cod_ref').val())
     })
 </script>
 {% endblock content_center %}
