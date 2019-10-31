@@ -27,6 +27,7 @@ from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
 from utils.constantes import documentos_dict
 from utils.CustomMixin import SeleccionarEmpresaView
 from utils.views import sendToSii
+from utils.SIISdk import SII_SDK
 
 from .models import DTE
 from .forms import FormCreateDte
@@ -348,7 +349,7 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
                     Compania.objects.get(pk=self.kwargs.get('comp')),
                     descuento_global
                     )
-        productos = self.dict_product(productos['productos'])
+        productos = self.dict_product(productos.get('productos'))
 
         context['productos'] = productos
         return context
@@ -375,7 +376,7 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
             new_prod['cantidad'] = int(producto['cantidad'])
             new_prod['precio'] = float(producto['precio'])
             new_prod['descuento'] = float(producto['descuento'])
-            new_prod['exento'] = int(producto.get('exento', 0))
+            new_prod['exento'] = 0 if producto.get('exento', 0) is None else int(producto.get('exento'))
             products.append(new_prod)
         return products
 
@@ -655,7 +656,7 @@ class AjaxGenericListDTETable(LoginRequiredMixin, BaseDatatableView):
             if self.request.GET.get(u'sistema', None) == 'True':
                 url = str(reverse_lazy('dte:send_sii', kwargs={'pk':item.pk}))
                 boton_enviar_sii = '<a href="#" onclick=send_to_sii("'+url+'")\
-                                    class="btn btn-success">Enviar al Sii</a> '
+                                    class="btn btn-success" id="send_dte" >Enviar al Sii</a> '
                 url_eliminar = str(reverse_lazy('dte:eliminar_dte', kwargs={'pk':item.pk,'comp':self.kwargs['pk']}))
                 boton_eliminar = "<a data-toggle='modal' data-target='#myModal' \
                     class='btn btn-danger' \
@@ -667,7 +668,7 @@ class AjaxGenericListDTETable(LoginRequiredMixin, BaseDatatableView):
                 botones_acciones = boton_enviar_sii + boton_editar +boton_eliminar
             else:
                 boton_estado = '<a href="{0}"\
-                                class="btn btn-success">Ver Estado</a> '.format(reverse_lazy('notaCredito:ver_estado_nc', kwargs={'pk':self.kwargs['pk'], 'slug':item.numero_factura}))
+                                class="btn btn-success">Ver Estado</a> '.format(reverse_lazy('dte:ver_estado', kwargs={'pk':self.kwargs['pk'], 'slug':item.numero_factura}))
                 boton_imprimir_doc = '<a  id="edit_foo" href="{0}"\
                                      target="_blank" class="btn btn-info">Imprimir</a> '.format(reverse_lazy('dte:imprimir_dte', kwargs={'pk':self.kwargs['pk'], 'slug':item.numero_factura}))
                 boton_imprimir_con = '<a  id="edit_foo" href="{0}?impre=cont"\
@@ -682,6 +683,7 @@ class AjaxGenericListDTETable(LoginRequiredMixin, BaseDatatableView):
             ])
         return json_data
 
+
 class SendToSiiView(LoginRequiredMixin, View):
     """!
     Envia el documento al sii
@@ -693,7 +695,7 @@ class SendToSiiView(LoginRequiredMixin, View):
 
     def get(self, request, **kwargs):
         """
-        Método para manejar la petición post
+        Método para manejar la petición get
         """
         model = DTE.objects.get(pk=kwargs['pk'])
         send_sii = sendToSii(model.compania,model.dte_xml,model.compania.pass_certificado)
@@ -715,7 +717,7 @@ class GetDteDataView(LoginRequiredMixin, View):
     """
     def get(self, request, **kwargs):
         """
-        Método para manejar la petición post
+        Método para manejar la petición get
         """
         try:
             dte = DTE.objects.filter(pk=kwargs['pk']).get()
@@ -734,3 +736,66 @@ class GetDteDataView(LoginRequiredMixin, View):
         except Exception as e:
             print(e)
             return JsonResponse({'success':False, 'msg':str(e)})
+
+
+class VerEstado(LoginRequiredMixin, TemplateView):
+    """!
+    Clase para ver el estado de envio de una factura
+
+    @author Rodrigo Boet (rodrigo.b at timgla.com)
+    @date 04-04-2019
+    @version 1.0.0
+    """
+    template_name = "estado_factura.html"
+    model = DTE
+
+    def get_context_data(self, *args, **kwargs):
+        """!
+        Method to handle data on get
+
+        @date 04-04-2019
+        @return Returns dict with data
+        """
+        context = super().get_context_data(*args, **kwargs)
+        num_factura = self.kwargs['slug']
+        compania = self.kwargs['pk']
+
+        factura = self.model.objects.get(numero_factura=num_factura, compania=compania)
+        context['factura'] = factura
+        
+        estado = self.get_invoice_status(factura,factura.compania,)
+
+        if(not estado['estado']):
+            messages.error(self.request, estado['msg'])
+        else:
+            context['estado'] = estado['status']
+            context['glosa'] = estado['glosa']
+
+        return context
+
+    def get_invoice_status(self,factura,compania):
+        """
+        Método para enviar la factura al sii
+        @param factura recibe el objeto de la factura
+        @param compania recibe el objeto compañia
+        @return dict con la respuesta
+        """
+        try:
+            sii_sdk = SII_SDK(settings.SII_PRODUCTION)
+            seed = sii_sdk.getSeed()
+            try:
+                sign = sii_sdk.signXml(seed, compania, compania.pass_certificado)
+                token = sii_sdk.getAuthToken(sign)
+                if(token):
+                    print(token)
+                    estado = sii_sdk.checkDTEstatus(compania.rut,factura.track_id,token)
+                    return {'estado':True,'status':estado['estado'],'glosa':estado['glosa']} 
+                else:
+                    return {'estado':False,'msg':'No se pudo obtener el token del sii'}
+            except Exception as e:
+                print(e)
+                return {'estado':False,'msg':'Ocurrió un error al firmar el documento'}
+            return {'estado':True}
+        except Exception as e:
+            print(e)
+            return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}

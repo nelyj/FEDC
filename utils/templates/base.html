@@ -45,6 +45,7 @@
     {% endblock extras_js %}
 </head>
     <body>
+        <div class="se-pre-con"></div>
         {% block contenido %}
         {% endblock contenido %}
     </body>
@@ -54,6 +55,10 @@
     $('.datepicker').datepicker({
         format: "dd/mm/yyyy",
         language: 'es'
+    });
+    $(window).load(function() {
+        // Animate loader off screen
+        $(".se-pre-con").fadeOut("slow");
     });
     </script>
     {% block custom_js%}

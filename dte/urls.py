@@ -18,7 +18,9 @@ urlpatterns = [
     path('listar-dte/<int:pk>/',
          AjaxGenericListDTETable.as_view(), name="ajax_list_dte"),
     path('send_sii/<int:pk>/',
-       SendToSiiView.as_view(), name="send_sii"),
-    path('get-dte-data/<int:pk>/', 
-        GetDteDataView.as_view(), name="get_dte_data"),
+         SendToSiiView.as_view(), name="send_sii"),
+    path('get-dte-data/<int:pk>/',
+         GetDteDataView.as_view(), name="get_dte_data"),
+    path('estado/<int:pk>/<str:slug>/',
+         VerEstado.as_view(), name="ver_estado"),
 ]
