@@ -14,7 +14,14 @@ function appendRow(table_id, product={codigo:'', nombre:'', cantidad:'', precio:
 	else
 		html += '<option value="0" selected>No</option><option value="1">Si</option>'
 	html += '</select></td>'
-	html += '<td><input type="text" name="total" readonly="readonly" id="total" value="'+product.cantidad*product.precio+'"></td>'
+	if (product.descuento != ''){
+		var f_total = product.cantidad * product.precio;
+		html += '<td><input type="text" name="total" readonly="readonly" id="total" value="'+(f_total-(f_total*(product.descuento/100)))+'"></td>'
+		console.log(html)
+	}
+	else{
+		html += '<td><input type="text" name="total" readonly="readonly" id="total" value="'+product.cantidad*product.precio+'"></td>'
+	}
 	html += '<td><a class="btn btn-danger" onclick="remove_row(this,\''+table_id+'\')"> <i class="fa fa-minus" aria-hidden="true"></i></a></td></tr>'
 	$(table_id+' tbody').append(html)
 }

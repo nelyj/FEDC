@@ -349,6 +349,7 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
                     Compania.objects.get(pk=self.kwargs.get('comp')),
                     descuento_global
                     )
+        print(productos)
         productos = self.dict_product(productos.get('productos'))
 
         context['productos'] = productos
@@ -375,8 +376,9 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
             new_prod['codigo'] = producto['codigo']
             new_prod['cantidad'] = int(producto['cantidad'])
             new_prod['precio'] = float(producto['precio'])
-            new_prod['descuento'] = float(producto['descuento'])
-            new_prod['exento'] = 0 if producto.get('exento', 0) is None else int(producto.get('exento'))
+            new_prod['descuento'] = 0 if producto.get('exento', None) is None else float(producto.get('exento'))
+            new_prod['exento'] = 0 if producto.get('exento', 0) is None else float(producto.get('exento'))
+
             products.append(new_prod)
         return products
 
@@ -420,7 +422,7 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
                 nuevo_exento = decimal.Decimal(data['neto']) * (descuento['descuento']/100)
             data['neto'] -= nuevo_exento
             data['exento'] += nuevo_exento
-        data['total'] = data['exento'] + data['neto'] + data['iva']
+        data['total'] = decimal.Decimal(data['exento']) + decimal.Decimal(data['neto']) + decimal.Decimal(data['iva'])
         return data
 
 
@@ -581,7 +583,7 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView, WeasyTemplateResponseMix
         etiqueta=self.kwargs['slug'].replace('º','')
         context['etiqueta'] = etiqueta
 
-        context['exento'] = abs(float(context['factura'].total) - float(context['factura'].neto) - float(context['factura'].iva))
+        
 
         context['referencia'] = context['factura'].ref_factura
 
@@ -589,6 +591,22 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView, WeasyTemplateResponseMix
 
         productos = json.loads(prod)
         context['productos'] = productos
+        exento = 0
+        
+        for prod in productos:
+            if prod['discount']:
+                f_total = prod['qty'] * prod['base_net_rate']
+                total = f_total - (f_total*(prod['discount']/100))
+                exento += decimal.Decimal(total)
+
+        if(context['factura'].descuento_global):
+            #nuevo_exento = context['factura'].descuento_global
+            nuevo_exento = 0
+            if(context['factura'].tipo_descuento == "%"):
+                nuevo_exento = decimal.Decimal(context['factura'].neto) * decimal.Decimal(context['factura'].descuento_global/100)
+            exento += nuevo_exento
+        context['exento'] = decimal.Decimal(exento) #abs(float(context['factura'].total) - float(context['factura'].neto) - float(context['factura'].iva))
+        context['total'] = decimal.Decimal(context['exento']) + decimal.Decimal(context['factura'].neto) + decimal.Decimal(context['factura'].compania.tasa_de_iva)
 
         ruta = settings.STATIC_URL + context['factura'].numero_factura + '/timbre.jpg'
         context['ruta']=ruta

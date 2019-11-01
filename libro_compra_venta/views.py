@@ -15,6 +15,8 @@ from django.db.models import Q
 
 from django_datatables_view.base_datatable_view import BaseDatatableView
 
+from dte.models import DTE
+
 from conectores.models import Compania
 
 from facturas.models import Factura
@@ -66,9 +68,10 @@ class CreateLibro(LoginRequiredMixin, FormView):
     template_name = 'crear_libro.html'
     success_url = '/libro/'
     model = Libro
-    model_factura = Factura
-    model_nota_cr = notaCredito
-    model_nota_db = notaDebito
+    #model_factura = Factura
+    #model_nota_cr = notaCredito
+    #model_nota_db = notaDebito
+    model_dte = DTE
 
     def get_context_data(self, *args, **kwargs): 
 
@@ -92,31 +95,23 @@ class CreateLibro(LoginRequiredMixin, FormView):
         #end_date = "-".join(date_arr)
 
         objects = []
-        factura = self.model_factura.objects.filter(compania=compania, fecha__range=[start_date, end_date])
-        nota_credito = self.model_nota_cr.objects.filter(compania=compania, fecha__range=[start_date, end_date])
-        nota_debito = self.model_nota_db.objects.filter(compania=compania, fecha__range=[start_date, end_date])
-        
-        for fact in factura:
-            fact.doc_type = 33
-            fact.total_doc = 1
-            fact.numero_factura = fact.numero_factura.replace('º','')
-        for fact in nota_debito:
-            fact.doc_type = 56
-            fact.total_doc = 1
-            fact.numero_factura = fact.numero_factura.replace('º','')
-        for fact in nota_credito:
-            fact.doc_type = 61
-            fact.total_doc = 1
-            fact.numero_factura = fact.numero_factura.replace('º','')
-        objects.append(factura)
-        objects.append(nota_debito)
-        objects.append(nota_credito)
+        object_dte = self.model_dte.objects.filter(compania=compania, fecha__range=[start_date, end_date]).exclude(track_id=None)
+        #factura = self.model_factura.objects.filter(compania=compania, fecha__range=[start_date, end_date])
+        #nota_credito = self.model_nota_cr.objects.filter(compania=compania, fecha__range=[start_date, end_date])
+        #nota_debito = self.model_nota_db.objects.filter(compania=compania, fecha__range=[start_date, end_date])
+
+        for dte in object_dte:
+            dte.total_doc = 1
+            dte.numero_factura = dte.numero_factura.replace('º','')
+            dte.exento = abs(float(dte.total) - float(dte.neto) - float(dte.iva))
+
+        objects.append(object_dte)
         detail = form['details'].value()
         if detail:
             xml = render_to_string('xml_lcv/resumen_periodo.xml', {'objects':objects, 'objects_details': objects})
         else:
             xml = render_to_string('xml_lcv/resumen_periodo.xml', {'objects':objects})
-        if not factura and not nota_debito and not nota_credito:
+        if not object_dte:
             messages.warning(self.request, "No existen facturas, notas de credito o debito para esta fecha {0}/{1}".format(start_date, end_date))
             return HttpResponseRedirect(reverse_lazy('libro:crear_libro', kwargs={'pk':compania}))
 
