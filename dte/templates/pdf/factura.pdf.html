@@ -116,6 +116,16 @@
                         </td>
                         {% endcomment %}
                     </tr>
+                    <tr>
+                        {% if factura.descuento_global %}
+                            <td>
+                                Descuento global:
+                            </td>
+                            <td>
+                                {{factura.descuento_global|default_if_none:0|format_mil}}{{factura.tipo_descuento|default_if_none:""|upper}}
+                            </td>
+                        {% endif %}
+                    </tr>
                     {% comment %}
                     <tr>
                         <td>

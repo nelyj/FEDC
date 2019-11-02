@@ -1,3 +1,6 @@
+import json
+import decimal
+
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
@@ -72,6 +75,7 @@ class CreateLibro(LoginRequiredMixin, FormView):
     #model_nota_cr = notaCredito
     #model_nota_db = notaDebito
     model_dte = DTE
+    TWOPLACES = decimal.Decimal(10) ** -2 
 
     def get_context_data(self, *args, **kwargs): 
 
@@ -103,7 +107,21 @@ class CreateLibro(LoginRequiredMixin, FormView):
         for dte in object_dte:
             dte.total_doc = 1
             dte.numero_factura = dte.numero_factura.replace('º','')
-            dte.exento = abs(float(dte.total) - float(dte.neto) - float(dte.iva))
+            productos = dte.productos.replace('\'{','{').replace('}\'','}').replace('\'',"\"")
+            json_productos = json.loads(productos)
+            dte.exento = 0
+            for producto in json_productos:
+                if producto['discount']:
+                    f_total = producto['qty'] * producto['base_net_rate']
+                    total = f_total - (f_total*(producto['discount']/100))
+                    dte.exento += decimal.Decimal(total).quantize(self.TWOPLACES)
+            if(dte.descuento_global):
+                nuevo_exento = dte.descuento_global
+                if(dte.tipo_descuento == "%"):
+                    nuevo_exento = decimal.Decimal(dte.neto).quantize(self.TWOPLACES) * decimal.Decimal(dte.descuento_global/100).quantize(self.TWOPLACES)
+            dte.exento += decimal.Decimal(nuevo_exento).quantize(self.TWOPLACES)
+            dte.total = decimal.Decimal(dte.exento + decimal.Decimal(dte.neto) + decimal.Decimal(dte.compania.tasa_de_iva)).quantize(self.TWOPLACES)
+            #dte.exento = abs(float(dte.total) - float(dte.neto) - float(dte.iva))
 
         objects.append(object_dte)
         detail = form['details'].value()
@@ -211,7 +229,7 @@ class AjaxListTable(LoginRequiredMixin, BaseDatatableView):
                     onclick='modal_detalle_libro({0})'></a>\
                     ".format(str(item.pk))
             if not item.enviada:
-                send = "<a  class='btn btn-block btn-success btn-xs fa fa-paper-plane' onclick='enviar_libro({0})'></a>\
+                send = "<a class='btn btn-block btn-success btn-xs fa fa-paper-plane' onclick='enviar_libro(this, {0})'></a>\
                     ".format(str(item.pk))
             else:
                 send = ""

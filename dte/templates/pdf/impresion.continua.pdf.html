@@ -33,6 +33,16 @@
             </div>
             <p>
                 <h3 class="fecha">Fecha:{{factura.fecha|date:"SHORT_DATE_FORMAT"}}</h3>
+                <p>
+                    {% if factura.descuento_global %}
+                        <td>
+                            Descuento global:
+                        </td>
+                        <td>
+                            {{factura.descuento_global|default_if_none:0|format_mil}}{{factura.tipo_descuento|default_if_none:""|upper}}
+                        </td>
+                    {% endif %}
+                </p>
             </p>
             <div>
                 <table class="table-factura">
@@ -66,8 +76,8 @@
                                 <td class="align-center">Unidad</td>
                             </tr>
                             <tr>
-                                <td class="align-right">{{prod.qty}}   X </td>
-                                <td class="align-center">{{prod.base_net_rate|default_if_none:0|format_mil}}</td>
+                                <td class="align-right">{% if prod.exento == 1 %}<b> Exento</b>{% endif %}  {{prod.qty}}   X </td>
+                                <td class="align-center">{{prod.base_net_rate|default_if_none:0|format_mil}} {% if prod.discount %} X {{prod.discount}}  Desc(%) {% endif %}</td>
                                 <td class="align-center">{{prod.amount|default_if_none:0|format_mil}}</td>
                             </tr>
                         {% endfor %}

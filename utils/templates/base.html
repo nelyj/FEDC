@@ -45,11 +45,14 @@
     {% endblock extras_js %}
 </head>
     <body>
-        <div class="se-pre-con"></div>
+        <div class="se-pre-con"><marquee  behavior="scroll" direction="left" id="mensaje_spinner" scrollamount="10"></marquee></div>
         {% block contenido %}
         {% endblock contenido %}
     </body>
     <script src="{% static 'users/login.js' %}"></script>
+    {% block custom_js%}
+
+    {% endblock custom_js%}
     <script type="text/javascript">
     //$("#wrapper").toggleClass("toggled");
     $('.datepicker').datepicker({
@@ -61,7 +64,4 @@
         $(".se-pre-con").fadeOut("slow");
     });
     </script>
-    {% block custom_js%}
-
-    {% endblock custom_js%}
 </html>

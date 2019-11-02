@@ -18,3 +18,11 @@
     z-index: 9999;
     background: url(../images/loader-128x/Preloader_1.gif) center no-repeat #fff;
 }
+
+.se-pre-con marquee {
+    position: fixed;
+    top: 50%;
+    //left: 50%;
+    margin-top: -100px;
+    //margin-left: -200px;
+}

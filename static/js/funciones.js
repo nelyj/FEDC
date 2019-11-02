@@ -20,6 +20,7 @@ function showField(field, show){
 function send_to_sii(url){
   $(".se-pre-con").fadeOut("slow").show();
   $("#send_dte").attr("disabled", true);
+  $('#mensaje_spinner').text('Se esta enviando el DTE al sii, por favor espere...')
   $.ajax({
     type: 'GET',
     url: url,
@@ -33,6 +34,7 @@ function send_to_sii(url){
       else{
       	console.log(response['msg'])
         $(".se-pre-con").fadeOut("slow").hide();
+        $("#send_dte").attr("disabled", false); 
       }
     }
   }) 

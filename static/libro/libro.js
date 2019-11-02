@@ -12,7 +12,10 @@ $(document).ready(function() {
     })
 })
 
-function enviar_libro(pk){
+function enviar_libro(element, pk){
+  $(".se-pre-con").fadeOut("slow").show();
+  $(element).attr("disabled", true);
+  $('#mensaje_spinner').text('Se esta enviando el libro al sii, por favor espere...')
    $.ajax({
       url: '/libro/enviar/'+pk,
       type: "POST",
@@ -20,6 +23,8 @@ function enviar_libro(pk){
       },
       success: function(data) {
       	location.reload(true);
+        $(".se-pre-con").fadeOut("slow").hide();
+        $(element).attr("disabled", false); 
       }
   });
 }

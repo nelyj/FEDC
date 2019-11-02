@@ -592,7 +592,7 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView, WeasyTemplateResponseMix
         productos = json.loads(prod)
         context['productos'] = productos
         exento = 0
-        
+
         for prod in productos:
             if prod['discount']:
                 f_total = prod['qty'] * prod['base_net_rate']
@@ -600,12 +600,11 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView, WeasyTemplateResponseMix
                 exento += decimal.Decimal(total)
 
         if(context['factura'].descuento_global):
-            #nuevo_exento = context['factura'].descuento_global
-            nuevo_exento = 0
+            nuevo_exento = context['factura'].descuento_global
             if(context['factura'].tipo_descuento == "%"):
                 nuevo_exento = decimal.Decimal(context['factura'].neto) * decimal.Decimal(context['factura'].descuento_global/100)
             exento += nuevo_exento
-        context['exento'] = decimal.Decimal(exento) #abs(float(context['factura'].total) - float(context['factura'].neto) - float(context['factura'].iva))
+        context['exento'] = decimal.Decimal(exento) 
         context['total'] = decimal.Decimal(context['exento']) + decimal.Decimal(context['factura'].neto) + decimal.Decimal(context['factura'].compania.tasa_de_iva)
 
         ruta = settings.STATIC_URL + context['factura'].numero_factura + '/timbre.jpg'
