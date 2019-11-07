@@ -1,0 +1,99 @@
+{% extends "utils_start.html" %}
+{% block titulo %} Crear Libro {% endblock titulo %}
+{% load staticfiles %}
+{% block extras_css %}
+{% endblock extras_css %}
+{% block extras_js %}
+    <script type="text/javascript" src="{% static 'libro/libro.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/formset.js' %}"></script>
+    <script type="text/javascript">
+    $(function() {
+        $('#libro_compra tbody tr').formset();
+        $(".delete-row").text('')
+        $(".delete-row").addClass("glyphicon glyphicon-minus");
+        $(".delete-row").css("color", "#e40140");
+        $(".add-row").text('')
+        $(".add-row").addClass("glyphicon glyphicon-plus btn");
+        $(".add-row").attr("data-toggle", "tooltip");
+        $(".add-row").attr("data-placement", "top");
+        $(".add-row").attr("title", "Agregar otro");
+        $(".add-row").css("color", "#1ba773");
+        
+        $(".add-row").click(function(){
+            $(".delete-row").each(function( index ) {
+                console.log(index)
+                $( this ).text('')
+                $( this ).addClass("glyphicon glyphicon-minus");
+                $( this ).attr("data-toggle", "tooltip");
+                $( this ).attr("data-placement", "top");
+                $( this ).attr("title", "Eliminar");
+                $( this ).css("color", "#e40140");
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+        })
+    });
+    </script>
+{% endblock extras_js %}
+{% block content_center %}
+<div id="page-content-wrapper">
+    <div class="container-fluid">
+        <a class="glyphicon glyphicon-list" id="menu-toggle"></a>
+        <div class="col-xs-12">
+            <div class="content">
+            
+              <!-- Inicio Tab panes -->
+                <div class="tab-content">
+                    <div class="col-lg-3">
+                        <a href="{% url 'libro:listar_libro' compania %}" class="glyphicon glyphicon-list btn btn-block btn-primary"> Listar Libros</a>
+                    </div><br><br>
+                    <div role="tabpanel" class="tab-pane active" id="libro">
+                    <form id="form_register" method="post">
+                      <h3>Crear Libro</h3>
+                        <div class="col-xs-12">
+                              {% csrf_token %}
+                                <table id="libro_compra" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Tipo de DTE</th>
+                                        <th scope="col">Numero de folio</th>
+                                        <th scope="col">Observaciones</th>
+                                        <th scope="col">Monto Exento</th>
+                                        <th scope="col">Monto Afecto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{ form.management_form }}
+                                        {% for form_item in form %}
+                                        <tr id="{{ form_item.prefix }}-row">
+                                          <td>
+                                          {{ form_item.tipo_dte }}
+                                          </td>
+                                          <td>
+                                          {{ form_item.n_folio }}
+                                          </td>
+                                          <td>
+                                          {{ form_item.observaciones }}
+                                          </td>
+                                          <td>
+                                          {{ form_item.monto_exento }}
+                                          </td>
+                                          <td>
+                                          {{ form_item.monto_afecto }}
+                                          </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                 <button id="submit" type="submit" class="btn btn-success btn-block btn-flat">Registrar</button>
+                        </div>
+                    </form>
+                    </div>
+                  
+                  <br>
+                </div>
+                <!-- Fin Tab panel -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content_center %}
