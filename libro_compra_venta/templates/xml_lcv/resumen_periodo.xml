@@ -2,6 +2,7 @@
       <TotalesPeriodo>
         <TpoDoc>{{ periodo.tipo_dte }}</TpoDoc>
         <TotDoc>{{ periodo.total_doc }}</TotDoc>
+        <Folio>{{ periodo.n_folio }}</Folio>
         <TotMntExe>{{ periodo.exento|default_if_none:"0" }}</TotMntExe>
         <TotMntNeto>{{ periodo.neto|default_if_none:"0" }}</TotMntNeto>
         <TotMntIVA>{{ periodo.iva|default_if_none:"0" }}</TotMntIVA>

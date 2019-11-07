@@ -47,13 +47,16 @@ class StartLibro(SeleccionarEmpresaView):
     def post(self, request, *args, **kwargs):
 
         empresa = int(request.POST.get('empresa'))
-        print (self.kwargs['tipo'])
         if not empresa:
             return HttpResponseRedirect('/')
         empresa_obj = Compania.objects.get(pk=empresa)
         if empresa_obj and self.request.user == empresa_obj.owner and self.kwargs['tipo'] == 'crear':
             return HttpResponseRedirect(reverse_lazy('libro:crear_libro', kwargs={'pk':empresa}))
         elif empresa_obj and self.request.user == empresa_obj.owner and self.kwargs['tipo'] == 'listar':
+            return HttpResponseRedirect(reverse_lazy('libro:listar_libro', kwargs={'pk':empresa}))
+        elif empresa_obj and self.request.user == empresa_obj.owner and self.kwargs['tipo'] == 'crear-compra':
+            return HttpResponseRedirect(reverse_lazy('libro:crear_libro_compra', kwargs={'pk':empresa}))
+        elif empresa_obj and self.request.user == empresa_obj.owner and self.kwargs['tipo'] == 'listar-compra':
             return HttpResponseRedirect(reverse_lazy('libro:listar_libro', kwargs={'pk':empresa}))
         else:
             return HttpResponseRedirect('/')
@@ -109,18 +112,19 @@ class CreateLibro(LoginRequiredMixin, FormView):
             dte.numero_factura = dte.numero_factura.replace('º','')
             productos = dte.productos.replace('\'{','{').replace('}\'','}').replace('\'',"\"")
             json_productos = json.loads(productos)
-            dte.exento = 0
+            exento = 0
             for producto in json_productos:
                 if producto['discount']:
                     f_total = producto['qty'] * producto['base_net_rate']
                     total = f_total - (f_total*(producto['discount']/100))
-                    dte.exento += decimal.Decimal(total).quantize(self.TWOPLACES)
+                    exento += decimal.Decimal(total).quantize(self.TWOPLACES)
             if(dte.descuento_global):
                 nuevo_exento = dte.descuento_global
                 if(dte.tipo_descuento == "%"):
                     nuevo_exento = decimal.Decimal(dte.neto).quantize(self.TWOPLACES) * decimal.Decimal(dte.descuento_global/100).quantize(self.TWOPLACES)
-            dte.exento += decimal.Decimal(nuevo_exento).quantize(self.TWOPLACES)
-            dte.total = decimal.Decimal(dte.exento + decimal.Decimal(dte.neto) + decimal.Decimal(dte.compania.tasa_de_iva)).quantize(self.TWOPLACES)
+            exento += decimal.Decimal(nuevo_exento).quantize(self.TWOPLACES)
+            dte.exento = '{0:.2f}'.format(exento)
+            dte.total = '{0:.2f}'.format(decimal.Decimal(exento + decimal.Decimal(dte.neto) + decimal.Decimal(dte.compania.tasa_de_iva)).quantize(self.TWOPLACES))
             #dte.exento = abs(float(dte.total) - float(dte.neto) - float(dte.iva))
 
         objects.append(object_dte)
@@ -139,7 +143,9 @@ class CreateLibro(LoginRequiredMixin, FormView):
                 fk_compania=compania,
                 current_date=end_date,
                 details=form['details'].value(),
-                libro_xml=xml
+                libro_xml=xml,
+                tipo_libro=1,
+                periodo=end_date
                 )
             libro.save()
             messages.success(self.request, "Se registro el libro con éxito")
@@ -238,9 +244,8 @@ class AjaxListTable(LoginRequiredMixin, BaseDatatableView):
                 detail,
                 item.libro_xml,
                 ver + send,
-                
             ])
-            
+
         return json_data
 
 
@@ -295,3 +300,28 @@ class LibroSendView(LoginRequiredMixin,View):
             messages.error(self.request, "Libro incorrecto")
             return JsonResponse(False, safe=False)
 
+
+class CreateLibroCompra(LoginRequiredMixin, FormView):
+    """
+    Registra un nuevo libro
+
+    @author Rodrigo A. Boet (rodrigo.b at timgla.com)
+    @date 12-08-2019
+    @version 1.0.0
+    """
+    form_class = CrearLibroCompraFormFormSet
+    template_name = 'crear_libro_compra.html'
+    success_url = '/libro/'
+    model = DetailLibroCompra
+    model_dte = DTE
+    TWOPLACES = decimal.Decimal(10) ** -2 
+
+    def get_context_data(self, *args, **kwargs): 
+
+        context = super().get_context_data(*args, **kwargs)
+
+        context['compania'] = self.kwargs['pk']
+        return context
+
+    def form_valid(self, form, *args, **kwargs):
+        pass

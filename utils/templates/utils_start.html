@@ -114,8 +114,10 @@
                 </li>
                 <div class="collapse" id="libros-collapse">
                     <ul class="submenu" id="marketing_services">
-                        <li><a href="{% url 'libro:libro' tipo='crear' %}"> Crear Libros</a></li>
-                        <li><a href="{% url 'libro:libro' tipo='listar' %}">Listar Libros</a></li>
+                        <li><a href="{% url 'libro:libro' tipo='crear' %}"> Crear Libros de venta</a></li>
+                        <li><a href="{% url 'libro:libro' tipo='listar' %}">Listar Libros de venta</a></li>
+                        <li><a href="{% url 'libro:libro' tipo='crear-compra' %}"> Crear Libros de compra</a></li>
+                        <li><a href="{% url 'libro:libro' tipo='listar-compra' %}">Listar Libros de compra</a></li>
                     </ul>
                 </div>
                 <li>

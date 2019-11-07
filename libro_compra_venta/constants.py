@@ -15,3 +15,10 @@ TIPO_ENVIO = [
   "TOTAL", #Indica que es el Unico Envio que Compone el Libro
   "AJUSTE", #Indica que es un Envio con Informacion para Corregir un Libro Previamente Enviado
 ]
+
+CHOICE_LIBRO = (
+        (0, TIPO_OPERACION[0]),
+        (1, TIPO_OPERACION[1]),
+    )
+
+dict_tipo_libro = dict((key, value) for key, value in CHOICE_LIBRO)
