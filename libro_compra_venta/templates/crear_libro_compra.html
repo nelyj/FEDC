@@ -11,6 +11,9 @@
         $('#libro_compra tbody tr').formset();
         $(".delete-row").text('')
         $(".delete-row").addClass("glyphicon glyphicon-minus");
+        $(".delete-row").attr("data-toggle", "tooltip");
+        $(".delete-row").attr("data-placement", "top");
+        $(".delete-row").attr("title", "Eliminar");
         $(".delete-row").css("color", "#e40140");
         $(".add-row").text('')
         $(".add-row").addClass("glyphicon glyphicon-plus btn");
@@ -18,7 +21,7 @@
         $(".add-row").attr("data-placement", "top");
         $(".add-row").attr("title", "Agregar otro");
         $(".add-row").css("color", "#1ba773");
-        
+        $('[data-toggle="tooltip"]').tooltip();
         $(".add-row").click(function(){
             $(".delete-row").each(function( index ) {
                 console.log(index)
@@ -48,10 +51,11 @@
                     </div><br><br>
                     <div role="tabpanel" class="tab-pane active" id="libro">
                     <form id="form_register" method="post">
+                        {% csrf_token %}
+                        <p><label for="id_periodo">Periodo:</label> <input type="text" name="periodo" id="id_periodo" readonly='readonly' required="required"></p>
                       <h3>Crear Libro</h3>
-                        <div class="col-xs-12">
-                              {% csrf_token %}
-                                <table id="libro_compra" class="table table-bordered">
+                        <div class="table-responsive col-xs-12">
+                            <table id="libro_compra" class="table">
                                 <thead>
                                     <tr>
                                         <th scope="col">Tipo de DTE</th>
@@ -84,8 +88,8 @@
                                         {% endfor %}
                                     </tbody>
                                 </table>
-                                 <button id="submit" type="submit" class="btn btn-success btn-block btn-flat">Registrar</button>
                         </div>
+                         <button id="submit" type="submit" class="btn btn-success btn-block btn-flat">Registrar</button>
                     </form>
                     </div>
                   

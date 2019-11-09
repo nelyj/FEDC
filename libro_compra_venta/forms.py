@@ -31,17 +31,20 @@ class FormLibro(forms.ModelForm):
 class CrearLibroCompraForm(forms.ModelForm):
     """
     """
+
     class Meta:
         model = DetailLibroCompra
         fields = ('tipo_dte', 'n_folio',
                   'observaciones', 'monto_exento',
                   'monto_afecto')
+        widgets = {
+          'observaciones': forms.Textarea(attrs={'rows':4, 'cols':18}),
+        }
 
     def __ini__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.fields['tipo_dte'].widget = forms.Select(attrs={'class':'form-control'})
-                               
         self.fields['n_folio'].widget.attrs.update({'class': 'form-control'})
         self.fields['observaciones'].widget.attrs.update(
                                     {
@@ -67,4 +70,4 @@ CrearLibroCompraFormFormSet = modelformset_factory(
                             extra=0, validate_min=True,
                         )
 
-formsetFac = formset_factory(CrearLibroCompraFormFormSet)
+formsetFac = formset_factory(CrearLibroCompraForm, min_num=1, extra=0, validate_min=True)

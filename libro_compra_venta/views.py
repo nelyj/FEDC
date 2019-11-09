@@ -92,7 +92,7 @@ class CreateLibro(LoginRequiredMixin, FormView):
         compania = self.kwargs['pk']
         date = form['current_date'].value()
         date_arr = date.split('/')
-        
+
         start_date = date_arr[2]+"-"+date_arr[1]+"-"+'01'
         objeto_datetime = datetime.datetime.strptime(start_date, "%Y-%m-%d")
         start_date = objeto_datetime - relativedelta(months=1)
@@ -138,7 +138,7 @@ class CreateLibro(LoginRequiredMixin, FormView):
             return HttpResponseRedirect(reverse_lazy('libro:crear_libro', kwargs={'pk':compania}))
 
         try:
-            compania = Compania.objects.get(pk=compania)    
+            compania = Compania.objects.get(pk=compania)
             libro = self.model(
                 fk_compania=compania,
                 current_date=end_date,
@@ -150,7 +150,6 @@ class CreateLibro(LoginRequiredMixin, FormView):
             libro.save()
             messages.success(self.request, "Se registro el libro con éxito")
         except Exception as e:
-            compania = Compania.objects.get(pk=compania)
             messages.error(self.request, e)
 
         return HttpResponseRedirect(reverse_lazy('libro:listar_libro', kwargs={'pk':compania.pk}))
@@ -300,23 +299,32 @@ class LibroSendView(LoginRequiredMixin,View):
             messages.error(self.request, "Libro incorrecto")
             return JsonResponse(False, safe=False)
 
+class LibroItems:
+
+  def __init__(self, tipo_dte, n_folio, observaciones, exento, total):
+    self.tipo_dte = tipo_dte
+    self.n_folio = n_folio
+    self.observaciones = observaciones
+    self.exento = exento
+    self.total = total
+
 
 class CreateLibroCompra(LoginRequiredMixin, FormView):
     """
     Registra un nuevo libro
 
     @author Rodrigo A. Boet (rodrigo.b at timgla.com)
-    @date 12-08-2019
+    @date 09-11-2019
     @version 1.0.0
     """
-    form_class = CrearLibroCompraFormFormSet
+    form_class = formsetFac
     template_name = 'crear_libro_compra.html'
     success_url = '/libro/'
     model = DetailLibroCompra
     model_dte = DTE
-    TWOPLACES = decimal.Decimal(10) ** -2 
+    TWOPLACES = decimal.Decimal(10) ** -2
 
-    def get_context_data(self, *args, **kwargs): 
+    def get_context_data(self, *args, **kwargs):
 
         context = super().get_context_data(*args, **kwargs)
 
@@ -324,4 +332,48 @@ class CreateLibroCompra(LoginRequiredMixin, FormView):
         return context
 
     def form_valid(self, form, *args, **kwargs):
-        pass
+        compania = self.kwargs['pk']
+        formset = formsetFac(self.request.POST)
+        periodo = self.request.POST.get('periodo', None)
+        if periodo == '':
+            messages.error(self.request, "El periodo es requerido")
+            return super().form_invalid(form, *args, **kwargs)
+        objects = []
+        for libro_compra in form:
+            tipo_dte = libro_compra.cleaned_data['tipo_dte']
+            n_folio = libro_compra.cleaned_data['n_folio']
+            observaciones = libro_compra.cleaned_data['observaciones']
+            monto_exento = libro_compra.cleaned_data['monto_exento']
+            monto_afecto = libro_compra.cleaned_data['monto_afecto']
+            exento = '{0:.2f}'.format(monto_exento)
+            total = '{0:.2f}'.format(monto_afecto)
+            libro_items = LibroItems(tipo_dte, n_folio, observaciones, exento, total)
+            objects.append(libro_items)
+
+        xml = render_to_string('xml_lcv/resumen_periodo_compra.xml', {'objects':objects})
+        date_arr = periodo.split('/')
+        current_date = date_arr[2]+"-"+date_arr[1]+"-"+date_arr[0]
+        periodo = datetime.datetime.strptime(current_date, "%Y-%m-%d")
+        try:
+            compania = Compania.objects.get(pk=compania)
+            libro = Libro(
+                    fk_compania=compania,
+                    current_date=current_date,
+                    details=False,
+                    libro_xml=xml,
+                    tipo_libro=1,
+                    periodo=periodo
+                    )
+            libro.save()
+        except Exception as e:
+            messages.error(self.request, e)
+        for libro_compra in form:
+            crear_libro = libro_compra.save(commit=False)
+            crear_libro.fk_libro = libro
+            crear_libro.save()
+
+        self.success_url = reverse_lazy('libro:crear_libro_compra',
+                                        kwargs={'pk': self.kwargs['pk']}
+                                        )
+        messages.success(self.request, "Libro de compra creado con éxito")
+        return super().form_valid(form, *args, **kwargs)

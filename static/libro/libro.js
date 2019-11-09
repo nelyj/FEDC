@@ -10,6 +10,16 @@ $(document).ready(function() {
         viewMode: "months", 
         minViewMode: "months"
     })
+
+    $("#id_periodo").datepicker({
+        format: "dd/mm/yyyy",
+        //startDate: 'month',
+        endDate: today,
+        changeYear: false,
+        autoclose: true,
+        viewMode: "months", 
+        minViewMode: "months"
+    })
 })
 
 function enviar_libro(element, pk){
