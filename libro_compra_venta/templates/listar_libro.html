@@ -22,10 +22,10 @@
                   <!-- Inicio Tab panes -->
                     <div class="tab-content">
                         <div class="col-lg-3">
-                            <a href="{% url 'libro:crear_libro' pk %}" class="glyphicon glyphicon-plus btn btn-block btn-primary"> Crear Libros</a>
+                            <a class="glyphicon glyphicon-plus btn btn-block btn-primary" href={% if tipo_libro == '0' %}"{% url 'libro:crear_libro_compra' pk%}"{% elif tipo_libro == '1' %} "{% url 'libro:crear_libro' pk %}"{% else %}"#"{% endif %} > {% if tipo_libro == '0' %}Crear Libros de Compra{% elif tipo_libro == '1' %}Crear Libros de Venta{% else %}No existe ninguna acción{% endif %}</a>
                         </div><br><br>
                         <div role="tabpanel" class="tab-pane active" id="libro_listar">
-                          <h3>Listar Libros</h3>
+                          <h3>{% if tipo_libro == '0' %}Listar Libros de Compra{% elif tipo_libro == '1' %}Listar Libros de Venta{% else %}?{% endif %}</h3>
                         </div>
                         <table id="datatable" class="display" style="width:100%">
                             <thead>
@@ -48,7 +48,7 @@
 
     <script type="text/javascript">
     // Objeto Json lista de intercambios
-        var URL = "{% url 'libro:listar_libro_ajax' pk %}";
+        var URL = "{% url 'libro:listar_libro_ajax' pk tipo_libro%}";
     </script>
     <script type="text/javascript" src="{% static 'libro/libro.js' %}"></script>
     <script src="{% static 'DataTables/media/js/jquery.dataTables.min.js' %}"></script>

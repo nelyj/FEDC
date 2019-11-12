@@ -22,12 +22,12 @@ $(document).ready(function() {
     })
 })
 
-function enviar_libro(element, pk){
+function enviar_libro(element, pk, tipo_libro){
   $(".se-pre-con").fadeOut("slow").show();
   $(element).attr("disabled", true);
   $('#mensaje_spinner').text('Se esta enviando el libro al sii, por favor espere...')
    $.ajax({
-      url: '/libro/enviar/'+pk,
+      url: '/libro/enviar/'+pk+'/'+tipo_libro,
       type: "POST",
       data: {
       },

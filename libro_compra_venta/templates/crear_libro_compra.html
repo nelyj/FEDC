@@ -47,13 +47,13 @@
               <!-- Inicio Tab panes -->
                 <div class="tab-content">
                     <div class="col-lg-3">
-                        <a href="{% url 'libro:listar_libro' compania %}" class="glyphicon glyphicon-list btn btn-block btn-primary"> Listar Libros</a>
+                        <a href="{% url 'libro:listar_libro' compania %}?tipo_libro=0" class="glyphicon glyphicon-list btn btn-block btn-primary"> Listar Libros de Compra</a>
                     </div><br><br>
                     <div role="tabpanel" class="tab-pane active" id="libro">
                     <form id="form_register" method="post">
                         {% csrf_token %}
                         <p><label for="id_periodo">Periodo:</label> <input type="text" name="periodo" id="id_periodo" readonly='readonly' required="required"></p>
-                      <h3>Crear Libro</h3>
+                      <h3>Crear Libro de compra</h3>
                         <div class="table-responsive col-xs-12">
                             <table id="libro_compra" class="table">
                                 <thead>

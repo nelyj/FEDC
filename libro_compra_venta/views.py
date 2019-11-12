@@ -31,6 +31,7 @@ from nota_debito.models import notaDebito
 from utils.views import sendToSii
 from utils.CustomMixin import SeleccionarEmpresaView
 
+from .constants import dict_tipo_libro
 from .forms import *
 from .models import *
 
@@ -53,11 +54,11 @@ class StartLibro(SeleccionarEmpresaView):
         if empresa_obj and self.request.user == empresa_obj.owner and self.kwargs['tipo'] == 'crear':
             return HttpResponseRedirect(reverse_lazy('libro:crear_libro', kwargs={'pk':empresa}))
         elif empresa_obj and self.request.user == empresa_obj.owner and self.kwargs['tipo'] == 'listar':
-            return HttpResponseRedirect(reverse_lazy('libro:listar_libro', kwargs={'pk':empresa}))
+            return HttpResponseRedirect(str(reverse_lazy('libro:listar_libro', kwargs={'pk':empresa})+"?tipo_libro=1"))
         elif empresa_obj and self.request.user == empresa_obj.owner and self.kwargs['tipo'] == 'crear-compra':
             return HttpResponseRedirect(reverse_lazy('libro:crear_libro_compra', kwargs={'pk':empresa}))
         elif empresa_obj and self.request.user == empresa_obj.owner and self.kwargs['tipo'] == 'listar-compra':
-            return HttpResponseRedirect(reverse_lazy('libro:listar_libro', kwargs={'pk':empresa}))
+            return HttpResponseRedirect(str(reverse_lazy('libro:listar_libro', kwargs={'pk':empresa})+"?tipo_libro=0"))
         else:
             return HttpResponseRedirect('/')
 
@@ -165,6 +166,12 @@ class ListarLibrosViews(LoginRequiredMixin, TemplateView):
     """
     template_name = 'listar_libro.html'
 
+    def get_context_data(self, *args, **kwargs): 
+
+        context = super().get_context_data(*args, **kwargs)
+        tipo_libro = self.request.GET.get('tipo_libro', None)
+        context['tipo_libro'] = tipo_libro
+        return context
 
 class AjaxListTable(LoginRequiredMixin, BaseDatatableView):
     """!
@@ -200,8 +207,13 @@ class AjaxListTable(LoginRequiredMixin, BaseDatatableView):
         # these are simply objects displayed in datatable
         # You should not filter data returned here by any filter values entered by Intercambio. This is because
         # we need some base queryset to count total number of records.
-        print(self.kwargs['pk'])
-        return self.model.objects.filter(fk_compania=self.kwargs['pk']).order_by('-current_date')
+        libro = self.kwargs['tipo_libro']
+
+        return self.model.objects.filter(
+                        fk_compania=self.kwargs['pk'],
+                        tipo_libro=libro
+                        ).order_by('-current_date')
+
 
     def filter_queryset(self, qs):
         # use parameters passed in GET request to filter queryset
@@ -223,19 +235,23 @@ class AjaxListTable(LoginRequiredMixin, BaseDatatableView):
         Prepara la data para mostrar en el datatable
         @return: Objeto json con los datos del intercambio
         """
+
+        libro = self.kwargs['tipo_libro']
+
         # prepare list with output column data
         json_data = []
         for item in qs:
-            
+
             detail = "Si" if item.details else "No"
-            
+
             ver = "<a data-toggle='modal' data-target='#myModal' \
                     class='btn btn-block btn-info btn-xs fa fa-search' \
                     onclick='modal_detalle_libro({0})'></a>\
                     ".format(str(item.pk))
             if not item.enviada:
-                send = "<a class='btn btn-block btn-success btn-xs fa fa-paper-plane' onclick='enviar_libro(this, {0})'></a>\
-                    ".format(str(item.pk))
+                send = "<a class='btn btn-block btn-success btn-xs fa fa-paper-plane'\
+                        onclick='enviar_libro(this, {0}, {1})'></a>\
+                    ".format(str(item.pk), libro)
             else:
                 send = ""
             json_data.append([
@@ -269,17 +285,23 @@ class LibroSendView(LoginRequiredMixin,View):
     @date 14-08-2019
     @version 1.0
     """
-    def post(self,request,pk):
+    def post(self, request, pk, tipo_libro):
         """!
         Método para enviar el libro
         @param request Recibe el objeto de la petición
         @param pk Recibe el pk del libro
         @return: Objeto json con success y message
         """
+        #tipo_libro = self.kwargs['tipo_libro']
+        if tipo_libro == 0:
+            tipo_libro_xml = dict_tipo_libro[tipo_libro]
+        elif tipo_libro == 1:
+            tipo_libro_xml = dict_tipo_libro[tipo_libro]
+
         try:
             libro = Libro.objects.get(pk=pk)
             if(not libro.enviada):
-                signed_xml = libro.sign_base('VENTA','MENSUAL','TOTAL')
+                signed_xml = libro.sign_base(tipo_libro_xml,'MENSUAL','TOTAL')
                 compania = libro.fk_compania
                 send_sii = sendToSii(compania,signed_xml,compania.pass_certificado)
                 if(not send_sii['estado']):
@@ -288,6 +310,7 @@ class LibroSendView(LoginRequiredMixin,View):
                 else:
                     libro.enviada = True
                     libro.track_id = send_sii['track_id']
+                    libro.periodo = datetime.datetime.strptime(libro.periodo, '%Y-%m')
                     libro.save()
                     messages.success(self.request, "Libro envíado con éxito")
                     return JsonResponse(True, safe=False)
@@ -298,6 +321,7 @@ class LibroSendView(LoginRequiredMixin,View):
             print(e)
             messages.error(self.request, "Libro incorrecto")
             return JsonResponse(False, safe=False)
+
 
 class LibroItems:
 
@@ -333,7 +357,7 @@ class CreateLibroCompra(LoginRequiredMixin, FormView):
 
     def form_valid(self, form, *args, **kwargs):
         compania = self.kwargs['pk']
-        formset = formsetFac(self.request.POST)
+
         periodo = self.request.POST.get('periodo', None)
         if periodo == '':
             messages.error(self.request, "El periodo es requerido")
@@ -347,10 +371,12 @@ class CreateLibroCompra(LoginRequiredMixin, FormView):
             monto_afecto = libro_compra.cleaned_data['monto_afecto']
             exento = '{0:.2f}'.format(monto_exento)
             total = '{0:.2f}'.format(monto_afecto)
-            libro_items = LibroItems(tipo_dte, n_folio, observaciones, exento, total)
+            libro_items = LibroItems(tipo_dte, n_folio,
+                                     observaciones, exento, total)
             objects.append(libro_items)
 
-        xml = render_to_string('xml_lcv/resumen_periodo_compra.xml', {'objects':objects})
+        xml = render_to_string('xml_lcv/resumen_periodo_compra.xml',
+                               {'objects': objects})
         date_arr = periodo.split('/')
         current_date = date_arr[2]+"-"+date_arr[1]+"-"+date_arr[0]
         periodo = datetime.datetime.strptime(current_date, "%Y-%m-%d")
@@ -361,7 +387,7 @@ class CreateLibroCompra(LoginRequiredMixin, FormView):
                     current_date=current_date,
                     details=False,
                     libro_xml=xml,
-                    tipo_libro=1,
+                    tipo_libro=0,
                     periodo=periodo
                     )
             libro.save()
