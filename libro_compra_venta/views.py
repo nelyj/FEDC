@@ -89,7 +89,7 @@ class CreateLibro(LoginRequiredMixin, FormView):
         return context
 
     def form_valid(self, form, *args, **kwargs):
-        
+
         compania = self.kwargs['pk']
         date = form['current_date'].value()
         date_arr = date.split('/')
@@ -166,7 +166,7 @@ class ListarLibrosViews(LoginRequiredMixin, TemplateView):
     """
     template_name = 'listar_libro.html'
 
-    def get_context_data(self, *args, **kwargs): 
+    def get_context_data(self, *args, **kwargs):
 
         context = super().get_context_data(*args, **kwargs)
         tipo_libro = self.request.GET.get('tipo_libro', None)
@@ -265,19 +265,19 @@ class AjaxListTable(LoginRequiredMixin, BaseDatatableView):
 
 
 class LibroDetailView(LoginRequiredMixin, DetailView):
-  """
-  Clase para el detalle de intercambio
-  @author Rodrigo A. Boet (rodrigo.b at timgla.com)
-  @copyright TIMG
-  @date 12-08-2019
-  @version 1.0
-  """
+    """
+    Clase para el detalle de intercambio
+    @author Rodrigo A. Boet (rodrigo.b at timgla.com)
+    @copyright TIMG
+    @date 12-08-2019
+    @version 1.0
+    """
+    template_name = "libro_detail.html"
+    model = Libro
 
-  template_name="libro_detail.html"
-  model = Libro
 
 @method_decorator(csrf_exempt, name='dispatch')
-class LibroSendView(LoginRequiredMixin,View):
+class LibroSendView(LoginRequiredMixin, View):
     """
     Clase para enviar el libro
     @author Rodrigo A. Boet (rodrigo.b at timgla.com)
@@ -292,12 +292,11 @@ class LibroSendView(LoginRequiredMixin,View):
         @param pk Recibe el pk del libro
         @return: Objeto json con success y message
         """
-        #tipo_libro = self.kwargs['tipo_libro']
+        # tipo_libro = self.kwargs['tipo_libro']
         if tipo_libro == 0:
             tipo_libro_xml = dict_tipo_libro[tipo_libro]
         elif tipo_libro == 1:
             tipo_libro_xml = dict_tipo_libro[tipo_libro]
-
         try:
             libro = Libro.objects.get(pk=pk)
             if(not libro.enviada):
@@ -325,12 +324,12 @@ class LibroSendView(LoginRequiredMixin,View):
 
 class LibroItems:
 
-  def __init__(self, tipo_dte, n_folio, observaciones, exento, total):
-    self.tipo_dte = tipo_dte
-    self.n_folio = n_folio
-    self.observaciones = observaciones
-    self.exento = exento
-    self.total = total
+    def __init__(self, tipo_dte, n_folio, observaciones, exento, total):
+        self.tipo_dte = tipo_dte
+        self.n_folio = n_folio
+        self.observaciones = observaciones
+        self.exento = exento
+        self.total = total
 
 
 class CreateLibroCompra(LoginRequiredMixin, FormView):
