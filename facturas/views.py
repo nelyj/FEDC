@@ -67,6 +67,9 @@ class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
         else:
             return HttpResponseRedirect('/')
 
+
+from utils.views import DecodeEncodeChain
+
 class ListaFacturasViews(LoginRequiredMixin,TemplateView):
     template_name = 'lista_facturas.html'
 
@@ -82,7 +85,7 @@ class ListaFacturasViews(LoginRequiredMixin,TemplateView):
             return HttpResponseRedirect(reverse_lazy('facturas:seleccionar-empresa'))
 
         return super().dispatch(*args, **kwargs)
-            
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -96,10 +99,15 @@ class ListaFacturasViews(LoginRequiredMixin,TemplateView):
 
             print(e)
 
-        payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
+        decode_encode = DecodeEncodeChain()
+        passw = usuario.password.strip()
+        passw = decode_encode.decrypt(passw).decode("utf-8")
+        print(passw)
+        payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, passw)
 
         headers = {'content-type': "application/json"}
         response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
+        print(response)
         lista = session.get(usuario.url_erp+'/api/resource/Sales%20Invoice/?limit_page_length')
         erp_data = json.loads(lista.text)
 
