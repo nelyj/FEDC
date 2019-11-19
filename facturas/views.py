@@ -69,6 +69,7 @@ class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
 
 
 from utils.views import DecodeEncodeChain
+from conectores.sdkConectorERP import SdkConectorERP
 
 class ListaFacturasViews(LoginRequiredMixin,TemplateView):
     template_name = 'lista_facturas.html'
@@ -103,12 +104,17 @@ class ListaFacturasViews(LoginRequiredMixin,TemplateView):
         passw = usuario.password.strip()
         passw = decode_encode.decrypt(passw).decode("utf-8")
         print(passw)
-        payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, passw)
+        #payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, passw)
 
-        headers = {'content-type': "application/json"}
-        response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
-        print(response)
-        lista = session.get(usuario.url_erp+'/api/resource/Sales%20Invoice/?limit_page_length')
+        #headers = {'content-type': "application/json"}
+        #response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
+
+        erp = SdkConectorERP(usuario.url_erp, usuario.usuario, passw)
+        response, session = erp.login()
+
+        #lista = session.get(usuario.url_erp+'/api/resource/Sales%20Invoice/?limit_page_length')
+        lista = erp.list_limit(session)
+
         erp_data = json.loads(lista.text)
 
         # Todas las facturas y boletas sin discriminacion 
