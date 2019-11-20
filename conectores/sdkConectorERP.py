@@ -51,7 +51,7 @@ class SdkConectorERP:
 
         return response
 
-    def list(self, session):
+    def list(self, session, slug=None):
         """
         Metodo para listar todas las facturas del erp
 
@@ -59,7 +59,7 @@ class SdkConectorERP:
         @param session objeto de sesion del usuario
         @return response respuesta del servidor
         """
-        url = self.url + self.api_list_invoice
+        url = self.url + self.api_list_invoice + slug if slug else self.url + self.api_list_invoice
         response = session.get(url)
 
         return response

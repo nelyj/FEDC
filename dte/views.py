@@ -20,13 +20,16 @@ from django_weasyprint import WeasyTemplateResponseMixin
 from django_datatables_view.base_datatable_view import BaseDatatableView
 
 from conectores.models import *
+from conectores.sdkConectorERP import SdkConectorERP
 
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
 
 from utils.constantes import documentos_dict
 from utils.CustomMixin import SeleccionarEmpresaView
-from utils.views import sendToSii
+from utils.views import (
+    sendToSii, DecodeEncodeChain
+)
 from utils.SIISdk import SII_SDK
 
 from .models import DTE
@@ -49,7 +52,9 @@ class StartDte(SeleccionarEmpresaView):
         empresa_obj = Compania.objects.get(pk=empresa)
         if self.request.GET.get(u'enviadas', None):
             return redirect(str(reverse_lazy('dte:lista_dte', kwargs={'pk':empresa}))+"?enviadas=1")
-        if empresa_obj and self.request.user == empresa_obj.owner:
+        elif self.request.GET.get(u'no_enviadas_erp', None) == '1':
+            return HttpResponseRedirect(reverse_lazy('dte:lista_dte_erp', kwargs={'pk':empresa}))
+        elif empresa_obj and self.request.user == empresa_obj.owner:
             return HttpResponseRedirect(reverse_lazy('dte:lista_dte', kwargs={'pk':empresa}))
         else:
             return HttpResponseRedirect('/')
@@ -816,3 +821,87 @@ class VerEstado(LoginRequiredMixin, TemplateView):
         except Exception as e:
             print(e)
             return {'estado':False,'msg':'Ocurrió un error al comunicarse con el sii'}
+
+
+class ListarDteDesdeERP(LoginRequiredMixin, TemplateView):
+    """
+    Clase para listar todos los DTE que se encuentran en el ERPNext
+
+    @author Rodrigo Boet (rodrigo.b at timgla.com)
+    @date 20-11-2019
+    @version 1.0.0
+    """
+    template_name = 'listar_dte_erp.html'
+    decode_encode = DecodeEncodeChain()
+
+    def dispatch(self, *args, **kwargs):
+
+        compania = self.kwargs.get('pk')
+
+        usuario = Conector.objects.filter(empresa=compania).first()
+
+        if not usuario:
+
+            messages.info(self.request,
+                          "No posee conectores asociados a esta empresa")
+            return HttpResponseRedirect(reverse_lazy(
+                                        'facturas:seleccionar-empresa'
+                                        ))
+
+        return super().dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        compania = self.kwargs.get('pk')
+        context['id_empresa'] = compania
+
+        try:
+            usuario = Conector.objects.filter(t_documento='33',empresa=compania).first()
+        except Exception as e:
+
+            print(e)
+
+        passw = usuario.password.strip()
+        passw = self.decode_encode.decrypt(passw).decode("utf-8")
+        erp = SdkConectorERP(usuario.url_erp, usuario.usuario, passw)
+
+        response, session = erp.login()
+        lista = erp.list_limit(session)
+
+        erp_data = json.loads(lista.text)
+
+        # Todas las facturas y boletas sin discriminacion 
+        data = erp_data['data']
+
+        # Consulta en la base de datos todos los numeros de facturas
+        # cargadas por la empresa correspondiente para hacer una comparacion
+        # con el ERP y eliminar las que ya se encuentran cargadas
+        enviadas = [factura.numero_factura for factura in DTE.objects.filter(compania=compania).only('numero_factura')]
+        
+
+        # Agrega todos los dte
+        # y crea una nueva lista con todas las facturas 
+        solo_facturas  = []
+        for i , item in enumerate(data):
+
+            if item['name'].startswith(''):
+
+                solo_facturas.append(item['name'])
+
+        # Verifica si la factura que vienen del ERP 
+        # ya se encuentran cargadas en el sistema
+        # y en ese caso las elimina de la lista
+        solo_nuevas = []
+        for i , item in enumerate(solo_facturas):
+
+            valor = item.replace('º','')
+            if not item in enviadas:
+
+                solo_nuevas.append(item)
+
+        context['detail']=[]
+        for tmp in solo_nuevas:
+            aux = erp.list(session, str(tmp))
+            context['detail'].append(json.loads(aux.text))
+        session.close()
+        return context

@@ -103,7 +103,7 @@ class ListaFacturasViews(LoginRequiredMixin,TemplateView):
         decode_encode = DecodeEncodeChain()
         passw = usuario.password.strip()
         passw = decode_encode.decrypt(passw).decode("utf-8")
-        print(passw)
+
         #payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, passw)
 
         #headers = {'content-type': "application/json"}
@@ -116,6 +116,8 @@ class ListaFacturasViews(LoginRequiredMixin,TemplateView):
         lista = erp.list_limit(session)
 
         erp_data = json.loads(lista.text)
+
+        session.close()
 
         # Todas las facturas y boletas sin discriminacion 
         data = erp_data['data']
@@ -163,16 +165,27 @@ class DeatailInvoice(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        session = requests.Session()
+        #session = requests.Session()
         try:
             usuario = Conector.objects.filter(pk=1).first()
         except Exception as e:
             print(e)
-        payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
-        headers = {'content-type': "application/json"}
-        response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
-        url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+str(kwargs['slug'])
-        aux=session.get(url)
+        decode_encode = DecodeEncodeChain()
+        passw = usuario.password.strip()
+        passw = decode_encode.decrypt(passw).decode("utf-8")
+
+        erp = SdkConectorERP(usuario.url_erp, usuario.usuario, passw)
+        response, session = erp.login()
+        print(response)
+        aux = erp.list(session, str(kwargs['slug']))
+        print(aux)
+
+        erp_data = json.loads(lista.text)
+        #payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
+        #headers = {'content-type': "application/json"}
+        #response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
+        #url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+str(kwargs['slug'])
+        #aux=session.get(url)
         session.close()
         aux=json.loads(aux.text)
         xml = dicttoxml.dicttoxml(aux)
@@ -199,22 +212,30 @@ class SendInvoice(LoginRequiredMixin, FormView):
             usuario = Conector.objects.filter(t_documento='33',empresa=compania).first()
         except Exception as e:
             print(e)
-        payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
-        headers = {'content-type': "application/json"}
+        #payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
+        #headers = {'content-type': "application/json"}
+        decode_encode = DecodeEncodeChain()
+        passw = usuario.password.strip()
+        passw = decode_encode.decrypt(passw).decode("utf-8")
+
+        erp = SdkConectorERP(usuario.url_erp, usuario.usuario, passw)
         try:
-            response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
+            #response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
+            response, session = erp.login()
         except Exception as e:
             messages.warning(self.request, "No se pudo establecer conexion con el ERP Next, se genera el siguiente error: "+str(e))
-        url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+url
+        #url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+url
         try:
-            aux=session.get(url)
-            session.close()
+            #aux=session.get(url)
+            aux = erp.list(session, url)
             aux=json.loads(aux.text)
+            session.close()
             context={}
             context['factura'] = dict(zip(aux['data'].keys(), aux['data'].values()))
             context['factura']['sales_team'] = context['factura']['sales_team'][0]['sales_person']
             context['factura']['total_taxes_and_charges'] = round(abs(float(context['factura']['total_taxes_and_charges'])))
         except Exception as e:
+            print(e)
             messages.warning(self.request, "No se pudo establecer conexion con el ERP Next, se genera el siguiente error: "+str(e))
         try:
             initial['status']= context['factura']['status_sii']
@@ -315,17 +336,24 @@ class SendInvoice(LoginRequiredMixin, FormView):
             usuario = Conector.objects.filter(pk=1).first()
         except Exception as e:
             print(e)
-        payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
-        headers = {'content-type': "application/json"}
+        decode_encode = DecodeEncodeChain()
+        passw = usuario.password.strip()
+        passw = decode_encode.decrypt(passw).decode("utf-8")
+
+        erp = SdkConectorERP(usuario.url_erp, usuario.usuario, passw)
+        #payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
+        #headers = {'content-type': "application/json"}
         try:
-            response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
+            #response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
+            response, session = erp.login()
         except Exception as e:
             messages.warning(self.request, "No se pudo establecer conexion con el ERP Next, se genera el siguiente error: "+str(e))
-        url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+url
+        #url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+url
         try:
-            aux=session.get(url)
-            session.close()
+            #aux=session.get(url)
+            aux = erp.list(session, url)
             aux=json.loads(aux.text)
+            session.close()
             context['factura'] = dict(zip(aux['data'].keys(), aux['data'].values()))
         except Exception as e:
             messages.warning(self.request, "No se pudo establecer conexion con el ERP Next, se genera el siguiente error: "+str(e))
@@ -337,7 +365,7 @@ class SendInvoice(LoginRequiredMixin, FormView):
                 form = FormCompania()
             context['compania'] = form
         except Exception as e:
-            raise e        
+            raise e
         return context
 
     def form_valid(self, form, **kwargs):
@@ -481,7 +509,7 @@ class VerEstadoFactura(LoginRequiredMixin, TemplateView):
 
         factura = self.model.objects.get(numero_factura=num_factura, compania=compania)
         context['factura'] = factura
-        
+
         estado = self.get_invoice_status(factura,factura.compania,)
 
         if(not estado['estado']):

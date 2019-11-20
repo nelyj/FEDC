@@ -59,6 +59,8 @@ class StartNotaCredito(SeleccionarEmpresaView):
         else:
             return HttpResponseRedirect('/')
 
+from utils.views import DecodeEncodeChain
+from conectores.sdkConectorERP import SdkConectorERP
 
 class ListaNotaCreditoViews(LoginRequiredMixin, TemplateView):
     template_name = 'lista_NC.html'
@@ -88,11 +90,18 @@ class ListaNotaCreditoViews(LoginRequiredMixin, TemplateView):
 
             print(e)
 
-        payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
+        #payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
 
-        headers = {'content-type': "application/json"}
-        response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
-        lista = session.get(usuario.url_erp+'/api/resource/Sales%20Invoice/?limit_page_length')
+        #headers = {'content-type': "application/json"}
+        #response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
+        decode_encode = DecodeEncodeChain()
+        passw = usuario.password.strip()
+        passw = decode_encode.decrypt(passw).decode("utf-8")
+        erp = SdkConectorERP(usuario.url_erp, usuario.usuario, passw)
+        response, session = erp.login()
+        #lista = session.get(usuario.url_erp+'/api/resource/Sales%20Invoice/?limit_page_length')
+        lista = erp.list_limit(session)
+
         erp_data = json.loads(lista.text)
 
         # Todas las facturas y boletas sin discriminacion 
@@ -107,7 +116,7 @@ class ListaNotaCreditoViews(LoginRequiredMixin, TemplateView):
         solo_facturas  = []
         for i , item in enumerate(data):
 
-            if item['name'].startswith('NC'):
+            if item['name']:#.startswith('BOL'):
 
                 solo_facturas.append(item['name'])
         # Verifica si la factura que vienen del ERP 

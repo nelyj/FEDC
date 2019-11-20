@@ -23,4 +23,6 @@ urlpatterns = [
          GetDteDataView.as_view(), name="get_dte_data"),
     path('estado/<int:pk>/<str:slug>/',
          VerEstado.as_view(), name="ver_estado"),
+    path('listar-dte-erp/<int:pk>/',
+         ListarDteDesdeERP.as_view(), name="lista_dte_erp"),
 ]
