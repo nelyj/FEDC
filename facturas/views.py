@@ -180,17 +180,17 @@ class DeatailInvoice(LoginRequiredMixin, TemplateView):
         aux = erp.list(session, str(kwargs['slug']))
         print(aux)
 
-        erp_data = json.loads(lista.text)
+        #erp_data = json.loads(lista.text)
         #payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
         #headers = {'content-type': "application/json"}
         #response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
         #url=usuario.url_erp+'/api/resource/Sales%20Invoice/'+str(kwargs['slug'])
         #aux=session.get(url)
-        session.close()
         aux=json.loads(aux.text)
         xml = dicttoxml.dicttoxml(aux)
         context['keys'] = list(aux['data'].keys())
         context['values'] = list(aux['data'].values())
+        session.close()
         return context
 
 class SendInvoice(LoginRequiredMixin, FormView):

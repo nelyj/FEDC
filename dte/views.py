@@ -1,4 +1,4 @@
-import os, datetime, json, decimal
+import os, datetime, json, decimal, re
 from collections import OrderedDict
 
 from django.core import serializers
@@ -128,7 +128,11 @@ class DteCreateView(LoginRequiredMixin, CreateView):
 
         dict_post = dict(self.request.POST.lists())
         datetime_object = datetime.datetime.now()
-        fecha = datetime.datetime.strptime(dict_post['fecha'][0], '%d/%m/%Y')
+        if dict_post.get('fecha', None)[0]:
+            fecha = datetime.datetime.strptime(dict_post['fecha'][0], '%d/%m/%Y')
+        else:
+            messages.error(self.request, "Falta el campo fecha")
+            return super().form_invalid(form)
         if 'codigo' not in self.request.POST or 'nombre' not in self.request.POST\
             or 'cantidad' not in self.request.POST or 'precio' not in self.request.POST:
             messages.error(self.request, "Debe cargar al menos un producto")
@@ -894,8 +898,10 @@ class ListarDteDesdeERP(LoginRequiredMixin, TemplateView):
         solo_nuevas = []
         for i , item in enumerate(solo_facturas):
 
-            valor = item.replace('º','')
-            if not item in enviadas:
+            #valor = item.replace('º','')
+            valor = re.sub('[^a-zA-Z0-9 \n\.]', '', item)
+            valor = valor.replace(' ', '')
+            if not valor in enviadas:
 
                 solo_nuevas.append(item)
 

@@ -4,18 +4,15 @@
 {% load staticfiles %}
 <link type="text/css" rel="stylesheet" href="{% static 'jquery-entropizer-master/dist/css/jquery-entropizer.min.css' %}" />
 <link rel="stylesheet" href="{% static 'DataTables/media/css/jquery.dataTables.min.css' %}">
-
 {% endblock extras_css %}
 {% block extras_js %}
-<script type="text/javascript" src="{% static 'jquery-entropizer-master/lib/entropizer.js' %}"></script>
-<script type="text/javascript" src="{% static 'jquery-entropizer-master/dist/js/jquery-entropizer.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'users/user_register.js' %}"></script>
 <script src="{% static 'DataTables/media/js/jquery.dataTables.min.js' %}"></script>
 {% endblock extras_js %}
 {% block content_center %}
 <style>
 div.dataTables_wrapper {
-        width: 800px;
+        width: auto;
         margin: 0 auto;
     }
 </style>
@@ -40,13 +37,9 @@ div.dataTables_wrapper {
         
     </tbody>
 </table>
+<script type="text/javascript" src="{% static 'jquery-entropizer-master/lib/entropizer.js' %}"></script>
+<script type="text/javascript" src="{% static 'jquery-entropizer-master/dist/js/jquery-entropizer.min.js' %}"></script>
 
-<script
-src="https://code.jquery.com/jquery-3.3.1.min.js"
-integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-crossorigin="anonymous"></script>
-
-<script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.js"></script>
 <script type="text/javascript">
     $(document).ready( function () {
       $('#myTable').DataTable( {
