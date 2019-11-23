@@ -16,11 +16,12 @@ class FormCreateDte(ModelForm):
     """
     class Meta:
         model = DTE
-        fields = ['numero_factura','senores', 'giro',
-                    'rut','fecha','tipo_dte', 'forma_pago',
-                    'productos','ciudad_receptora','comuna', 'region', 
-                    'descuento_global', 'glosa_descuento', 'tipo_descuento', 'ref_factura',
-                    'cod_ref', 'razon_ref']
+        fields = ['numero_factura', 'senores', 'giro',
+                  'rut', 'fecha', 'tipo_dte',
+                  'forma_pago', 'productos', 'ciudad_receptora',
+                  'comuna', 'region', 'descuento_global',
+                  'glosa_descuento', 'tipo_descuento', 'ref_factura',
+                  'cod_ref', 'razon_ref']
 
     def __init__(self, *args, **kwargs):
         compania = kwargs.pop('compania')

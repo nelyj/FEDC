@@ -12,7 +12,7 @@ from django.views import View
 from django.views.generic import CreateView
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import (
-    UpdateView, DeleteView
+    UpdateView, DeleteView, FormView
 )
 
 from django_weasyprint import WeasyTemplateResponseMixin
@@ -93,14 +93,15 @@ class DteCreateView(LoginRequiredMixin, CreateView):
     model = DTE
     form_class = FormCreateDte
     success_url = 'dte:lista_dte'
+    pk = None
 
     def get_context_data(self, *args, **kwargs):
         """
         Método para colocar contexto en la vista
         """
         context = super().get_context_data(*args, **kwargs)
-        context['compania'] = self.kwargs.get('pk')
-        context['impuesto'] = Compania.objects.get(pk=self.kwargs.get('pk')).tasa_de_iva
+        context['compania'] = self.kwargs.get('pk') if self.kwargs.get('pk', None) else self.pk
+        context['impuesto'] =  Compania.objects.get(pk=self.pk).tasa_de_iva if self.pk else Compania.objects.get(pk=self.kwargs.get('pk')).tasa_de_iva
         if(self.request.method == 'POST'):
             dict_post = dict(self.request.POST.lists())
             productos = self.transform_product(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'],dict_post['descuento'],dict_post['exento'])
@@ -119,7 +120,8 @@ class DteCreateView(LoginRequiredMixin, CreateView):
         """
         Método para retornar la url de éxito
         """
-        return reverse_lazy(self.success_url, kwargs={'pk': self.kwargs['pk']})
+        pk = self.pk if self.pk else self.kwargs['pk']
+        return reverse_lazy(self.success_url, kwargs={'pk': pk})
 
     def form_valid(self, form, **kwargs):
         """
@@ -156,7 +158,7 @@ class DteCreateView(LoginRequiredMixin, CreateView):
             messages.error(self.request, valid_r['msg'])
             return super().form_invalid(form)
         productos = self.transform_product(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'],dict_post['descuento'],dict_post['exento'])
-        compania = Compania.objects.get(pk=self.kwargs.get('pk'))
+        compania =  Compania.objects.get(pk=self.pk) if self.pk else Compania.objects.get(pk=self.kwargs.get('pk'))
         pass_certificado = compania.pass_certificado
         descuento_global = {
             'descuento': form.cleaned_data['descuento_global'],
@@ -176,8 +178,9 @@ class DteCreateView(LoginRequiredMixin, CreateView):
             pass
         diccionario_general['forma_pago'] = form.cleaned_data['forma_pago']
         # Se verifica el folio
+        
         try:
-            folio = Folio.objects.filter(empresa=self.kwargs.get('pk'),is_active=True,vencido=False,tipo_de_documento=self.object.tipo_dte).order_by('fecha_de_autorizacion').first()
+            folio = Folio.objects.filter(empresa=compania.pk,is_active=True,vencido=False,tipo_de_documento=self.object.tipo_dte).order_by('fecha_de_autorizacion').first()
             if not folio:
                 raise Folio.DoesNotExist
         except Folio.DoesNotExist:  
@@ -345,7 +348,6 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
             context['productos'] = productos
 
             return context
-
         prod = context['form']['productos'].value().replace('\'{','{').replace('}\'','}').replace('\'',"\"")
         descuento_global = {
             'descuento': context['form']['descuento_global'].value(),
@@ -353,12 +355,12 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
         }
         productos = json.loads(prod)
         productos = productos
+        print(productos)
         productos = self.reverse_product(
                     productos,
                     Compania.objects.get(pk=self.kwargs.get('comp')),
                     descuento_global
                     )
-        print(productos)
         productos = self.dict_product(productos.get('productos'))
 
         context['productos'] = productos
@@ -408,7 +410,12 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
             new_prod['codigo'] = producto['item_code']
             new_prod['cantidad'] = producto['qty']
             new_prod['precio'] = producto['base_net_rate']
-            new_prod['descuento'] = producto['discount']
+            if producto.get('discount'):
+                new_prod['descuento'] = producto.get('discount')
+            elif producto.get('discount_percentage'):
+                new_prod['descuento'] = producto.get('discount_percentage')
+            else:
+                new_prod['descuento'] = 0
             new_prod['exento'] = producto.get('exento')
             if(new_prod['descuento']):
                 f_total = producto['qty'] * producto['base_net_rate']
@@ -868,10 +875,14 @@ class ListarDteDesdeERP(LoginRequiredMixin, TemplateView):
         passw = usuario.password.strip()
         passw = self.decode_encode.decrypt(passw).decode("utf-8")
         erp = SdkConectorERP(usuario.url_erp, usuario.usuario, passw)
-
-        response, session = erp.login()
-        lista = erp.list_limit(session)
-
+        try:
+            response, session = erp.login()
+        except Exception as e:
+            messages.warning(self.request, "No se pudo establecer conexion con el ERP Next, se genera el siguiente error: "+str(e))
+        try:
+            lista = erp.list_limit(session)
+        except Exception as e:
+            messages.warning(self.request, "Error al obtener el listado de dte del ERP Next, se genera el siguiente error: "+str(e))
         erp_data = json.loads(lista.text)
 
         # Todas las facturas y boletas sin discriminacion 
@@ -911,3 +922,182 @@ class ListarDteDesdeERP(LoginRequiredMixin, TemplateView):
             context['detail'].append(json.loads(aux.text))
         session.close()
         return context
+
+
+class SaveDteErp(LoginRequiredMixin, FormView):
+    """
+    """
+    model = DTE
+    template_name = "crear_dte.html"
+    form_class = FormCreateDte
+    decode_encode = DecodeEncodeChain()
+    class_create = DteCreateView()
+    class_update = UpdateDTEView()
+
+    def type_dte(self, factura):
+        """
+        """
+        if factura.startswith('BOL'):
+            return 39
+        elif factura.startswith('N'):
+            return 33
+        elif factura.startswith('ND'):
+            return 61
+        elif factura.startswith('NC'):
+            return 56
+        else:
+            return 52
+
+    def get_initial(self):
+        initial = super().get_initial()
+        url = self.kwargs['slug']
+        compania = self.kwargs['pk']
+
+        try:
+            usuario = Conector.objects.filter(empresa=compania).first()
+        except Exception as e:
+            print(e)
+
+        passw = usuario.password.strip()
+        passw = self.decode_encode.decrypt(passw).decode("utf-8")
+
+        erp = SdkConectorERP(usuario.url_erp, usuario.usuario, passw)
+        try:
+            response, session = erp.login()
+        except Exception as e:
+            messages.warning(self.request, "No se pudo establecer conexion con el ERP Next, se genera el siguiente error: "+str(e))
+        try:
+            aux = erp.list(session, url)
+            aux=json.loads(aux.text)
+            session.close()
+            context={}
+            context['factura'] = dict(zip(aux['data'].keys(), aux['data'].values()))
+            context['factura']['sales_team'] = context['factura']['sales_team'][0]['sales_person']
+            context['factura']['total_taxes_and_charges'] = round(abs(float(context['factura']['total_taxes_and_charges'])))
+        except Exception as e:
+            print(e)
+            messages.warning(self.request, "No se pudo establecer conexion con el ERP Next, se genera el siguiente error: "+str(e))
+
+        valor = re.sub('[^a-zA-Z0-9 \n\.]', '', self.kwargs['slug'])
+        valor = valor.replace(' ', '')
+        initial['numero_factura']=valor
+        tipo_dte = self.type_dte(valor)
+        initial['tipo_dte'] = tipo_dte
+        try:
+            initial['senores']=context['factura']['customer_name']
+        except Exception as e:
+            initial['senores']=""
+        try:
+            initial['comuna']=context['factura']['comuna']
+        except Exception as e:
+            initial['comuna']=""
+        try:
+            initial['ciudad_receptora']=context['factura']['ciudad_receptora']
+        except Exception as e:
+            initial['ciudad_receptora']=""
+        try:
+            initial['giro']=context['factura']['giro']
+        except Exception as e:
+            self.form_class.base_fields['giro'].initial=""
+        # self.form_class.base_fields['condicion_venta'].initial=context['factura']['']
+        # self.form_class.base_fields['vencimiento'].initial=context['factura']['']
+        try:
+            initial['vendedor']=context['factura']['sales_team']
+        except Exception as e:
+            initial['vendedor']=""
+        try:
+            initial['rut']=context['factura']['rut']
+        except Exception as e:
+            initial['rut']=""
+
+        try:
+            fecha = datetime.datetime.strptime(context['factura']['posting_date'], '%Y-%m-%d')
+            initial['fecha'] = fecha.strftime("%d/%m/%Y")
+        except Exception as e:
+            initial['fecha']=""
+        # self.form_class.base_fields['guia'].initial=context['factura']['']
+        try:
+            initial['orden_compra']=context['factura']['po_no']
+        except Exception as e:
+            initial['orden_compra']=""
+        try:
+            initial['nota_venta']=context['factura']['orden_de_venta']
+        except Exception as e:
+            initial['nota_venta']=""
+        try:
+            initial['productos']=context['factura']['items']
+        except Exception as e:
+            initial['productos']=""
+        try:
+            initial['monto_palabra']=context['factura']['in_words']
+        except Exception as e:
+            initial['monto_palabra']=""
+        try:
+            initial['neto']=context['factura']['net_total']
+        except Exception as e:
+            initial['neto']=""
+        # self.form_class.base_fields['excento'].initial=context['factura']['']
+        try:
+            initial['iva']=context['factura']['total_taxes_and_charges']
+        except Exception as e:
+            initial['iva']=""
+        try:
+            initial['total']=context['factura']['rounded_total']
+        except Exception as e:
+            initial['total']=""
+        return initial
+
+    def get_form_kwargs(self):
+        """
+        Método para pasar datos al formulario
+        """
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'compania': self.kwargs.get('pk')})
+        return kwargs
+
+    def get_context_data(self, *args, **kwargs):
+        """
+        Método para colocar contexto en la vista
+        """
+        context = super().get_context_data(*args, **kwargs)
+        context['impuesto'] = Compania.objects.get(pk=self.kwargs.get('pk')).tasa_de_iva
+        context['compania'] = self.kwargs.get('pk')
+        try:
+            context['impuesto'] = Compania.objects.get(pk=self.kwargs.get('comp')).tasa_de_iva
+        except:
+            pass
+        if(self.request.method == 'POST'):
+            dict_post = dict(self.request.POST.lists())
+            productos = self.class_create.transform_product(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'], dict_post['descuento'], dict_post['exento'])
+            context['productos'] = productos
+
+            return context
+        if context['form']['productos'].value():
+            prod = str(context['form']['productos'].value()).replace('\'{','{').replace('}\'','}').replace('\'',"\"")
+
+            descuento_global = {
+                'descuento': context['form']['descuento_global'].value(),
+                'tipo_descuento': context['form']['tipo_descuento'].value()
+            }
+
+            productos = json.loads(prod)
+            productos = productos
+            productos = self.class_update.reverse_product(
+                        productos,
+                        Compania.objects.get(pk=self.kwargs.get('pk')),
+                        descuento_global
+                        )
+            productos = self.class_update.dict_product(productos.get('productos'))
+
+            context['productos'] = productos
+        return context
+
+    def form_valid(self, form, **kwargs):
+        #DteCreateView.as_view(pk=self.kwargs.get('pk')).form_valid(form)(self.request)
+        return DteCreateView.as_view(pk=self.kwargs.get('pk'))(self.request)#.form_valid(form)
+
+    def get_success_url(self):
+        """
+        Método para retornar la url de éxito
+        """
+        return reverse_lazy('dte:save_dte_erp', kwargs={'pk': self.kwargs['pk'], 'slug': self.kwargs.get('slug')})

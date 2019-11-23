@@ -25,4 +25,6 @@ urlpatterns = [
          VerEstado.as_view(), name="ver_estado"),
     path('listar-dte-erp/<int:pk>/',
          ListarDteDesdeERP.as_view(), name="lista_dte_erp"),
+    path('guardar-dte-erp/<int:pk>/<str:slug>/',
+         SaveDteErp.as_view(), name='save_dte_erp'),
 ]
