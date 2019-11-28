@@ -225,3 +225,29 @@ function disable_dte_table_buttons(disable){
 		}
 	})
 }
+
+
+/**
+ * Funcion para enviar el DTE del ERPNext al SII
+ * @param num_factura
+*/
+function send_dte_erp(num_factura, url){
+	console.log("ingresa", num_factura);
+	$(".se-pre-con").fadeOut("slow").show();
+	$("#send_foo").attr("disabled", true);
+	$('#mensaje_spinner').text('Se esta enviando el DTE al sii, por favor espere...')
+	$.ajax({
+		type:'GET',
+		url: url,
+	    success: function(response) {
+	      	$(".se-pre-con").fadeOut("slow").hide();
+			$("#send_foo").attr("disabled", false); 
+	      	alert(response.msg)
+	      	location.reload()
+	      	
+	    }	
+	  });
+}
+
+
+
