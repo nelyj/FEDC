@@ -1,4 +1,10 @@
-import os, datetime, json, decimal, re
+import datetime
+import decimal
+import dicttoxml
+import json
+import os
+import re
+
 from collections import OrderedDict
 
 from django.core import serializers
@@ -1287,3 +1293,29 @@ class SendDteErpToSii(LoginRequiredMixin, View):
         dte.dte_xml = caratula_firmada
         dte.save()
         return SendToSiiView.as_view(pk=dte.pk)(self.request) #.get()
+
+
+class DeatailDTE(LoginRequiredMixin, TemplateView):
+    template_name = 'detail_dte_erp.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            usuario = Conector.objects.filter(pk=1).first()
+        except Exception as e:
+            print(e)
+        decode_encode = DecodeEncodeChain()
+        passw = usuario.password.strip()
+        passw = decode_encode.decrypt(passw).decode("utf-8")
+
+        erp = SdkConectorERP(usuario.url_erp, usuario.usuario, passw)
+        response, session = erp.login()
+
+        aux = erp.list(session, str(kwargs['slug']))
+
+        aux=json.loads(aux.text)
+        xml = dicttoxml.dicttoxml(aux)
+        context['keys'] = list(aux['data'].keys())
+        context['values'] = list(aux['data'].values())
+        session.close()
+        return context

@@ -37,7 +37,7 @@
             <td>
                 <a  id="save_foo" href="{% url 'dte:save_dte_erp' pk=id_empresa slug=lista.data.name %}" class="btn btn-success">Guardar</a>
                 <a  id="send_foo" onclick="send_dte_erp('{{lista.data.name}}', '{% url 'dte:send_dte_erp' pk=id_empresa slug=lista.data.name %}')" class="btn btn-warning">Enviar al SII</a>
-                <a  id="edit_foo" href="{% url 'facturas:send-invoice' pk=id_empresa slug=lista.data.name %}" class="btn btn-info">Detalle</a>
+                <a  id="edit_foo" href="{% url 'dte:detail_dte' pk=id_empresa slug=lista.data.name %}" class="btn btn-info">Detalle</a>
                 <!-- Trigger the modal with a button -->
                 {% comment %} <button  id="edit_foo" onclick="return validar('{% url 'facturas:send-invoice' lista.data.name%}')" type="button" class="btn btn-info">Detalle</button> {% endcomment %}
                 {% comment %}<a  id="edit_foo" href="{% url 'facturas:send-invoice' pk=id_empresa slug=lista.data.name %}" class="btn btn-info">Detalle</a>{% endcomment %}

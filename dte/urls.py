@@ -29,4 +29,6 @@ urlpatterns = [
          SaveDteErp.as_view(), name='save_dte_erp'),
     path('enviar-dte-erp/<int:pk>/<str:slug>/',
          SendDteErpToSii.as_view(), name='send_dte_erp'),
+    path('detalle-dte/<int:pk>/<str:slug>/',
+         DeatailDTE.as_view(), name='detail_dte'),
 ]
