@@ -393,8 +393,8 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
             new_prod = {}
             new_prod['nombre'] = producto['nombre']
             new_prod['codigo'] = producto['codigo']
-            new_prod['cantidad'] = int(producto['cantidad'])
-            new_prod['precio'] = float(producto['precio'])
+            new_prod['cantidad'] = int(producto.get('cantidad', 0))
+            new_prod['precio'] = float(producto.get('precio')) if producto.get('precio') else 0
             new_prod['descuento'] = 0 if producto.get('exento', None) is None else float(producto.get('exento'))
             new_prod['exento'] = 0 if producto.get('exento', 0) is None else float(producto.get('exento'))
 
@@ -413,11 +413,11 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
         products = []
         for producto in prod_dict:
             new_prod = OrderedDict()
-            new_prod['nombre'] = producto['item_name']
-            new_prod['nombre'] = producto['description']
-            new_prod['codigo'] = producto['item_code']
-            new_prod['cantidad'] = producto['qty']
-            new_prod['precio'] = producto['base_net_rate']
+            new_prod['nombre'] = producto.get('item_name', None)
+            new_prod['nombre'] = producto.get('description', None)
+            new_prod['codigo'] = producto.get('item_code', None)
+            new_prod['cantidad'] = producto.get('qty', 0)
+            new_prod['precio'] = producto.get('base_net_rate', None)
             if producto.get('discount'):
                 new_prod['descuento'] = float(producto.get('discount'))
             elif producto.get('discount_percentage'):
@@ -426,10 +426,10 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
                 new_prod['descuento'] = 0
             new_prod['exento'] = producto.get('exento')
             if(new_prod['descuento']):
-                f_total = producto['qty'] * producto['base_net_rate']
+                f_total = producto.get('qty', 0) * producto.get('base_net_rate', 0)
                 new_prod['amount'] = f_total - (f_total*(new_prod['descuento']/100))
             else:
-                new_prod['amount'] = producto['qty'] * producto['base_net_rate']
+                new_prod['amount'] = producto.get('qty', 0) * producto.get('base_net_rate', 0)
             products.append(new_prod)
             if(new_prod['exento']):
                 exento += new_prod['amount']
@@ -606,9 +606,6 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView, WeasyTemplateResponseMix
         context['nombre_documento'] = documentos_dict[context['factura'].tipo_dte]
         etiqueta=self.kwargs['slug'].replace('º','')
         context['etiqueta'] = etiqueta
-
-        
-
         context['referencia'] = context['factura'].ref_factura
 
         prod = context['factura'].productos.replace('\'{','{').replace('}\'','}').replace('\'',"\"")
@@ -998,7 +995,7 @@ class SaveDteErp(LoginRequiredMixin, FormView):
         valor = re.sub('[^a-zA-Z0-9 \n\.]', '', self.kwargs['slug'])
         valor = valor.replace(' ', '')
         initial['numero_factura']=valor
-        tipo_dte = self.type_dte(valor)
+        tipo_dte = self.type_dte(context.get('factura').get('tipo_de_documento', None))
         initial['tipo_dte'] = tipo_dte
         try:
             initial['senores']=context['factura']['customer_name']
@@ -1210,8 +1207,8 @@ class SendDteErpToSii(LoginRequiredMixin, View):
             'tipo_descuento': '%'
         }
 
-        productos = json.loads(prod)
-        productos = productos
+        productos_json = json.loads(prod)
+        productos = productos_json
         productos = self.class_update.reverse_product(
                     productos,
                     Compania.objects.get(pk=compania),
@@ -1231,7 +1228,7 @@ class SendDteErpToSii(LoginRequiredMixin, View):
                 giro=giro,
                 rut=rut,
                 fecha=fecha,
-                productos=productos,
+                productos=productos_json,
                 neto=neto,
                 iva=iva,
                 total=total,
@@ -1241,7 +1238,7 @@ class SendDteErpToSii(LoginRequiredMixin, View):
                 forma_pago=FORMA_DE_PAGO[0][0],
             )
         # Se verifica el folio
-        
+
         try:
             folio = Folio.objects.filter(empresa=compania, is_active=True,
                                          vencido=False,
