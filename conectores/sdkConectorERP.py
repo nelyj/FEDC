@@ -14,6 +14,7 @@ class SdkConectorERP:
     api_login = '/api/method/login'
     api_invoice_limit = '/api/resource/Sales%20Invoice/?limit_page_length'
     api_list_invoice = '/api/resource/Sales%20Invoice/'
+    api_list_delivery= '/api/resource/Delivery%20Note/'
 
     def __init__(self, url, user, password):
         """
@@ -60,6 +61,19 @@ class SdkConectorERP:
         @return response respuesta del servidor
         """
         url = self.url + self.api_list_invoice + slug if slug else self.url + self.api_list_invoice
+        response = session.get(url)
+
+        return response
+
+    def list_delivery(self, session, slug=None):
+        """
+        Metodo para listar las guias de despacho con un limite o con un detalle
+
+        @param self atributos de la clase
+        @param session objeto de sesion del usuario
+        @return response respuesta del servidor
+        """
+        url = self.url + self.api_list_delivery + slug if slug else self.url + self.api_list_delivery + '?limit_page_length'
         response = session.get(url)
 
         return response

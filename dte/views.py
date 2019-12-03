@@ -887,13 +887,19 @@ class ListarDteDesdeERP(LoginRequiredMixin, TemplateView):
             messages.warning(self.request, "No se pudo establecer conexion con el ERP Next, se genera el siguiente error: "+str(e))
         try:
             lista = erp.list_limit(session)
+            lista_guia = erp.list_delivery(session)
+            erp_data = json.loads(lista.text)
+
+            erp_data_guia = json.loads(lista_guia.text)
+
         except Exception as e:
+            session.close()
             messages.warning(self.request, "Error al obtener el listado de dte del ERP Next, se genera el siguiente error: "+str(e))
             return context
-        erp_data = json.loads(lista.text)
 
-        # Todas las facturas y boletas sin discriminacion 
+        # Todas las facturas, guias y boletas sin discriminacion 
         data = erp_data['data']
+        data_guia = erp_data_guia.get('data', [])
 
         # Consulta en la base de datos todos los numeros de facturas
         # cargadas por la empresa correspondiente para hacer una comparacion
@@ -908,6 +914,10 @@ class ListarDteDesdeERP(LoginRequiredMixin, TemplateView):
             if item['name'].startswith(''):
 
                 solo_facturas.append(item['name'])
+        solo_guias = []
+        for i , item in enumerate(data_guia):
+            print(item)
+            solo_guias.append(item['name'])
 
         # Verifica si la factura que vienen del ERP 
         # ya se encuentran cargadas en el sistema
@@ -919,17 +929,28 @@ class ListarDteDesdeERP(LoginRequiredMixin, TemplateView):
             valor = re.sub('[^a-zA-Z0-9 \n\.]', '', item)
             valor = valor.replace(' ', '')
             if not valor in enviadas:
+                solo_nuevas.append(item)
 
+        for i , item in enumerate(solo_guias):
+            valor = re.sub('[^a-zA-Z0-9 \n\.]', '', item)
+            valor = valor.replace(' ', '')
+            if not valor in enviadas:
                 solo_nuevas.append(item)
 
         context['detail']=[]
         for tmp in solo_nuevas:
             try:
                 aux = erp.list(session, str(tmp))
-                context['detail'].append(json.loads(aux.text))
-                session.close()
+                if aux.status_code == 200:
+                    context['detail'].append(json.loads(aux.text))
+                elif aux.status_code == 404:
+                    aux = erp.list_delivery(session, str(tmp))
+                    if aux.text:
+                        context['detail'].append(json.loads(aux.text))
             except Exception as e:
+                session.close()
                 messages.warning(self.request, "Error al obtener el listado de dte del ERP Next, se genera el siguiente error: "+str(e))
+        session.close()
         return context
 
 
@@ -959,8 +980,10 @@ class SaveDteErp(LoginRequiredMixin, FormView):
             return 61
         elif tipo_documento.startswith('Nota de Credito'):
             return 56
-        else:
+        elif tipo_documento.startswith('Guía de Despacho:'):
             return 52
+        else:
+            return ''
 
     def get_initial(self):
         initial = super().get_initial()

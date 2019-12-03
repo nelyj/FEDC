@@ -24,6 +24,7 @@
         <tr>
             <th>Factura</th>
             <th>Cliente</th>
+            <td>Tipo de Documento</td>
             <th>Status</th>
             <th>Acciones</th>
         </tr>
@@ -33,6 +34,7 @@
         <tr>
             <td> {% comment %}<a href="{% url 'facturas:detail-invoice' lista.data.name %}">{% endcomment %}{{lista.data.name}}{% comment %}</a>{% endcomment %}</td>
             <td>{{lista.data.title}}</td>
+            <td>{{lista.data.tipo_de_documento}}</td>
             <td>{{lista.data.status_sii}}</td>
             <td>
                 <a  id="save_foo" href="{% url 'dte:save_dte_erp' pk=id_empresa slug=lista.data.name %}" class="btn btn-success">Guardar</a>
@@ -50,6 +52,7 @@
         <tr>
             <th>Factura</th>
             <th>Cliente</th>
+            <td>Tipo de Documento</td>
             <th>Status</th>
             <th>Acciones</th>
         </tr>
