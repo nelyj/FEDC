@@ -897,6 +897,7 @@ class ListarDteDesdeERP(LoginRequiredMixin, TemplateView):
             response, session = erp.login()
         except Exception as e:
             messages.warning(self.request, "No se pudo establecer conexion con el ERP Next, se genera el siguiente error: "+str(e))
+            return context
         try:
             lista = erp.list_limit(session)
             lista_guia = erp.list_delivery(session)

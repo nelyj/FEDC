@@ -35,7 +35,7 @@ class SdkConectorERP:
         payload = {"usr": self.user, "pwd": self.password}
         headers = {'content-type': "application/json"}
 
-        response = session.get(url, data=json.dumps(payload), headers=headers)
+        response = session.get(url, data=json.dumps(payload), headers=headers, verify=False)
 
         return response, session
 
@@ -48,7 +48,7 @@ class SdkConectorERP:
         @return response respuesta del servidor
         """
         url = self.url + self.api_invoice_limit
-        response = session.get(url)
+        response = session.get(url,  verify=False)
 
         return response
 
@@ -61,7 +61,7 @@ class SdkConectorERP:
         @return response respuesta del servidor
         """
         url = self.url + self.api_list_invoice + slug if slug else self.url + self.api_list_invoice
-        response = session.get(url)
+        response = session.get(url, verify=False)
 
         return response
 
@@ -74,6 +74,6 @@ class SdkConectorERP:
         @return response respuesta del servidor
         """
         url = self.url + self.api_list_delivery + slug if slug else self.url + self.api_list_delivery + '?limit_page_length'
-        response = session.get(url)
+        response = session.get(url, verify=False)
 
         return response
