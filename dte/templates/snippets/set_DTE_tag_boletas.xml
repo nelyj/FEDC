@@ -1,0 +1,16 @@
+<SetDTE ID="SetDoc">
+	<Caratula version="1.0">
+		<RutEmisor>{{compania.rut}}</RutEmisor>
+		<RutEnvia>{{compania.rut}}</RutEnvia>
+		<RutReceptor>60803000-K</RutReceptor> 
+		<FchResol>{{compania.fecha_resolucion|date:"Y-m-d"}}</FchResol>
+		<NroResol>{{compania.numero_resolucion}}</NroResol>
+		<TmstFirmaEnv>{{ timestamp_firma }}</TmstFirmaEnv>
+		<SubTotDTE>
+			<TpoDTE>{{ folio.tipo_de_documento }}</TpoDTE>
+			<NroDTE>1</NroDTE>
+		</SubTotDTE>
+	</Caratula>
+	{% autoescape off %}
+	{%for doc in documento%}{{doc.dte_xml}}{%endfor%}{% endautoescape %}
+</SetDTE>
