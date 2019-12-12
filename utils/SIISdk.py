@@ -120,7 +120,7 @@ class SII_SDK():
         Método para firmar cualquier xml
         @param compania recibe el objeto compañia
         @param compania recibe el string a firmar
-        @return xml con la fima 
+        @return xml con la fima
         """
         pass_certificado = self.decode_encode.decrypt(pass_certificado).decode("utf-8")
         tree = etree.fromstring(xml_string)

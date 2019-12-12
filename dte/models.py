@@ -181,10 +181,10 @@ class DTE(CreationModificationDateMixin):
 
         sii_sdk = SII_SDK(settings.SII_PRODUCTION)
         set_dte_sin_aplanar = sii_sdk.generalSign(compania,documento_sin_aplanar,pass_certificado)
-    
+
         return set_dte_sin_aplanar
 
-    def firmar_etiqueta_set_dte(compania, folio, etiqueta_Documento):
+    def firmar_etiqueta_set_dte(compania, folio, etiqueta_Documento, nro_dte=1):
 
 
         # Genera timestamp en formato correspondiente
@@ -197,18 +197,33 @@ class DTE(CreationModificationDateMixin):
             compania.rut = compania.rut.replace('k','K')
 
         # LLena la plantilla dte_base.xml con los datos correspondientes
-        set_dte_sin_aplanar = render_to_string(
-            'snippets/dte_base.xml', {
-                'compania':compania, 
-                'folio':folio, 
-                'timestamp_firma':timestamp_firma,
-                'documento': etiqueta_Documento
-            }
-        )
+
+        if not isinstance(etiqueta_Documento, str):
+            list_rest = [dte.tipo_dte for dte in etiqueta_Documento]        
+            if len(list(set(list_rest))) == 1 and list(set(list_rest))[0] == 39:
+                set_dte_sin_aplanar = render_to_string(
+                    'snippets/set_DTE_tag_boletas.xml', {
+                        'compania':compania,
+                        'folio':folio,
+                        'timestamp_firma':timestamp_firma,
+                        'nro_dte': nro_dte,
+                        'documento': etiqueta_Documento
+                    }
+                )
+        else:
+            set_dte_sin_aplanar = render_to_string(
+                'snippets/dte_base.xml', {
+                    'compania':compania,
+                    'folio':folio,
+                    'timestamp_firma':timestamp_firma,
+                    'nro_dte': nro_dte,
+                    'documento': etiqueta_Documento
+                }
+            )
 
         return set_dte_sin_aplanar
 
-    def generar_documento_final(compania,etiqueta_SetDte,pass_certificado):
+    def generar_documento_final(compania, etiqueta_SetDte, pass_certificado, instance):
 
         """
         Incorpora todo el documento firmado al la presentacion final y elimina 
@@ -217,8 +232,10 @@ class DTE(CreationModificationDateMixin):
         """
         # Incorpora todo el documento firmado al la presentacion final y elimina 
         # las tabulaciones.
-
-        documento_final = render_to_string('snippets/dte.xml', {'set_DTE':etiqueta_SetDte})
+        if instance.tipo_dte == 39:
+            documento_final = render_to_string('snippets/boleta.xml', {'set_DTE':etiqueta_SetDte})
+        else:
+            documento_final = render_to_string('snippets/dte.xml', {'set_DTE':etiqueta_SetDte})
 
         # Se firmó el archivo xml
         sii_sdk = SII_SDK(settings.SII_PRODUCTION)

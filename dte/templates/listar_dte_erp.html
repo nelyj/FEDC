@@ -38,7 +38,9 @@
             <td>{{lista.data.status_sii}}</td>
             <td>
                 <a  id="save_foo" href="{% url 'dte:save_dte_erp' pk=id_empresa slug=lista.data.name %}" class="btn btn-success">Guardar</a>
-                <a  id="send_foo" onclick="send_dte_erp('{{lista.data.name}}', '{% url 'dte:send_dte_erp' pk=id_empresa slug=lista.data.name %}')" class="btn btn-warning">Enviar al SII</a>
+                {% if  lista.data.tipo_de_documento != "Boleta" %}
+                <a  id="send_foo" onclick="send_dte_erp('{{lista.data.name}}', '{% url 'dte:send_dte_erp' pk=id_empresa %}')" class="btn btn-warning"> Enviar al SII </a>{% endif %}
+                
                 <a  id="edit_foo" href="{% url 'dte:detail_dte' pk=id_empresa slug=lista.data.name %}" class="btn btn-info">Detalle</a>
                 <!-- Trigger the modal with a button -->
                 {% comment %} <button  id="edit_foo" onclick="return validar('{% url 'facturas:send-invoice' lista.data.name%}')" type="button" class="btn btn-info">Detalle</button> {% endcomment %}
@@ -58,6 +60,7 @@
         </tr>
     </tfoot>
 </table>
+<a  id="send_foo_boletas" class="btn btn-warning"> Enviar Boletas al SII </a>
 <script type="text/javascript">
         {% comment %} 
         function validar(url) {
@@ -74,7 +77,39 @@
         }     
         {% endcomment %}
     $(document).ready( function () {
-          $('#myTable').DataTable();
+          var theButton = $('#send_foo_boletas');
+          theButton.hide();
+          var selected = [];
+          $('#myTable').DataTable({
+                "rowCallback": function( row, data ) {
+                if ( $.inArray(data.DT_RowId, selected) !== -1 ) {
+                        $(row).addClass('selected');
+                    }
+                }
+          });
+
+            $('#myTable tbody').on( 'click', 'tr', function () {
+                if ($(this).find('td:eq(2)').text() == 'Boleta'){
+                    var id = $.trim($(this).find('td:eq(0)').text());
+                    var index = $.inArray(id, selected);
+             
+                    if ( index === -1 ) {
+                        selected.push( id );
+                    } else {
+                        selected.splice( index, 1 );
+                    }
+    
+                    $(this).toggleClass('selected');
+                    
+                    document.querySelector("a[id=send_foo_boletas]").addEventListener("click", function() {
+                        send_dte_erp(selected, '{% url "dte:send_dte_erp" pk=id_empresa %}')
+                    }, false);
+                    theButton.show(1000)
+                    if ( selected.length == 0){
+                        theButton.hide(600)
+                    }
+                }
+            } );
     });
 
     $('.btn-success').click(

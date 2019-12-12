@@ -8,7 +8,7 @@
     <TmstFirmaEnv>{{ timestamp_firma }}</TmstFirmaEnv>
     <SubTotDTE>
       <TpoDTE>{{ folio.tipo_de_documento }}</TpoDTE>
-      <NroDTE>1</NroDTE>
+      <NroDTE>{{ nro_dte }}</NroDTE>
     </SubTotDTE>
   </Caratula>
   {% autoescape off %}

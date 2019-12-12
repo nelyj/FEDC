@@ -236,9 +236,15 @@ function send_dte_erp(num_factura, url){
 	$(".se-pre-con").fadeOut("slow").show();
 	$("#send_foo").attr("disabled", true);
 	$('#mensaje_spinner').text('Se esta enviando el DTE al sii, por favor espere...')
+	var data = {
+		"pk": num_factura
+	}
 	$.ajax({
 		type:'GET',
 		url: url,
+		data: data,
+		traditional: true,
+		contentType: 'application/json; charset=utf-8',
 	    success: function(response) {
 	      	$(".se-pre-con").fadeOut("slow").hide();
 			$("#send_foo").attr("disabled", false); 

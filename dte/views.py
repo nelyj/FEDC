@@ -12,6 +12,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect, JsonResponse
+from django.db.models import Q
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
@@ -555,7 +556,6 @@ class DeleteDTEView(LoginRequiredMixin, DeleteView):
         return reverse_lazy(self.success_url, kwargs={'pk': self.kwargs['comp']})
 
 
-
 class ImprimirFactura(LoginRequiredMixin, TemplateView, WeasyTemplateResponseMixin):
     """!
     Class para imprimir la factura en PDF
@@ -604,7 +604,7 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView, WeasyTemplateResponseMix
 
         context['factura'] = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
         context['nombre_documento'] = documentos_dict[context['factura'].tipo_dte]
-        etiqueta=self.kwargs['slug'].replace('º','')
+        etiqueta = self.kwargs['slug'].replace('º','')
         context['etiqueta'] = etiqueta
         context['referencia'] = context['factura'].ref_factura
 
@@ -667,9 +667,10 @@ class AjaxGenericListDTETable(LoginRequiredMixin, BaseDatatableView):
         # these are simply objects displayed in datatable
         # You should not filter data returned here by any filter values entered by Intercambio. This is because
         # we need some base queryset to count total number of records.
+        qs_params = Q(tipo_dte=33)|Q(tipo_dte=56)|Q(tipo_dte=61)
         if self.request.GET.get(u'sistema', None) == 'True':
-            return self.model.objects.filter(compania=self.kwargs['pk'], track_id=None)
-        return self.model.objects.filter(compania=self.kwargs['pk']).exclude(track_id=None)
+            return self.model.objects.filter(compania=self.kwargs['pk'], track_id=None).filter(qs_params)
+        return self.model.objects.filter(compania=self.kwargs['pk']).exclude(track_id=None).filter(qs_params)
 
     def filter_queryset(self, qs):
         # use parameters passed in GET request to filter queryset
@@ -731,20 +732,31 @@ class SendToSiiView(LoginRequiredMixin, View):
     @version 1.0.0
     """
     pk = None 
+    caratula = None
 
     def get(self, request, **kwargs):
         """
         Método para manejar la petición get
         """
-        pk = self.pk if self.pk is not None else kwargs['pk ']
-        model = DTE.objects.get(pk=pk)
-        send_sii = sendToSii(model.compania,model.dte_xml,model.compania.pass_certificado)
-        if(not send_sii['estado']):
-            return JsonResponse({'status':send_sii['estado'], 'msg':send_sii['msg']})
+        pk = self.pk if self.pk is not None else kwargs['pk']
+        caratula = self.caratula
+        if caratula:
+            send_sii = sendToSii(model.compania,caratula,model.compania.pass_certificado)
+            if(not send_sii['estado']):
+                return JsonResponse({'status':send_sii['estado'], 'msg':send_sii['msg']})
+            else:
+                model.track_id = send_sii['track_id']
+                model.save()
+                return JsonResponse({'status':send_sii['estado'], 'msg':'Envíado con éxito'})
         else:
-            model.track_id = send_sii['track_id']
-            model.save()
-            return JsonResponse({'status':send_sii['estado'], 'msg':'Envíado con éxito'})
+            model = DTE.objects.get(pk=pk)
+            send_sii = sendToSii(model.compania,model.dte_xml,model.compania.pass_certificado)
+            if(not send_sii['estado']):
+                return JsonResponse({'status':send_sii['estado'], 'msg':send_sii['msg']})
+            else:
+                model.track_id = send_sii['track_id']
+                model.save()
+                return JsonResponse({'status':send_sii['estado'], 'msg':'Envíado con éxito'})
 
 
 class GetDteDataView(LoginRequiredMixin, View):
@@ -916,7 +928,7 @@ class ListarDteDesdeERP(LoginRequiredMixin, TemplateView):
                 solo_facturas.append(item['name'])
         solo_guias = []
         for i , item in enumerate(data_guia):
-            print(item)
+
             solo_guias.append(item['name'])
 
         # Verifica si la factura que vienen del ERP 
@@ -980,7 +992,7 @@ class SaveDteErp(LoginRequiredMixin, FormView):
             return 61
         elif tipo_documento.startswith('Nota de Credito'):
             return 56
-        elif tipo_documento.startswith('Guía de Despacho:'):
+        elif tipo_documento.startswith('Guía de Despacho'):
             return 52
         else:
             return ''
@@ -1158,8 +1170,9 @@ class SendDteErpToSii(LoginRequiredMixin, View):
         """
         Metodo para obtener el numeo de DTE y procesarlo desde el ERP al Sii y guardarlo en la plataforma
         """
-        url = kwargs.get('slug')
+
         compania = kwargs.get('pk')
+        urls = request.GET.getlist('pk', [])
 
         try:
             usuario = Conector.objects.filter(empresa=compania).first()
@@ -1172,147 +1185,179 @@ class SendDteErpToSii(LoginRequiredMixin, View):
         try:
             response, session = erp.login()
         except Exception as e:
-            messages.warning(self.request, "No se pudo establecer conexion con el ERP Next, se genera el siguiente error: "+str(e))
-        try:
-            aux = erp.list(session, url)
-            aux = json.loads(aux.text)
-            session.close()
-            context = {}
-            context['factura'] = dict(zip(aux['data'].keys(),
-                                      aux['data'].values()))
-            if len(context['factura']['sales_team'])> 0:
-                context['factura']['sales_team'] = context['factura']['sales_team'][0].get('sales_person', None)
-            else:
-                context['factura']['sales_team'] = context['factura']['sales_team']
-            context['factura']['total_taxes_and_charges'] = round(abs(float(context['factura']['total_taxes_and_charges'])))
-        except Exception as e:
             print(e)
-            context = {}
-            context['factura'] = {}
             messages.warning(self.request, "No se pudo establecer conexion con el ERP Next, se genera el siguiente error: "+str(e))
 
-        cleanr = re.compile('<.*?>')
-        valor = re.sub('[^a-zA-Z0-9 \n\.]', '', url)
-        valor = valor.replace(' ', '')
-        numero_factura = valor
-        tipo_dte = self.erp_dte.type_dte(context.get('factura').get('tipo_de_documento', None))
-        senores = context.get('factura').get('customer_name', None)
-        comuna = context.get('factura').get('comuna_receptora') if context.get('factura').get('comuna_receptora') else 'Arica'
-        shipping_address = context.get('factura').get('shipping_address')
-        shipping_address = shipping_address.replace('\n', ' ') if shipping_address else 'Direccion'
-        shipping_address = re.sub(cleanr, '', shipping_address)
-        ciudad_receptora = shipping_address
-        giro = context.get('factura').get('giro')
-        vendedor = context.get('factura').get('sales_team')
-        rut = context.get('factura').get('rut')
-        if rut is None:
-            return JsonResponse({'status':False, 'msg':'El DTE no tiene Rut'})
-        try:
-            fecha = datetime.datetime.strptime(context.get('factura').get('posting_date'), '%Y-%m-%d')
-            fecha = fecha.strftime('%Y-%m-%d')
-        except:
-            fecha = datetime.datetime.now()
-            fecha = fecha.strftime('%Y-%m-%d')
-        orden_compra = context.get('factura').get('po_no')
-        nota_venta = context.get('factura').get('orden_de_venta')
-        productos = context.get('factura').get('items')
-        monto_palabra = context.get('factura').get('in_words')
-        neto = context.get('factura').get('net_total')
-        descuento = context.get('factura').get('additional_discount_percentage')
-        descuento = descuento if descuento is not None else 0
-        iva = context.get('factura').get('total_taxes_and_charges')
-        total = context.get('factura').get('rounded_total')
+        for url in urls:
+            dte_list = []
+            #url = url.replace(' ', '%20')
+            #print(url)
+            try:
+                aux = erp.list(session, url)
+                if aux.status_code == 200:
+                    aux = json.loads(aux.text)
+                elif aux.status_code == 404:
+                    aux = erp.list_delivery(session, url)
+                    if aux.text:
+                        aux = json.loads(aux.text)
 
-        prod = str(productos).replace('\'{','{').replace('}\'','}').replace('\'',"\"")
+                context = {}
+                context['factura'] = dict(zip(aux['data'].keys(),
+                                          aux['data'].values()))
 
-        descuento_global = {
-            'descuento': float(descuento),
-            'tipo_descuento': '%'
-        }
+                if len(context['factura']['sales_team']) > 0:
+                    context['factura']['sales_team'] = context['factura']['sales_team'][0].get('sales_person', None)
+                else:
+                    context['factura']['sales_team'] = context['factura']['sales_team']
+                context['factura']['total_taxes_and_charges'] = round(abs(float(context['factura']['total_taxes_and_charges'])))
+            except Exception as e:
+                print(e)
+                context = {}
+                context['factura'] = {}
+                messages.warning(self.request, "No se pudo establecer conexion con el ERP Next, se genera el siguiente error: "+str(e))
 
-        productos_json = json.loads(prod)
-        productos = productos_json
-        productos = self.class_update.reverse_product(
-                    productos,
-                    Compania.objects.get(pk=compania),
-                    descuento_global
-                    )
-        productos = self.class_update.dict_product(productos.get('productos'))
+            cleanr = re.compile('<.*?>')
+            valor = re.sub('[^a-zA-Z0-9 \n\.]', '', url)
+            valor = valor.replace(' ', '')
+            numero_factura = valor
+            tipo_dte = self.erp_dte.type_dte(str(context.get('factura').get('tipo_de_documento', None)))
+            senores = context.get('factura').get('customer_name', None)
+            comuna = context.get('factura').get('comuna_receptora') if context.get('factura').get('comuna_receptora') else 'Arica'
+            shipping_address = context.get('factura').get('shipping_address')
+            shipping_address = shipping_address.replace('\n', ' ') if shipping_address else 'Direccion'
+            shipping_address = re.sub(cleanr, '', shipping_address)
+            ciudad_receptora = shipping_address
+            giro = context.get('factura').get('giro')
+            vendedor = context.get('factura').get('sales_team')
+            rut = context.get('factura').get('rut')
+            if rut is None:
+                return JsonResponse({'status':False, 'msg':'El DTE no tiene Rut'})
+            try:
+                fecha = datetime.datetime.strptime(context.get('factura').get('posting_date'), '%Y-%m-%d')
+                fecha = fecha.strftime('%Y-%m-%d')
+            except:
+                fecha = datetime.datetime.now()
+                fecha = fecha.strftime('%Y-%m-%d')
+            orden_compra = context.get('factura').get('po_no')
+            nota_venta = context.get('factura').get('orden_de_venta')
+            productos = context.get('factura').get('items')
+            monto_palabra = context.get('factura').get('in_words')
+            neto = context.get('factura').get('net_total')
+            descuento = context.get('factura').get('additional_discount_percentage')
+            descuento = descuento if descuento is not None else 0
+            iva = context.get('factura').get('total_taxes_and_charges')
+            total = context.get('factura').get('rounded_total')
 
-        productos = productos
-        dte = DTE(
-                compania=Compania.objects.get(pk=compania),
-                numero_factura=numero_factura,
-                senores=senores,
-                direccion=shipping_address,
-                comuna=comuna,
-                region=shipping_address,
-                ciudad_receptora=ciudad_receptora,
-                giro=giro,
-                rut=rut,
-                fecha=fecha,
-                productos=productos_json,
-                neto=neto,
-                iva=iva,
-                total=total,
-                tipo_dte=tipo_dte,
-                tipo_descuento='%',
-                descuento_global=float(descuento),
-                forma_pago=FORMA_DE_PAGO[0][0],
-            )
-        # Se verifica el folio
+            prod = str(productos).replace('\'{','{').replace('}\'','}').replace('\'',"\"")
 
-        try:
-            folio = Folio.objects.filter(empresa=compania, is_active=True,
-                                         vencido=False,
-                                         tipo_de_documento=tipo_dte).order_by('fecha_de_autorizacion').first()
-            if not folio:
-                raise Folio.DoesNotExist
-        except Folio.DoesNotExist:
-            return JsonResponse({'status':False, 'msg':"No posee folios para asignacion de timbre"})
-        try:
-            folio.verificar_vencimiento()
-        except ElCAFSenEncuentraVencido:
-            return JsonResponse({'status':False, 'msg':"El CAF se encuentra vencido"})
-        try:
-            dte.recibir_folio(folio)
-        except (ElCafNoTieneMasTimbres, ValueError):
-            return JsonResponse({'status':False, 'msg':"Ya ha consumido todos sus timbres"})
+            descuento_global = {
+                'descuento': float(descuento),
+                'tipo_descuento': '%'
+            }
+
+            productos_json = json.loads(prod)
+            productos = productos_json
+            productos = self.class_update.reverse_product(
+                        productos,
+                        Compania.objects.get(pk=compania),
+                        descuento_global
+                        )
+            productos = self.class_update.dict_product(productos.get('productos'))
+
+            productos = productos
+            dte = DTE(
+                    compania=Compania.objects.get(pk=compania),
+                    numero_factura=numero_factura,
+                    senores=senores,
+                    direccion=shipping_address,
+                    comuna=comuna,
+                    region=shipping_address,
+                    ciudad_receptora=ciudad_receptora,
+                    giro=giro,
+                    rut=rut,
+                    fecha=fecha,
+                    productos=productos_json,
+                    neto=neto,
+                    iva=iva,
+                    total=total,
+                    tipo_dte=tipo_dte,
+                    tipo_descuento='%',
+                    descuento_global=float(descuento),
+                    forma_pago=FORMA_DE_PAGO[0][0],
+                )
+            # Se verifica el folio
+
+            try:
+                folio = Folio.objects.filter(empresa=compania, is_active=True,
+                                             vencido=False,
+                                             tipo_de_documento=tipo_dte).order_by('fecha_de_autorizacion').first()
+                if not folio:
+                    raise Folio.DoesNotExist
+            except Folio.DoesNotExist:
+                return JsonResponse({'status':False, 'msg':"No posee folios para asignacion de timbre"})
+            try:
+                folio.verificar_vencimiento()
+            except ElCAFSenEncuentraVencido:
+                return JsonResponse({'status':False, 'msg':"El CAF se encuentra vencido"})
+            try:
+                dte.recibir_folio(folio)
+            except (ElCafNoTieneMasTimbres, ValueError):
+                return JsonResponse({'status':False, 'msg':"Ya ha consumido todos sus timbres"})
 
 
-        compania =  Compania.objects.get(pk=compania)
-        pass_certificado = compania.pass_certificado
+            compania =  Compania.objects.get(pk=compania)
+            pass_certificado = compania.pass_certificado
 
-        diccionario_general = self.class_create.load_product(productos,
-                                                             compania,
-                                                             descuento_global)
-        diccionario_general['rut'] = dte.rut
-        diccionario_general['numero_factura'] = dte.numero_factura
-        diccionario_general['senores'] = dte.senores
-        diccionario_general['giro'] = dte.giro
-        diccionario_general['direccion'] = dte.region
-        diccionario_general['comuna'] = dte.comuna
+            diccionario_general = self.class_create.load_product(productos,
+                                                                 compania,
+                                                                 descuento_global)
+            diccionario_general['rut'] = dte.rut
+            diccionario_general['numero_factura'] = dte.numero_factura
+            diccionario_general['senores'] = dte.senores
+            diccionario_general['giro'] = dte.giro
+            diccionario_general['direccion'] = dte.region
+            diccionario_general['comuna'] = dte.comuna
 
-        diccionario_general['ciudad_receptora'] = dte.ciudad_receptora
+            diccionario_general['ciudad_receptora'] = dte.ciudad_receptora
 
-        diccionario_general['forma_pago'] = dte.forma_pago
+            diccionario_general['forma_pago'] = dte.forma_pago
 
-        response_dd = self.model._firmar_dd(diccionario_general, folio, dte)
-        documento_firmado = self.model.firmar_documento(response_dd,
-                                                        diccionario_general,
-                                                        folio,
-                                                        compania,
-                                                        dte,
-                                                        pass_certificado)
-        documento_final_firmado = self.model.firmar_etiqueta_set_dte(compania,
+            response_dd = self.model._firmar_dd(diccionario_general, folio, dte)
+
+            documento_firmado = self.model.firmar_documento(response_dd,
+                                                            diccionario_general,
+                                                            folio,
+                                                            compania,
+                                                            dte,
+                                                            pass_certificado)
+            dte.save()
+            dte_list.append(dte.pk)
+        # end for
+        session.close()
+        if len(dte_list) > 1 or dte.tipo_dte == 39:
+            dte_boletas = DTE.objects.filter(compania_id=compania.pk, pk__in=dte_list).exclude(status='ENVIADA')
+
+            documento_final_firmado = self.model.firmar_etiqueta_set_dte(compania,
+                                                                     folio,
+                                                                     dte_boletas, dte_boletas.count())
+        else:
+            dte_boletas = None
+            documento_final_firmado = self.model.firmar_etiqueta_set_dte(compania,
                                                                      folio,
                                                                      documento_firmado)
+        print(documento_final_firmado)
         caratula_firmada = self.model.generar_documento_final(compania,
                                                               documento_final_firmado,
-                                                              pass_certificado)
-        dte.dte_xml = caratula_firmada
-        dte.save()
-        return SendToSiiView.as_view(pk=dte.pk)(self.request) #.get()
+                                                              pass_certificado, dte)
+        if dte_boletas:
+            for dte_b in dte_boletas:
+                dte_b.dte_xml = caratula_firmada
+                dte_b.save()
+            return SendToSiiView.as_view(caratula=caratula_firmada)(self.request)
+        else:
+            dte.dte_xml = caratula_firmada
+            dte.save()
+            return SendToSiiView.as_view(pk=dte.pk)(self.request) #.get()
 
 
 class DeatailDTE(LoginRequiredMixin, TemplateView):

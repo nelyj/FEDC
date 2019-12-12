@@ -27,7 +27,7 @@ urlpatterns = [
          ListarDteDesdeERP.as_view(), name="lista_dte_erp"),
     path('guardar-dte-erp/<int:pk>/<str:slug>/',
          SaveDteErp.as_view(), name='save_dte_erp'),
-    path('enviar-dte-erp/<int:pk>/<str:slug>/',
+    path('enviar-dte-erp/<int:pk>/',
          SendDteErpToSii.as_view(), name='send_dte_erp'),
     path('detalle-dte/<int:pk>/<str:slug>/',
          DeatailDTE.as_view(), name='detail_dte'),
