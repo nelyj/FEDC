@@ -667,10 +667,10 @@ class AjaxGenericListDTETable(LoginRequiredMixin, BaseDatatableView):
         # these are simply objects displayed in datatable
         # You should not filter data returned here by any filter values entered by Intercambio. This is because
         # we need some base queryset to count total number of records.
-        qs_params = Q(tipo_dte=33)|Q(tipo_dte=56)|Q(tipo_dte=61)
+        #qs_params = Q(tipo_dte=33)|Q(tipo_dte=56)|Q(tipo_dte=61)
         if self.request.GET.get(u'sistema', None) == 'True':
-            return self.model.objects.filter(compania=self.kwargs['pk'], track_id=None).filter(qs_params)
-        return self.model.objects.filter(compania=self.kwargs['pk']).exclude(track_id=None).filter(qs_params)
+            return self.model.objects.filter(compania=self.kwargs['pk'], track_id=None)
+        return self.model.objects.filter(compania=self.kwargs['pk']).exclude(track_id=None)
 
     def filter_queryset(self, qs):
         # use parameters passed in GET request to filter queryset
