@@ -731,17 +731,28 @@ class SendToSiiView(LoginRequiredMixin, View):
     @date 24-09-2019
     @version 1.0.0
     """
-    pk = None 
+    pk = None
     caratula = None
+    model = None
 
     def get(self, request, **kwargs):
         """
         Método para manejar la petición get
         """
-        pk = self.pk if self.pk is not None else kwargs['pk']
+        pk = self.pk if self.pk is not None else kwargs.get('pk', None)
         caratula = self.caratula
         if caratula:
+            model = self.model.last()
             send_sii = sendToSii(model.compania,caratula,model.compania.pass_certificado)
+            if not send_sii['estado']:
+                return JsonResponse({'status':send_sii['estado'], 'msg':send_sii['msg']})
+            else:
+                track_id = send_sii['track_id']
+                #BoletaSended.objects.create(**{'track_id':track_id})
+                for boleta in self.model:
+                    boleta.status = 'ENVIADA'
+                    boleta.track_id = track_id
+                    boleta.save()
             if(not send_sii['estado']):
                 return JsonResponse({'status':send_sii['estado'], 'msg':send_sii['msg']})
             else:
@@ -1172,11 +1183,11 @@ class SendDteErpToSii(LoginRequiredMixin, View):
         Metodo para obtener el numeo de DTE y procesarlo desde el ERP al Sii y guardarlo en la plataforma
         """
 
-        compania = kwargs.get('pk')
+        empresa = kwargs.get('pk')
         urls = request.GET.getlist('pk', [])
 
         try:
-            usuario = Conector.objects.filter(empresa=compania).first()
+            usuario = Conector.objects.filter(empresa=empresa).first()
         except Exception as e:
             print(e)
 
@@ -1191,8 +1202,6 @@ class SendDteErpToSii(LoginRequiredMixin, View):
 
         for url in urls:
             dte_list = []
-            #url = url.replace(' ', '%20')
-            #print(url)
             try:
                 aux = erp.list(session, url)
                 if aux.status_code == 200:
@@ -1232,7 +1241,8 @@ class SendDteErpToSii(LoginRequiredMixin, View):
             vendedor = context.get('factura').get('sales_team')
             rut = context.get('factura').get('rut')
             if rut is None:
-                return JsonResponse({'status':False, 'msg':'El DTE no tiene Rut'})
+                continue
+                #return JsonResponse({'status':False, 'msg':'El DTE no tiene Rut'})
             try:
                 fecha = datetime.datetime.strptime(context.get('factura').get('posting_date'), '%Y-%m-%d')
                 fecha = fecha.strftime('%Y-%m-%d')
@@ -1260,14 +1270,14 @@ class SendDteErpToSii(LoginRequiredMixin, View):
             productos = productos_json
             productos = self.class_update.reverse_product(
                         productos,
-                        Compania.objects.get(pk=compania),
+                        Compania.objects.get(pk=empresa),
                         descuento_global
                         )
             productos = self.class_update.dict_product(productos.get('productos'))
 
             productos = productos
             dte = DTE(
-                    compania=Compania.objects.get(pk=compania),
+                    compania=Compania.objects.get(pk=empresa),
                     numero_factura=numero_factura,
                     senores=senores,
                     direccion=shipping_address,
@@ -1289,24 +1299,28 @@ class SendDteErpToSii(LoginRequiredMixin, View):
             # Se verifica el folio
 
             try:
-                folio = Folio.objects.filter(empresa=compania, is_active=True,
+                folio = Folio.objects.filter(empresa=empresa, is_active=True,
                                              vencido=False,
                                              tipo_de_documento=tipo_dte).order_by('fecha_de_autorizacion').first()
                 if not folio:
+                    continue
                     raise Folio.DoesNotExist
             except Folio.DoesNotExist:
-                return JsonResponse({'status':False, 'msg':"No posee folios para asignacion de timbre"})
+                continue
+                #return JsonResponse({'status':False, 'msg':"No posee folios para asignacion de timbre"})
             try:
                 folio.verificar_vencimiento()
             except ElCAFSenEncuentraVencido:
-                return JsonResponse({'status':False, 'msg':"El CAF se encuentra vencido"})
+                continue
+                #return JsonResponse({'status':False, 'msg':"El CAF se encuentra vencido"})
             try:
                 dte.recibir_folio(folio)
             except (ElCafNoTieneMasTimbres, ValueError):
-                return JsonResponse({'status':False, 'msg':"Ya ha consumido todos sus timbres"})
+                continue
+                #return JsonResponse({'status':False, 'msg':"Ya ha consumido todos sus timbres"})
 
 
-            compania =  Compania.objects.get(pk=compania)
+            compania =  Compania.objects.get(pk=empresa)
             pass_certificado = compania.pass_certificado
 
             diccionario_general = self.class_create.load_product(productos,
@@ -1331,6 +1345,8 @@ class SendDteErpToSii(LoginRequiredMixin, View):
                                                             compania,
                                                             dte,
                                                             pass_certificado)
+            if dte.tipo_dte == 39:
+                dte.dte_xml = documento_firmado
             dte.save()
             dte_list.append(dte.pk)
         # end for
@@ -1346,15 +1362,12 @@ class SendDteErpToSii(LoginRequiredMixin, View):
             documento_final_firmado = self.model.firmar_etiqueta_set_dte(compania,
                                                                      folio,
                                                                      documento_firmado)
-        print(documento_final_firmado)
+
         caratula_firmada = self.model.generar_documento_final(compania,
                                                               documento_final_firmado,
                                                               pass_certificado, dte)
         if dte_boletas:
-            for dte_b in dte_boletas:
-                dte_b.dte_xml = caratula_firmada
-                dte_b.save()
-            return SendToSiiView.as_view(caratula=caratula_firmada)(self.request)
+            return SendToSiiView.as_view(caratula=caratula_firmada, model=dte_boletas)(self.request)
         else:
             dte.dte_xml = caratula_firmada
             dte.save()

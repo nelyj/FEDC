@@ -235,6 +235,7 @@ function send_dte_erp(num_factura, url){
 	console.log("ingresa", num_factura);
 	$(".se-pre-con").fadeOut("slow").show();
 	$("#send_foo").attr("disabled", true);
+	$("#send_foo_boletas").attr("disabled", true);
 	$('#mensaje_spinner').text('Se esta enviando el DTE al sii, por favor espere...')
 	var data = {
 		"pk": num_factura
