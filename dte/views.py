@@ -210,7 +210,7 @@ class DteCreateView(LoginRequiredMixin, CreateView):
         response_dd = self.model._firmar_dd(diccionario_general, folio, self.object)
         documento_firmado = self.model.firmar_documento(response_dd,diccionario_general,folio, compania, self.object, pass_certificado)
         documento_final_firmado = self.model.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
-        caratula_firmada = self.model.generar_documento_final(compania,documento_final_firmado,pass_certificado)
+        caratula_firmada = self.model.generar_documento_final(compania,documento_final_firmado,pass_certificado, self.object)
         self.object.dte_xml = caratula_firmada
         self.object.neto = diccionario_general['neto']
         self.object.total = diccionario_general['total']
@@ -514,7 +514,7 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
         response_dd = self.model._firmar_dd(diccionario_general, folio, self.object)
         documento_firmado = self.model.firmar_documento(response_dd,diccionario_general,folio, compania, self.object, pass_certificado)
         documento_final_firmado = self.model.firmar_etiqueta_set_dte(compania, folio, documento_firmado)
-        caratula_firmada = self.model.generar_documento_final(compania,documento_final_firmado,pass_certificado)
+        caratula_firmada = self.model.generar_documento_final(compania,documento_final_firmado,pass_certificado, self.object)
         self.object.dte_xml = caratula_firmada
         self.object.neto = diccionario_general['neto']
         self.object.total = diccionario_general['total']
