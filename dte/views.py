@@ -742,13 +742,13 @@ class SendToSiiView(LoginRequiredMixin, View):
         pk = self.pk if self.pk is not None else kwargs.get('pk', None)
         caratula = self.caratula
         if caratula:
-            model = self.model.last()
+            model = self.model
+            model = model.last()
             send_sii = sendToSii(model.compania,caratula,model.compania.pass_certificado)
             if not send_sii['estado']:
                 return JsonResponse({'status':send_sii['estado'], 'msg':send_sii['msg']})
             else:
                 track_id = send_sii['track_id']
-                #BoletaSended.objects.create(**{'track_id':track_id})
                 for boleta in self.model:
                     boleta.status = 'ENVIADA'
                     boleta.track_id = track_id
@@ -761,6 +761,7 @@ class SendToSiiView(LoginRequiredMixin, View):
                 return JsonResponse({'status':send_sii['estado'], 'msg':'Envíado con éxito'})
         else:
             model = DTE.objects.get(pk=pk)
+            print(model)
             send_sii = sendToSii(model.compania,model.dte_xml,model.compania.pass_certificado)
             if(not send_sii['estado']):
                 return JsonResponse({'status':send_sii['estado'], 'msg':send_sii['msg']})
@@ -1199,9 +1200,8 @@ class SendDteErpToSii(LoginRequiredMixin, View):
         except Exception as e:
             print(e)
             messages.warning(self.request, "No se pudo establecer conexion con el ERP Next, se genera el siguiente error: "+str(e))
-
+        dte_list = []
         for url in urls:
-            dte_list = []
             try:
                 aux = erp.list(session, url)
                 if aux.status_code == 200:

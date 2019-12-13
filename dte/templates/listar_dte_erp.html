@@ -100,16 +100,15 @@
                     }
     
                     $(this).toggleClass('selected');
-                    
-                    document.querySelector("a[id=send_foo_boletas]").addEventListener("click", function() {
-                        send_dte_erp(selected, '{% url "dte:send_dte_erp" pk=id_empresa %}')
-                    }, false);
                     theButton.show(1000)
                     if ( selected.length == 0){
                         theButton.hide(600)
                     }
                 }
             } );
+            document.querySelector("a[id=send_foo_boletas]").addEventListener("click", function() {
+                send_dte_erp(selected, '{% url "dte:send_dte_erp" pk=id_empresa %}')
+            }, false);
     });
 
     $('.btn-success').click(
