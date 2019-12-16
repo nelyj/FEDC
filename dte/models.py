@@ -17,7 +17,7 @@ from pdf417gen import encode, render_image
 from certificados.models import Certificado
 from conectores.constantes import (COMUNAS, ACTIVIDADES)
 from conectores.models import Compania
-from facturas.models import *
+
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres
 from mixins.models import CreationModificationDateMixin
