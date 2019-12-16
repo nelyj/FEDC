@@ -18,15 +18,23 @@ function showField(field, show){
  * @param url Recibe la url de envío
 */
 function send_to_sii(url){
-	$.ajax({
+  $(".se-pre-con").fadeOut("slow").show();
+  $("#send_dte").attr("disabled", true);
+  $('#mensaje_spinner').text('Se esta enviando el DTE al sii, por favor espere...')
+  $.ajax({
     type: 'GET',
     url: url,
     success: function(response) {
       if(response['status']){
-      	alert(response['msg'])
+        $(".se-pre-con").fadeOut("slow").hide();
+        $("#send_dte").attr("disabled", false); 
+        alert(response['msg'])
+        data_table.ajax.reload( null, true );
       }
       else{
-      	console.log(response['msg'])	
+      	console.log(response['msg'])
+        $(".se-pre-con").fadeOut("slow").hide();
+        $("#send_dte").attr("disabled", false); 
       }
     }
   }) 

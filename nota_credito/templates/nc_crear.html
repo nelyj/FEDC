@@ -74,6 +74,10 @@
                 {{ form.nota_venta }}
             </div>
             <div class="col-md-6">
+                <label>{{ form.exento.label }}</label>
+                {{ form.exento }}
+            </div>
+            <div class="col-md-6">
                 <label>{{ form.observaciones.label }}</label>
                 {{ form.observaciones }}
             </div>
@@ -89,6 +93,7 @@
                             <th>Nombre</th>
                             <th>Cantidad</th>
                             <th>Precio</th>
+                            <th>Descuento</th>
                             <th>Total</th>
                             <th>Opciones</th>
                         </tr>
@@ -118,13 +123,17 @@
     </form>
 <script type="text/javascript">
 
-    var impuesto = {{impuesto}}
-    var today = new Date()
+    var impuesto = {{impuesto}};
+    var today = new Date();
     
     $("#id_fecha").datepicker({
         format: "dd/mm/yyyy",
         endDate: today+1,
         autoclose: true
     })
+    {% for prod in productos %}
+        appendRow('#myTable', {{prod|safe}});
+        generalTotal('#myTable')
+    {% endfor %}
 </script>
 {% endblock content_center %}

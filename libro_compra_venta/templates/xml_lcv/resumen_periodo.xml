@@ -1,22 +1,23 @@
 <ResumenPeriodo>{% for tipo_documento in objects %}{% for periodo in tipo_documento %}
       <TotalesPeriodo>
-        <TpoDoc>{{ periodo.doc_type }}</TpoDoc>
+        <TpoDoc>{{ periodo.tipo_dte }}</TpoDoc>
         <TotDoc>{{ periodo.total_doc }}</TotDoc>
-        <TotMntExe>{{ periodo.excento|default_if_none:"0" }}</TotMntExe>
+        <Folio>{{ periodo.n_folio }}</Folio>
+        <TotMntExe>{{ periodo.exento|default_if_none:"0" }}</TotMntExe>
         <TotMntNeto>{{ periodo.neto|default_if_none:"0" }}</TotMntNeto>
         <TotMntIVA>{{ periodo.iva|default_if_none:"0" }}</TotMntIVA>
         <TotIVAFueraPlazo>{{ periodo.total_iva_fuera_plazo|default_if_none:"0" }}</TotIVAFueraPlazo>
         <TotMntTotal>{{ periodo.total|default_if_none:"0" }}</TotMntTotal>
       </TotalesPeriodo>{% endfor %}{% endfor %}{% for tipo_documento in objects_details %}{% for detalle in tipo_documento %}
       <Detalle>
-        <TpoDoc>{{ detalle.doc_type }}</TpoDoc>
+        <TpoDoc>{{ detalle.tipo_dte }}</TpoDoc>
         <NroDoc>{{ detalle.numero_factura }}</NroDoc>
         <TasaImp>{{ detalle.compania.tasa_de_iva }}</TasaImp>
         <NumInt>0</NumInt>
         <FchDoc>{{ detalle.fecha|date:'Y-m-d' }}</FchDoc>
         <RUTDoc>{{ detalle.compania.rut }}</RUTDoc>
         <RznSoc>{{ detalle.compania.razon_social }}</RznSoc>
-        <MntExe>{{ detalle.excento|default_if_none:"0" }}</MntExe>
+        <MntExe>{{ detalle.exento|default_if_none:"0" }}</MntExe>
         <MntNeto>{{ detalle.neto|default_if_none:"0" }}</MntNeto>
         <MntIVA>{{ detalle.iva|default_if_none:"0" }}</MntIVA>
         <MntTotal>{{ detalle.total|default_if_none:"0" }}</MntTotal>

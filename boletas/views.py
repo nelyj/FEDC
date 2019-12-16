@@ -16,6 +16,8 @@ from conectores.models import *
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
 
+from utils.views import DecodeEncodeChain
+
 from .models import *
 from .forms import *
 from .tasks import massshippingBoletas
@@ -48,7 +50,7 @@ class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
         empresa_obj = Compania.objects.get(pk=empresa)
         if empresa_obj and self.request.user == empresa_obj.owner:
             if enviadas == "1":
-                return HttpResponseRedirect(reverse_lazy('boletas:lista-boletas-enviadas', kwargs={'pk':empresa}))
+                return HttpResponseRedirect(reverse_lazy('boletas:lista-enviadas', kwargs={'pk':empresa}))
             else:
                 return HttpResponseRedirect(reverse_lazy('boletas:lista_boletas', kwargs={'pk':empresa}))
         else:
@@ -58,12 +60,13 @@ class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
 
 class ListaBoletasViews(LoginRequiredMixin, TemplateView):
     template_name = 'lista_boletas.html'
+    decode_encode = DecodeEncodeChain()
 
     def dispatch(self, *args, **kwargs):
 
         compania = self.kwargs.get('pk')
 
-        usuario = Conector.objects.filter(t_documento='39',empresa=compania).first()
+        usuario = Conector.objects.filter(empresa=compania).first()
 
         if not usuario:
 
@@ -80,12 +83,15 @@ class ListaBoletasViews(LoginRequiredMixin, TemplateView):
         context['id_empresa'] = compania
 
         try:
-            usuario = Conector.objects.filter(t_documento='39',empresa=compania).first()
+            usuario = Conector.objects.filter(empresa=compania).first()
         except Exception as e:
             messages.info(self.request, "No posee conectores asociados a esta empresa")
             return HttpResponseRedirect(reverse_lazy('boletas:seleccionar-empresa'))
 
-        payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, usuario.password)
+        passw = usuario.password.strip()
+        passw = self.decode_encode.decrypt(passw).decode("utf-8")
+
+        payload = "{\"usr\":\"%s\",\"pwd\":\"%s\"\n}" % (usuario.usuario, passw)
 
         headers = {'content-type': "application/json"}
         response = session.get(usuario.url_erp+'/api/method/login',data=payload,headers=headers)
@@ -393,7 +399,7 @@ class EnvioMasivo(LoginRequiredMixin, View):
     Class that allows to send massive document of Boletas
 
     @author Ing. Luis Barrios (nikeven at gmail.com)
-    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @author Rodrigo Boet (rodrigo.b at timgla.com)
     @date 22-04-2019
     @version 1.0.0
     """

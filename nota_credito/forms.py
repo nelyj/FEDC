@@ -19,7 +19,7 @@ class FormNotaCredito(ModelForm):
         model = notaCredito
         fields = ['status','compania','ref_factura','numero_factura','senores','direccion','transporte','despachar','observaciones',
                     'giro','condicion_venta','vencimiento','vendedor','rut','fecha','guia','orden_compra','nota_venta',
-                    'productos','monto_palabra','neto','excento','iva','total','track_id']
+                    'productos','monto_palabra','neto','exento','iva','total','track_id']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -86,9 +86,9 @@ class FormNotaCredito(ModelForm):
         self.fields['neto'].widget.attrs.update({'class': 'form-control'})
         self.fields['neto'].required = False
         self.fields['neto'].disabled = True
-        self.fields['excento'].widget.attrs.update({'class': 'form-control'})
-        self.fields['excento'].required = False
-        self.fields['excento'].disabled = True
+        self.fields['exento'].widget.attrs.update({'class': 'form-control'})
+        self.fields['exento'].required = False
+        self.fields['exento'].disabled = True
         self.fields['iva'].widget.attrs.update({'class': 'form-control'})
         self.fields['iva'].required = False
         self.fields['iva'].disabled = True
@@ -101,7 +101,7 @@ class FormCreateNotaCredito(ModelForm):
     """!
     Formulario para gestionar las notas de credito
 
-    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @author Rodrigo Boet (rodrigo.b at timgla.com)
     @date 13-09-2019
     @version 1.0.0
     """
@@ -110,7 +110,7 @@ class FormCreateNotaCredito(ModelForm):
         model = notaCredito
         fields = ['numero_factura','senores','transporte','despachar','observaciones',
                     'giro','rut','fecha','guia','orden_compra','nota_venta',
-                    'productos','ciudad_receptora','comuna', 'region']
+                    'productos','ciudad_receptora','comuna', 'region','exento']
 
     forma_pago = forms.ChoiceField(
         widget=forms.Select(attrs={'class':'form-control'}),
@@ -152,3 +152,4 @@ class FormCreateNotaCredito(ModelForm):
         self.fields['region'].widget.attrs.update({'class': 'form-control'})
         self.fields['region'].required = True
         self.fields['region'].label = "Dirección"
+        self.fields['exento'].widget.attrs.update({'class': 'form-control'})

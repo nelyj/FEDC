@@ -1,7 +1,7 @@
 """!
 Controlador para el manejo de tareas de modulo boletas
 
-@author Rodrigo A. Boet (rudmanmrrod at gmail.com)
+@author Rodrigo A. Boet (rodrigo.b at timgla.com)
 @date 01-08-2019
 @version 1.0.0
 """
@@ -27,7 +27,7 @@ def massshippingBoletas(compania_id):
     compania = Compania.objects.get(pk=compania_id)
     pass_certificado = compania.pass_certificado
     object_states = Boleta.objects.filter(compania_id=compania_id).exclude(status='ENVIADA')
-    
+
     folio = Folio.objects.filter(empresa=compania_id,is_active=True,vencido=False,tipo_de_documento=39).order_by('fecha_de_autorizacion').first()
 
     documento_final_firmado = Boleta.firmar_etiqueta_set_dte(compania, folio, object_states)

@@ -54,7 +54,7 @@ class SeleccionarEmpresaView(LoginRequiredMixin, TemplateView):
         empresa_obj = Compania.objects.get(pk=empresa)
         if empresa_obj and self.request.user == empresa_obj.owner:
             if enviadas == "1":
-                return HttpResponseRedirect(reverse_lazy('guiaDespacho:lista-guias-enviadas', kwargs={'pk':empresa}))
+                return HttpResponseRedirect(reverse_lazy('guiaDespacho:lista-enviadas', kwargs={'pk':empresa}))
             else:
                 return HttpResponseRedirect(reverse_lazy('guiaDespacho:lista_guias', kwargs={'pk':empresa}))
         else:
@@ -443,67 +443,12 @@ class GuiasEnviadasView(LoginRequiredMixin,ListView):
         compania = self.kwargs.get('pk')
         return guiaDespacho.objects.filter(compania=compania).order_by('-created')
 
-class ImprimirGuia(LoginRequiredMixin, TemplateView,WeasyTemplateResponseMixin):
-    """!
-    Class para imprimir la guia en PDF
-
-    @author Rodrigo Boet (rudmanmrrod at gmail.com)
-    @author Luis Barrios (nikeven at gmail.com)
-    @date 01-04-2019
-    @version 1.0.0
-    """
-    template_name = "pdf/factura.pdf.html"
-    model = guiaDespacho
-
-    def dispatch(self, request, *args, **kwargs):
-        num_factura = self.kwargs['slug']
-        compania = self.kwargs['pk']
-        tipo_doc = self.kwargs['doc']
-        if tipo_doc in LIST_DOC:
-            self.model = validarModelPorDoc(tipo_doc) 
-            try:
-                factura = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
-                return super().dispatch(request, *args, **kwargs)
-            except Exception as e:
-                factura = self.model.objects.select_related().filter(numero_factura=num_factura, compania=compania)
-                if len(factura) > 1:
-                    messages.error(self.request, 'Existe mas de un registro con el mismo numero de guia: {0}'.format(num_factura))
-                    return redirect(reverse_lazy('guia_despacho:lista-guias-enviadas', kwargs={'pk': compania}))
-                else:
-                    messages.error(self.request, "No se encuentra registrada esta guia: {0}".format(str(num_factura)))
-                    return redirect(reverse_lazy('guia_despacho:lista-guias-enviadas', kwargs={'pk': compania}))
-        else:
-            messages.error(self.request, "No existe este tipo de documento: {0}".format(str(tipo_doc)))
-            return redirect(reverse_lazy('guia_despacho:lista-guias-enviadas', kwargs={'pk': compania}))
-
-    def get_context_data(self, *args, **kwargs):
-        """!
-        Method to handle data on get
-
-        @date 21-03-2019
-        @return Returns dict with data
-        """
-        context = super().get_context_data(*args, **kwargs)
-        num_factura = self.kwargs['slug']
-        compania = self.kwargs['pk']
-        tipo_doc = self.kwargs['doc']
-        
-        context['factura'] = self.model.objects.select_related().get(numero_factura=num_factura, compania=compania)
-        context['nombre_documento'] = NOMB_DOC[tipo_doc]
-        etiqueta=self.kwargs['slug'].replace('º','')
-        context['etiqueta'] = etiqueta
-        prod = context['factura'].productos.replace('\'{','{').replace('}\'','}').replace('\'',"\"")
-        productos = json.loads(prod)
-        context['productos'] = productos
-        ruta = settings.STATIC_URL +'guia'+'/'+etiqueta+'/timbre.jpg'
-        context['ruta']=ruta
-        return context
 
 class VerEstadoGuia(LoginRequiredMixin, TemplateView):
     """!
     Clase para ver el estado de envio de una factura
 
-    @author Rodrigo Boet (rudmanmrrod at gmail.com)
+    @author Rodrigo Boet (rodrigo.b at timgla.com)
     @date 04-04-2019
     @version 1.0.0
     """

@@ -65,3 +65,18 @@ function modal_detalle_libro(id_libro){
     }
   });
 }
+
+function eliminar_dte(url){
+  $("#myModalLabel").text("Eliminar")
+  $.ajax({
+    url: url,
+    type: "GET",
+    data: {
+    },
+    dataType: 'html',
+    success: function(data) {
+      $('#modal-body').html(data);
+      $('#form_delete').attr('action',url)
+    }
+  });
+}

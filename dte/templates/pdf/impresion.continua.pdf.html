@@ -1,0 +1,104 @@
+{% load staticfiles %}
+{% load format_miles %}
+<!DOCTYPE html>
+<html>
+    <head>
+      <title></title>
+       <link rel="stylesheet" type="text/css" href="{% static 'css/factura_cont_pdf.css' %}">
+    </head>
+    <body>
+        <div class="continuo_contenedor">
+            <div class="continuo_cabecera">
+                <div class="logotipo">
+                    <img src="{{MEDIA_URL}}{{factura.compania.logo}}">
+                </div>
+                <div class="document">
+                    <p>R.U.T: {{factura.compania.rut}}</p>
+                    <p>{{nombre_documento}}</p>
+                    <p>{{factura.numero_factura}}</p>
+                </div>
+                <div class="direccion">
+                    Direccion: {{factura.compania.direccion}} {{factura.compania.comuna|upper}}
+                </div>
+                
+                <div class="descripcion">
+                    <h3>{{factura.compania.razon_social}}</h3>
+                    <p><b>{{factura.compania.actividad_principal}}</b></p>
+                    <p class="base-compania"><b>Casa Matriz: </b>{{factura.compania.direccion}} {{factura.compania.comuna|upper}}</p>
+                    <p class="base-compania"><b>Sucursales: </b></p>
+                    <p class="base-compania"><b>Telefono: </b></p>
+                    <p class="base-compania"><b>Email:</b> {{factura.compania.correo_intercambio}}</p>
+                    
+                </div>
+            </div>
+            <p>
+                <h3 class="fecha">Fecha:{{factura.fecha|date:"SHORT_DATE_FORMAT"}}</h3>
+                <p>
+                    {% if factura.descuento_global %}
+                        <td>
+                            Descuento global:
+                        </td>
+                        <td>
+                            {{factura.descuento_global|default_if_none:0|format_mil}}{{factura.tipo_descuento|default_if_none:""|upper}}
+                        </td>
+                    {% endif %}
+                </p>
+            </p>
+            <div>
+                <table class="table-factura">
+                        
+                    <tbody>
+                        <tr>
+                            <th width="75%" colspan="2">
+                                Codigo/Descripción
+                            </th>
+                            
+                            <th width="25%">
+                                Unidad medida
+                            </th>
+                        </tr>
+                        <tr>
+                            <th width="50%">
+                                Cantidad
+                            </th>
+                            <th width="25%">
+                                V. Unit
+                            </th>
+                            <th width="25%">
+                                Total
+                            </th>
+                        </tr>
+                        <!--Tr para el for-->
+                        {% for prod in productos%}
+                            <tr>
+                                <td class="align-center">{{prod.item_code}}/{{prod.item_name}}</td>
+                                <td class="align-center"></td>
+                                <td class="align-center">Unidad</td>
+                            </tr>
+                            <tr>
+                                <td class="align-right">{% if prod.exento == 1 %}<b> Exento</b>{% endif %}  {{prod.qty}}   X </td>
+                                <td class="align-center">{{prod.base_net_rate|default_if_none:0|format_mil}} {% if prod.discount %} X {{prod.discount}}  Desc(%) {% endif %}</td>
+                                <td class="align-center">{{prod.amount|default_if_none:0|format_mil}}</td>
+                            </tr>
+                        {% endfor %}
+                        <!--Fin del for del re-->
+                        <!--Tr final de la tabla-->
+                        <tr class="border_footer">
+                            <td colspan="2">
+                                <b>MONTO TOTAL: </b>
+                            </td>
+                            <td class="align-right">
+                                {{total|default_if_none:0|format_mil}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div><br><br>
+            <div class="timbre">
+                <img src="{{ruta}}">
+                <p>Timbre Electrónico SII</p>
+                <p>Res. 80 de 2014 Verifique documento: www.sii.cl</p>
+            </div>
+        </div>
+    </body>
+</html>

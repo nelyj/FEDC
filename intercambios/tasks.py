@@ -1,7 +1,7 @@
 """!
 Controlador para el manejo de tareas de modulo intercambio
 
-@author Rodrigo A. Boet (rudmanmrrod at gmail.com)
+@author Rodrigo A. Boet (rodrigo.b at timgla.com)
 @date 15-07-2019
 @version 1.0.0
 """
@@ -69,7 +69,7 @@ class RefrescarBandejaRedirectView(RedirectView):
   def get_attachment(self, msg):
 
     attachment_count = 0
-    attachment_dict = dict() 
+    attachment_dict = dict()
     for part in msg.walk():
       if part.get_content_maintype() == 'multipart':
         continue
@@ -109,6 +109,11 @@ class RefrescarBandejaRedirectView(RedirectView):
 
 def sycnInbox(comp, mail, refresh):
     """
+    Sincronizar el inbox
+
+    @author Rodrigo A. Boet (rodrigo.b at timgla.com)
+    @date 16-07-2019
+    @version 1.0.0
     """
     last_email = 0
     local_last_email_code = last_email
@@ -221,7 +226,7 @@ def updateInbox(compania=None):
     """
     Funcion que permite ejecutar una tarea para actualizar los correos de la bandeja de entrada automaticamente.
 
-    @author Rodrigo A. Boet (rudmanmrrod at gmail.com)
+    @author Rodrigo A. Boet (rodrigo.b at timgla.com)
     @date 15-07-2019
     @version 1.0.0
     @return True o False
@@ -229,7 +234,7 @@ def updateInbox(compania=None):
     refresh = RefrescarBandejaRedirectView()
 
     try:
-        obj_compania = Compania.objects.get(pk=compania) if compania else Compania.objects.all()  
+        obj_compania = Compania.objects.get(pk=compania) if compania else Compania.objects.all()
     except Exception as e:
         print(e)
     try:
@@ -239,7 +244,7 @@ def updateInbox(compania=None):
         num_compania = 0
 
     mail = imaplib.IMAP4_SSL(obj_compania.imap_correo_intercambio)
-    
+
     if num_compania > 0:
         for comp in obj_compania:
             sycnInbox(comp, mail, refresh)
@@ -247,4 +252,3 @@ def updateInbox(compania=None):
     else:
         sycnInbox(obj_compania, mail, refresh)
         return True
-        

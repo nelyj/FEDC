@@ -1,0 +1,43 @@
+{% extends "utils_start.html" %}
+{% block titulo %}Dte{% endblock titulo %}
+{% block extras_css %}
+{% load staticfiles %}
+<link type="text/css" rel="stylesheet" href="{% static 'jquery-entropizer-master/dist/css/jquery-entropizer.min.css' %}" />
+<link rel="stylesheet" href="{% static 'DataTables/media/css/jquery.dataTables.min.css' %}">
+{% endblock extras_css %}
+{% block extras_js %}
+<script type="text/javascript" src="{% static 'jquery-entropizer-master/lib/entropizer.js' %}"></script>
+<script type="text/javascript" src="{% static 'jquery-entropizer-master/dist/js/jquery-entropizer.min.js' %}"></script>
+<script src="{% static 'DataTables/media/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'users/user_register.js' %}"></script>
+{% endblock extras_js %}
+{% block content_center %}
+<a class="glyphicon glyphicon-list" id="menu-toggle"></a>
+<div class="row" style="margin-bottom:10px">
+    <div class="col-md-offset-10">
+        <a href="{% url 'dte:crear_dte' compania %}" class="btn btn-success">
+            Crear DTE
+        </a>
+    </div>
+</div>
+<table id="datatable" class="display" style="width:100%">
+    <thead>
+        <tr>
+            <th>N°</th>
+            <th>Compañía</th>
+            <th>N° de folio</th>
+            <th>Tipo de documento (DTE)</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+</table>
+    
+{% endblock content_center %}
+{% block custom_js%}
+<script type="text/javascript">
+// Objeto Json lista de nota de credito
+var URL = "{% url 'dte:ajax_list_dte' compania %}?sistema={{sistema}}";
+</script>
+<script type="text/javascript" src="{% static 'custom_datatable/listDataTable.js' %}" ></script>
+<script type="text/javascript" src="{% static 'start/modals.js' %}"></script>
+{% endblock custom_js%}

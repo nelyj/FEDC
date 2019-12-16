@@ -1,0 +1,21 @@
+<ResumenPeriodo>{% for tipo_documento in objects %}
+      <TotalesPeriodo>
+        <TpoDoc>{{ tipo_documento.tipo_dte }}</TpoDoc>
+        <Folio>{{ tipo_documento.n_folio }}</Folio>
+        <TotMntExe>{{ tipo_documento.exento|default_if_none:"0" }}</TotMntExe>
+        <TotMntTotal>{{ tipo_documento.total|default_if_none:"0" }}</TotMntTotal>
+      </TotalesPeriodo>{% endfor %}{% for tipo_documento in objects_details %}{% for detalle in tipo_documento %}
+      <Detalle>
+        <TpoDoc>{{ detalle.tipo_dte }}</TpoDoc>
+        <NroDoc>{{ detalle.numero_factura }}</NroDoc>
+        <TasaImp>{{ detalle.compania.tasa_de_iva }}</TasaImp>
+        <NumInt>0</NumInt>
+        <FchDoc>{{ detalle.fecha|date:'Y-m-d' }}</FchDoc>
+        <RUTDoc>{{ detalle.compania.rut }}</RUTDoc>
+        <RznSoc>{{ detalle.compania.razon_social }}</RznSoc>
+        <MntExe>{{ detalle.exento|default_if_none:"0" }}</MntExe>
+        <MntNeto>{{ detalle.neto|default_if_none:"0" }}</MntNeto>
+        <MntIVA>{{ detalle.iva|default_if_none:"0" }}</MntIVA>
+        <MntTotal>{{ detalle.total|default_if_none:"0" }}</MntTotal>
+      </Detalle>{% endfor %}{% endfor %}
+</ResumenPeriodo>

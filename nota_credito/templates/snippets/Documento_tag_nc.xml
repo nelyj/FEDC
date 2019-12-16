@@ -26,7 +26,8 @@
 			<Totales>
 				<MntNeto>{{datos.neto}}</MntNeto>
 				<TasaIVA>{{compania.tasa_de_iva}}</TasaIVA> 
-				<IVA>{{datos.iva}}</IVA>
+				<IVA>{{datos.iva}}</IVA>{% autoescape off %}{% if datos.monto_exento%}
+				<MntExe>{{datos.monto_exento}}</MntExe>{% endif %}{% endautoescape %}
 				<MntTotal>{{datos.total}}</MntTotal>
 			</Totales>
 		</Encabezado>{%for prod in datos.productos%}
@@ -39,12 +40,14 @@
 			<NmbItem>{{prod.description}}</NmbItem>
 			<DscItem/>
 			<QtyItem>{{prod.qty}}</QtyItem>
-			<PrcItem>{{prod.base_net_rate}}</PrcItem>
+			<PrcItem>{{prod.base_net_rate}}</PrcItem>{% autoescape off %}{% if prod.discount %}
+			<DescuentoPct>{{prod.discount}}</DescuentoPct>
+			<DescuentoMonto>{{prod.discount_amount}}</DescuentoMonto>{% endif %}{% endautoescape %}
 			<MontoItem>{{prod.amount}}</MontoItem>
 		</Detalle>{%endfor%}{%if datos.orden_compra %}
 		<Referencia>
 			<NroLinRef>1</NroLinRef>
-			<TpoDocRef>801</TpoDocRef>
+			<TpoDocRef>{{ folio.tipo_de_documento }}</TpoDocRef>
 			<FolioRef>{{datos.orden_compra}}</FolioRef>
 			<FchRef>{% now "Y-m-d" %}</FchRef>
 		</Referencia>{%endif%}

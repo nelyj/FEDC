@@ -1,0 +1,154 @@
+{% extends "utils_start.html" %}
+{% block titulo %}Crear DTE{% endblock titulo %}
+{% load staticfiles %}
+{% block extras_css %}
+<link rel="stylesheet" href="{% static 'DataTables/media/css/jquery.dataTables.min.css' %}">
+{% endblock extras_css %}
+{% block extras_js %}
+<script src="{% static 'DataTables/media/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'dte/dte.js' %}"></script>
+{% endblock extras_js %}
+{% block content_center %}
+    <a href="{% url 'dte:lista_dte' compania %}" class="btn btn-info">
+        Regresar
+    </a>
+    <h1 class="text-center">DTE</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-12">
+                <label>{{ form.tipo_dte.label }}</label> 
+                <i class="red asterisc">*</i>
+                {{ form.tipo_dte }}
+            </div>
+            <div id="dte_hidden" style="display: none">
+                <div class="col-md-12">
+                    <label>{{ form.ref_factura.label }}</label> <i class="red asterisc">*</i>
+                    {{ form.ref_factura }}
+                </div>
+                <div class="col-md-6">
+                    <label>{{ form.cod_ref.label }}</label> <i class="red asterisc">*</i>
+                    {{ form.cod_ref }}
+                </div>
+                <div class="col-md-6">
+                    <label>{{ form.razon_ref.label }}</label> <i class="red asterisc">*</i>
+                    {{ form.razon_ref }}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.numero_factura.label }} </label> <i class="red asterisc">*</i>
+                {{ form.numero_factura }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.senores.label }}</label> <i class="red asterisc">*</i>
+                {{ form.senores }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.giro.label }}</label> <i class="red asterisc">*</i>
+                {{ form.giro }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.rut.label }}</label> <i class="red asterisc">*</i>
+                {{ form.rut }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.fecha.label }}</label> <i class="red asterisc">*</i>
+                {{ form.fecha }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.ciudad_receptora.label }}</label> <i class="red asterisc">*</i>
+                {{ form.ciudad_receptora }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.comuna.label }}</label> <i class="red asterisc">*</i>
+                {{ form.comuna }}
+            </div>
+            <div class="col-md-6">
+                <label>{{ form.region.label }}</label> <i class="red asterisc">*</i>
+                {{ form.region }}
+            </div>
+            <div class="col-md-12">
+                <label>{{ form.forma_pago.label }}</label> 
+                <i class="red asterisc">*</i>
+                {{ form.forma_pago }}
+            </div>
+            <div class="col-md-12">
+                <h3>Descuento global</h3>
+            </div>
+            <div class="col-md-4">
+                <label>{{ form.descuento_global.label }}</label>
+                {{ form.descuento_global }}
+            </div>
+            <div class="col-md-4">
+                <label>{{ form.tipo_descuento.label }}</label>
+                {{ form.tipo_descuento }}
+            </div>
+            <div class="col-md-4">
+                <label>{{ form.glosa_descuento.label }}</label>
+                {{ form.glosa_descuento }}
+            </div>
+            <div class="col-md-12 table-responsive">
+                <h4>Productos <i class="red asterisc">*</i></h4> 
+                <a class="btn btn-success" onclick="appendRow('#myTable')"> 
+                    Agregar Producto <i class="fa fa-plus" aria-hidden="true"></i> 
+                </a>
+                <table id="myTable" class="table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                            <th>Descuento</th>
+                            <th>Exento</th>
+                            <th>Total</th>
+                            <th>Opciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-offset-8">
+                <label>Neto</label>
+                <input class="form-control" type="text" disabled="true" id="out_neto">
+            </div>
+            <div class="col-md-offset-8">
+                <label>Exento</label>
+                <input class="form-control" type="text" disabled="true" id="out_exento">
+            </div>
+            <div class="col-md-offset-8">
+                <label>Impuesto</label>
+                <input class="form-control" type="text" disabled="true" value="{{impuesto}}">
+            </div>
+            <div class="col-md-offset-8">
+                <label>Total</label>
+                <input class="form-control" type="text" disabled="true" id="out_total">
+            </div>
+        </div>
+        <div class="col-md-12 text-center">
+            <button type="submit" class="btn btn-success">Guardar</button>
+        </div>
+    </form>
+<script type="text/javascript">
+    const LOAD_DTE = "{% url 'dte:get_dte_data' 0 %}" ;
+    var impuesto = {{impuesto}};
+    var today = new Date();
+    
+    $("#id_fecha").datepicker({
+        format: "dd/mm/yyyy",
+        endDate: today+1,
+        autoclose: true
+    })
+    {% for prod in productos %}
+        appendRow('#myTable', {{prod|safe}});
+        generalTotal('#myTable')
+    {% endfor %}
+    $(document).ready(function(){
+        show_dte_fields($('#id_tipo_dte'))
+        enable_dte_fields($('#id_cod_ref').val())
+    })
+</script>
+{% endblock content_center %}

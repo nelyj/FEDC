@@ -1,0 +1,127 @@
+{% extends "utils_start.html" %}
+{% block titulo %}Lista Dte del ERP {% endblock titulo %}
+{% block extras_css %}
+{% load staticfiles %}
+<link type="text/css" rel="stylesheet" href="{% static 'jquery-entropizer-master/dist/css/jquery-entropizer.min.css' %}" />
+<link rel="stylesheet" href="{% static 'DataTables/media/css/jquery.dataTables.min.css' %}">
+{% endblock extras_css %}
+{% block extras_constantes %}
+{% endblock extras_constantes %}
+{% block extras_js %}
+<script type="text/javascript" src="{% static 'jquery-entropizer-master/lib/entropizer.js' %}"></script>
+<script type="text/javascript" src="{% static 'jquery-entropizer-master/dist/js/jquery-entropizer.min.js' %}"></script>
+<script src="{% static 'DataTables/media/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'users/user_register.js' %}"></script>
+<script type="text/javascript" src="{% static 'dte/dte.js' %}"></script>
+{% endblock extras_js %}
+{% block content_center %}
+<a class="glyphicon glyphicon-list" id="menu-toggle"></a>
+
+<h1 class="text-center"> Lista de DTE desde el ERPNext</h1>
+
+<table id="myTable" class="display" style="width:100%">
+    <thead>
+        <tr>
+            <th>Factura</th>
+            <th>Cliente</th>
+            <td>Tipo de Documento</td>
+            <th>Status</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {%for lista in detail%}
+        <tr>
+            <td> {% comment %}<a href="{% url 'facturas:detail-invoice' lista.data.name %}">{% endcomment %}{{lista.data.name}}{% comment %}</a>{% endcomment %}</td>
+            <td>{{lista.data.title}}</td>
+            <td>{{lista.data.tipo_de_documento}}</td>
+            <td>{{lista.data.status_sii}}</td>
+            <td>
+                <a  id="save_foo" href="{% url 'dte:save_dte_erp' pk=id_empresa slug=lista.data.name %}" class="btn btn-success">Guardar</a>
+                {% if  lista.data.tipo_de_documento != "Boleta" %}
+                <a  id="send_foo" onclick="send_dte_erp('{{lista.data.name}}', '{% url 'dte:send_dte_erp' pk=id_empresa %}')" class="btn btn-warning"> Enviar al SII </a>{% endif %}
+                
+                <a  id="edit_foo" href="{% url 'dte:detail_dte' pk=id_empresa slug=lista.data.name %}" class="btn btn-info">Detalle</a>
+                <!-- Trigger the modal with a button -->
+                {% comment %} <button  id="edit_foo" onclick="return validar('{% url 'facturas:send-invoice' lista.data.name%}')" type="button" class="btn btn-info">Detalle</button> {% endcomment %}
+                {% comment %}<a  id="edit_foo" href="{% url 'facturas:send-invoice' pk=id_empresa slug=lista.data.name %}" class="btn btn-info">Detalle</a>{% endcomment %}
+
+            </td>
+        </tr>
+        {%endfor%}
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>Factura</th>
+            <th>Cliente</th>
+            <td>Tipo de Documento</td>
+            <th>Status</th>
+            <th>Acciones</th>
+        </tr>
+    </tfoot>
+</table>
+<a  id="send_foo_boletas" class="btn btn-warning"> Enviar Boletas al SII </a>
+<script type="text/javascript">
+        {% comment %} 
+        function validar(url) {
+            console.log(url)
+            $.ajax({
+                type: 'GET',
+                url: url,
+                success: function (data) {
+                    $('#foo_modal').find('.modal-body').html(data);
+                    $('#foo_modal').modal('show');
+                },
+            });
+            return false; 
+        }     
+        {% endcomment %}
+    $(document).ready( function () {
+          var theButton = $('#send_foo_boletas');
+          theButton.hide();
+          var selected = [];
+          $('#myTable').DataTable({
+                "rowCallback": function( row, data ) {
+                if ( $.inArray(data.DT_RowId, selected) !== -1 ) {
+                        $(row).addClass('selected');
+                    }
+                }
+          });
+
+            $('#myTable tbody').on( 'click', 'tr', function () {
+                if ($(this).find('td:eq(2)').text() == 'Boleta'){
+                    var id = $.trim($(this).find('td:eq(0)').text());
+                    var index = $.inArray(id, selected);
+             
+                    if ( index === -1 ) {
+                        selected.push( id );
+                    } else {
+                        selected.splice( index, 1 );
+                    }
+    
+                    $(this).toggleClass('selected');
+                    theButton.show(1000)
+                    if ( selected.length == 0){
+                        theButton.hide(600)
+                    }
+                }
+            } );
+            document.querySelector("a[id=send_foo_boletas]").addEventListener("click", function() {
+                send_dte_erp(selected, '{% url "dte:send_dte_erp" pk=id_empresa %}')
+            }, false);
+    });
+
+    $('.btn-success').click(
+        function(){
+            $(".se-pre-con").fadeOut("slow").show();
+            //$('#mensaje_spinner').text('Se estan extrayendo datos desde el ERPNext del DTE, esto puede tardar unos segundos, por favor espere...')
+        }
+    );
+    $(window).bind('beforeunload', function() {
+        // Animate loader off screen
+        $(".se-pre-con").fadeOut("slow").show();
+        $('#mensaje_spinner').text('Estableciendo conexion con el ERPNext, esto puede tardar unos segundos, por favor espere...')
+    });
+    
+</script>
+{% endblock content_center%}

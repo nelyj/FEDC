@@ -6,6 +6,8 @@ register = template.Library()
 def formatSeparadorMiles(value, separador = '.'):
     """
     """
+    if value == '':
+        return 0
     cadena = float(value)
     if separador == '.':
         lista_decimal = "{0:,}".format(cadena).replace(',','.').split('.')[-1:]

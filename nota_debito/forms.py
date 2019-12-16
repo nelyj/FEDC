@@ -1,8 +1,12 @@
 from django import forms
 from django.forms import ModelForm
-from .models import *
+from django.forms.widgets import PasswordInput, Textarea
+
 from conectores.models import Compania
 
+from utils.constantes import FORMA_DE_PAGO
+
+from .models import *
 
 class FormNotaDebito(ModelForm):
 
@@ -88,3 +92,59 @@ class FormNotaDebito(ModelForm):
         self.fields['total'].disabled = True
         self.fields['track_id'].required = False
 
+
+class FormCreateNotaDebito(ModelForm):
+    """!
+    Formulario para gestionar las notas de credito
+
+    @author Rodrigo Boet (rodrigo.b at timgla.com)
+    @date 13-09-2019
+    @version 1.0.0
+    """
+    
+    class Meta:
+        model = notaDebito
+        fields = ['numero_factura','senores','transporte','despachar','observaciones',
+                    'giro','rut','fecha','guia','orden_compra','nota_venta',
+                    'productos', 'comuna', 'region','ciudad_receptora']
+
+    forma_pago = forms.ChoiceField(
+        widget=forms.Select(attrs={'class':'form-control'}),
+        choices=FORMA_DE_PAGO)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['numero_factura'].widget.attrs.update({'class': 'form-control'})
+        self.fields['numero_factura'].required = True
+        self.fields['numero_factura'].label = "Número"
+        self.fields['senores'].widget.attrs.update({'class': 'form-control'})
+        self.fields['senores'].required = True
+        self.fields['senores'].label = "Cliente"
+        self.fields['transporte'].widget.attrs.update({'class': 'form-control'})
+        self.fields['transporte'].required = False
+        self.fields['despachar'].widget.attrs.update({'class': 'form-control'})
+        self.fields['despachar'].required = False
+        self.fields['observaciones'].widget = Textarea()
+        self.fields['observaciones'].widget.attrs.update({'class': 'form-control'})
+        self.fields['observaciones'].required = False
+        self.fields['giro'].widget.attrs.update({'class': 'form-control'})
+        self.fields['giro'].required = True
+        self.fields['rut'].widget.attrs.update({'class': 'form-control'})
+        self.fields['rut'].required = True
+        self.fields['fecha'].widget.attrs.update({'class': 'form-control datepicker', 'readonly':'readonly'})
+        self.fields['fecha'].required = True
+        self.fields['guia'].widget.attrs.update({'class': 'form-control'})
+        self.fields['guia'].required = False
+        self.fields['orden_compra'].widget.attrs.update({'class': 'form-control'})
+        self.fields['orden_compra'].required = False
+        self.fields['nota_venta'].widget.attrs.update({'class': 'form-control'})
+        self.fields['nota_venta'].required = False
+        self.fields['productos'].widget.attrs.update({'class': 'form-control', 'style':'display:none'})
+        self.fields['productos'].required = False
+        self.fields['ciudad_receptora'].widget.attrs.update({'class': 'form-control'})
+        self.fields['ciudad_receptora'].required = True
+        self.fields['comuna'].widget.attrs.update({'class': 'form-control'})
+        self.fields['comuna'].required = True
+        self.fields['region'].widget.attrs.update({'class': 'form-control'})
+        self.fields['region'].required = True
+        self.fields['region'].label = "Dirección"

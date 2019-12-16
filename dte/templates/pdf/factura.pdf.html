@@ -1,0 +1,308 @@
+{% load staticfiles %}
+{% load format_miles %}
+{% load tipo_dte %}
+<!DOCTYPE html>
+<html>
+    <head>
+      <title></title>
+       <link rel="stylesheet" type="text/css" href="{% static 'css/factura_pdf.css' %}">
+    </head>
+    <body>
+        <div class="contenedor">
+            <div class="cabecera">
+                <div class="logotipo">
+                    <img src="{{MEDIA_URL}}{{factura.compania.logo}}">
+                </div>
+                <div class="descripcion">
+                    <h3>{{factura.compania.razon_social}}</h3>
+                    <p><b>{{factura.compania.actividad_principal}}</b></p>
+                    <p><b>Casa Matriz: </b>{{factura.compania.direccion}} {{factura.compania.comuna|upper}}</p>
+                    <p><b>Sucursal: </b></p>
+                    <p class="base-compania"><b>Telefono: Email: {{factura.compania.correo_intercambio}}  Web: {{factura.compania.web}}</b></p>
+                </div>
+                <div class="document">
+                    <p>R.U.T: {{factura.compania.rut}}</p>
+                    <p>{{nombre_documento}}</p>
+                    <p>{{factura.numero_factura}}</p>
+                </div>
+                <div class="direccion">
+                    DIreccion: {{factura.compania.direccion}} {{factura.compania.comuna|upper}}
+                </div>
+            </div>
+            <div>
+                <table class="table-descripcion">
+                    <tr>
+                        <td>
+                            Señores:
+                        </td>
+                        <td>
+                            {{factura.senores|upper}}
+                        </td>
+                        <td>
+                            
+                        </td>
+                        <td>
+                            
+                        </td>
+                        <td>
+                            R.U.T.: 
+                        </td>
+                        <td>
+                            {{factura.rut}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Dirección:
+                        </td>
+                        <td>
+                            {{factura.direccion|upper}}
+                        </td>
+                        <td>
+                            Giro:
+                        </td>
+                        <td>
+                            {{factura.giro|upper}}
+                        </td>
+                        <td>
+                            Fecha: 
+                        </td>
+                        <td>
+                            {{factura.fecha|date:"SHORT_DATE_FORMAT"}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Comuna:
+                        </td>
+                        <td>
+                            {{factura.comuna|default_if_none:""|upper}}
+                        </td>
+                        {% comment %}
+                        <td>
+                            Cond. de venta:
+                        </td>
+                        <td>
+                            {{factura.condicion_venta|default_if_none:""|upper}}
+                        </td>
+                        
+                        <td>
+                            Guía: 
+                        </td>
+                        <td>
+                            {{factura.guia|default_if_none:""|upper}}
+                        </td>
+                        {% endcomment %}
+                    </tr>
+                    <tr>
+                        <td>
+                            Región:
+                        </td>
+                        <td>
+                            {{factura.region|default_if_none:""|upper}}
+                        </td>
+                        {% comment %}
+                        <td>
+                            Vencimiento:
+                        </td>
+                        <td>
+                            {{factura.vencimiento|default_if_none:""|upper}}
+                        </td>
+                        <td>
+                            O. de Compra: 
+                        </td>
+                        <td>
+                            {{factura.orden_compra|default_if_none:""|upper}}
+                        </td>
+                        {% endcomment %}
+                    </tr>
+                    <tr>
+                        {% if factura.descuento_global %}
+                            <td>
+                                Descuento global:
+                            </td>
+                            <td>
+                                {{factura.descuento_global|default_if_none:0|format_mil}}{{factura.tipo_descuento|default_if_none:""|upper}}
+                            </td>
+                        {% endif %}
+                    </tr>
+                    {% comment %}
+                    <tr>
+                        <td>
+                            Transporte:
+                        </td>
+                        <td>
+                            {{factura.transporte|default_if_none:""|upper}}
+                        </td>
+                        <td>
+                            Vendedor:
+                        </td>
+                        <td>
+                            {{factura.vendedor|default_if_none:""|upper}}
+                        </td>
+                        <td>
+                            Nota de venta: 
+                        </td>
+                        <td>
+                            {{factura.nota_venta|default_if_none:""|upper}}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            Despachar A:
+                        </td>
+                        <td>
+                            {{factura.despachar|default_if_none:""|upper}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Observaciones:
+                        </td>
+                        <td>
+                            {{factura.observaciones|default_if_none:""|upper}}
+                        </td>
+                    </tr>
+                    {% endcomment %}
+                </table>
+            </div>
+            <div>
+                <table class="table-factura">
+                    <thead>
+                        <tr>
+                            <th width="10%">
+                                Cant.
+                            </th>
+                            <th width="10%">
+                                Unidad
+                            </th>
+                            <th width="10%">
+                                Código
+                            </th>
+                            <th width="40%">
+                                Descripción
+                            </th>
+                            <th width="10">
+                                P.Unit
+                            </th>
+                            <th width="10%">
+                                Dcto(%)
+                            </th>
+                            <th width="10%">
+                                Total
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--Tr para el for-->
+                        {% for prod in productos%}
+                        <tr>
+                            <td class="align-center">{{prod.qty}}</td>
+                            <td class="align-center">Unidad</td>
+                            <td class="align-center">{{prod.item_code}}</td>
+                            <td class="align-center">{{prod.item_name}}</td>
+                            <td class="align-right">{{prod.base_net_rate|default_if_none:0|format_mil}}</td>
+                            <td class="align-right">{{prod.discount|default_if_none:0|format_mil}}</td>
+                            <td class="align-right">{{prod.amount|default_if_none:0|format_mil}}</td>
+                        </tr>
+                        {% endfor %}
+                        <!--Fin del for del re-->
+                    </tbody>
+                    <tfoot>
+                        <!--Tr final de la tabla-->
+                        <tr class="border_footer">
+
+                            <td colspan="5" rowspan="4">
+                                {% comment %}
+                                SON: {{factura.monto_palabra|default_if_none:" "}}
+                                {% endcomment %}
+                            </td>
+
+                            <td>
+                                <b>NETO</b>
+                            </td>
+                            <td class="align-right">
+                                {{factura.neto|default_if_none:0|format_mil}}
+                            </td>
+                        </tr>
+                        <tr class="border">
+                            <td>
+                                <b>EXENTO</b>
+                            </td>
+                            <td class="align-right">
+                                {{exento|default_if_none:"0"|format_mil}}
+                            </td>
+                        </tr>
+                        <tr class="border">
+                            <td>
+                                <b>IVA( {{ factura.compania.tasa_de_iva}} %)</b>
+                            </td>
+                            <td class="align-right">
+                                {{factura.iva|default_if_none:"0"|format_mil}}
+                            </td>
+                        </tr>
+                        <tr class="border_bottom">
+                            <td>
+                                <b>TOTAL</b>
+                            </td>
+                            <td class="align-right">
+                                {{total|default_if_none:0|format_mil}}
+                            </td>
+                        </tr>                        
+                    </tfoot>
+                </table>
+            </div>
+            <br>
+            <div>
+                
+                {% if referencia %}
+                    <table class="table-factura">
+                        <thead>
+                        <tr>
+                            <th colspan="3">
+                                Referencia a otros documentos
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                Tipo de Documento
+                            </th>
+                            <th>
+                                Folio
+                            </th>
+                            <th>
+                                Fecha
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                {{referencia.tipo_dte|tipo_dte}}
+                            </td>
+                            <td>
+                                {{referencia.n_folio}}
+                            </td>
+                            <td>
+                                {{referencia.fecha}}
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr class="border_footer">
+                            <td colspan="3">
+                            </td>
+                        </tr>
+                    </tfoot>
+                    </table>
+                {% endif %}
+            </div>
+            <div class="timbre">
+                <img src="{{ruta}}">
+                <p>Timbre Electrónico SII</p>
+                <p>Res. 80 de 2014 Verifique documento: www.sii.cl</p>
+            </div>
+        </div>
+    </body>
+</html>

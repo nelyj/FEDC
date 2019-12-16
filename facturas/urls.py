@@ -1,5 +1,7 @@
 from django.urls import path, re_path
 
+from base.views import DeleteDTEView
+
 from .views import *
 
 app_name = 'facturas'
@@ -16,4 +18,6 @@ urlpatterns = [
          SendInvoice.as_view(), name='send-invoice'),
     path('estado-factura/<int:pk>/<str:slug>/',
          VerEstadoFactura.as_view(), name="ver_estado"),
+    path('eliminar-dte/<int:pk>',
+       DeleteDTEView.as_view(), name="eliminar_dte"),
 ]

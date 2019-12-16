@@ -1,5 +1,5 @@
 {% extends "utils_start.html" %}
-{% block titulo %}Registrar Conectores{% endblock titulo %}
+{% block titulo %}Notas de Debito{% endblock titulo %}
 {% block extras_css %}
 {% load staticfiles %}
 <link type="text/css" rel="stylesheet" href="{% static 'jquery-entropizer-master/dist/css/jquery-entropizer.min.css' %}" />
@@ -13,41 +13,32 @@
 {% endblock extras_js %}
 {% block content_center %}
 <a class="glyphicon glyphicon-list" id="menu-toggle"></a>
-<table id="myTable" class="display" style="width:100%">
+{% if sistema %}
+<div class="row" style="margin-bottom:10px">
+    <div class="col-md-offset-10">
+        <a href="{% url 'nota_debito:nota_sistema_crear' compania %}" class="btn btn-success">
+            Crear Nota de Debito
+        </a>
+    </div>
+</div>
+{% endif %}
+<table id="datatable" class="display" style="width:100%">
     <thead>
         <tr>
-            <th>Factura</th>
+            <th>N°</th>
             <th>Compañía</th>
             <th>N° de folio</th>
             <th>Acciones</th>
         </tr>
     </thead>
-    <tbody>
-        {%for factura in object_list%}
-        <tr>
-            <td> <a href="#">{{factura.numero_factura}}</a></td>
-            <td>{{factura.compania.razon_social}}</td>
-            <td>{{ factura.n_folio }}</td>
-            <td>
-                <a href="{% url 'nota_debito:ver_estado_nd' factura.compania.pk factura.numero_factura %}"  class="btn btn-success">Ver Estado</a>
-                <a  id="edit_foo" href="{% url 'nota_debito:imprimir_nd' factura.compania.pk factura.numero_factura 'NOTA_DEB_ELEC' %}" target="_blank" class="btn btn-info">Imprimir</a>
-                <a  id="edit_foo" href="{% url 'base:imprimir_factura' factura.compania.pk factura.numero_factura 'NOTA_DEB_ELEC' %}?impre=cont" target="_blank" class="btn btn-warning">Impresion continua</a>
-            </td>
-        </tr>
-        {%endfor%}
-    </tbody>
-    <tfoot>
-        <tr>
-            <th>Factura</th>
-            <th>Compañía</th>
-            <th>N° de folio</th>
-            <th>Acciones</th>
-        </tr>
-    </tfoot>
 </table>
-    <script type="text/javascript">
-        $(document).ready( function () {
-          $('#myTable').DataTable();
-      });
-  </script>
-  {% endblock content_center %}
+    
+{% endblock content_center %}
+{% block custom_js%}
+<script type="text/javascript">
+// Objeto Json lista de nota de credito
+var URL = "{% url 'base:ajax_list_dte' compania 'NOTA_DEB_ELEC'%}?sistema={{sistema}}";
+</script>
+<script type="text/javascript" src="{% static 'custom_datatable/listDataTable.js' %}" ></script>
+<script type="text/javascript" src="{% static 'start/modals.js' %}"></script>
+{% endblock custom_js%}

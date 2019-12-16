@@ -16,10 +16,10 @@
               <!-- Inicio Tab panes -->
                 <div class="tab-content">
                     <div class="col-lg-3">
-                        <a href="{% url 'libro:listar_libro' compania %}" class="glyphicon glyphicon-list btn btn-block btn-primary"> Listar Libros</a>
+                        <a href="{% url 'libro:listar_libro' compania %}?tipo_libro=1" class="glyphicon glyphicon-list btn btn-block btn-primary"> Listar Libros de Venta</a>
                     </div><br><br>
                     <div role="tabpanel" class="tab-pane active" id="libro">
-                      <h3>Crear Libro</h3>
+                      <h3>Crear Libro de Venta</h3>
                       <form id="form_register" method="post">
                           {% csrf_token %}
                           <div class="col-xs-12" >

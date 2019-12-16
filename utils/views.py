@@ -93,7 +93,7 @@ class TokenGenerator():
     """!
     Token Generator, based on Django signing
 
-    @author Rodrigo Boet (rudmanmrrod@gmail.com)
+    @author Rodrigo Boet (rodrigo.b at timgla.com)
     @author Ing. Luis Barrios (nikeven at gmail.com)
     @date 16-04-2017
     @version 1.0.0

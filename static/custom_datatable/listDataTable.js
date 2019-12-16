@@ -1,5 +1,5 @@
 $(document).ready(function() {
-   $('#datatable').dataTable({
+   data_table = $('#datatable').DataTable({
         "processing": true,
         "serverSide": true,
         "destroy": true,
@@ -7,8 +7,5 @@ $(document).ready(function() {
         language: {
             url: JSON_DATA
         }
-        });
-    $('#datatable')
-        .removeClass('display')
-        .addClass('table table-striped table-bordered');
+    });
 });

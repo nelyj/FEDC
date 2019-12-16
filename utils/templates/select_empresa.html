@@ -15,7 +15,7 @@
 
 <div class="empresa-form-wrapper">
     {% if tiene_empresa %}
-    <form method="POST">
+    <form method="POST" id="select_compania">
         {% csrf_token %}
         <select name="empresa" class=form-control>
             {% for empresa in empresas %}
@@ -30,5 +30,11 @@
 
     {% endif %}
 </div>
-  
+<script type="text/javascript">
+    $('#select_compania').submit(
+        function(){
+            $(".se-pre-con").fadeOut("slow").show();
+            $('#mensaje_spinner').text('Estableciendo conexion con el ERPNext, esto puede tardar unos segundos, por favor espere...')
+        });
+</script>
 {% endblock content_center %}
