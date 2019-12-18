@@ -122,15 +122,14 @@ class CompaniaViews(LoginRequiredMixin, FormView):
             messages.error(self.request, "Contraseña del certificado incorrecta")
             return super().form_invalid(form)
 
-
-
         try:
             saved_instance = form.save(commit=False)
             saved_instance.pass_correo_sii = self.decode_encode.encrypt(saved_instance.pass_correo_sii)
             saved_instance.pass_correo_intercambio = self.decode_encode.encrypt(saved_instance.pass_correo_intercambio)
             saved_instance.pass_certificado = self.decode_encode.encrypt(saved_instance.pass_certificado)
+            saved_instance.owner = self.request.user.pk
             saved_instance.save()
-            
+
             Certificado.objects.create(
                     empresa=saved_instance,
                     owner=self.request.user,
