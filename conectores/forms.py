@@ -34,8 +34,7 @@ class FormConector(ModelForm):
         self.fields['t_documento'].widget.attrs.update({'class': 'form-control'})
         self.fields['empresa'].widget.attrs.update({'class': 'form-control'})
         if self.request:
-            
-            self.fields['empresa'].queryset = Compania.objects.filter(owner=self.request.user)
+            self.fields['empresa'].queryset = Compania.objects.filter(owner=self.request.user.pk)
 
     def clean(self):
         cleaned_data = super(FormConector, self).clean()
