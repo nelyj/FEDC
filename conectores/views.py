@@ -54,7 +54,7 @@ class ConectorViews(LoginRequiredMixin, FormView):
                 'url_erp': form['url_erp'].value(),
                 'url_sii': form['url_sii'].value(),
                 #'password': self.hasher().encode(password=form['password'].value(), salt='salt', iterations=50000),
-                'password': self.decode_encode.encrypt(form['password'].value()),
+                'password': self.decode_encode.encrypt(str(form['password'].value())),
                 'time_cron': form['time_cron'].value(),
                 'certificado': form['certificado'].value(),
                 'empresa': Compania.objects.get(pk=form['empresa'].value())
@@ -127,7 +127,7 @@ class CompaniaViews(LoginRequiredMixin, FormView):
             saved_instance.pass_correo_sii = self.decode_encode.encrypt(saved_instance.pass_correo_sii)
             saved_instance.pass_correo_intercambio = self.decode_encode.encrypt(saved_instance.pass_correo_intercambio)
             saved_instance.pass_certificado = self.decode_encode.encrypt(saved_instance.pass_certificado)
-            saved_instance.owner = self.request.user.pk
+            saved_instance.owner = self.request.user
             saved_instance.save()
 
             Certificado.objects.create(
