@@ -615,7 +615,7 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView, WeasyTemplateResponseMix
         exento = 0
 
         for prod in productos:
-            if prod['discount']:
+            if prod.get('discount', None):
                 f_total = prod['qty'] * prod['base_net_rate']
                 total = f_total - (f_total*(prod['discount']/100))
                 exento += decimal.Decimal(total)
@@ -628,7 +628,7 @@ class ImprimirFactura(LoginRequiredMixin, TemplateView, WeasyTemplateResponseMix
         context['exento'] = decimal.Decimal(exento) 
         context['total'] = decimal.Decimal(context['exento']) + decimal.Decimal(context['factura'].neto) + decimal.Decimal(context['factura'].compania.tasa_de_iva)
 
-        ruta = settings.STATIC_URL + context['factura'].numero_factura + '/timbre.jpg'
+        ruta = settings.MEDIA_URL + context['factura'].numero_factura + '/timbre.jpg'
         context['ruta']=ruta
         return context
 
