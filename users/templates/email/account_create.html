@@ -1,0 +1,25 @@
+{% block subject %}
+Creacion de Cuenta de usuario {{ site_name }}
+{% endblock subject %}
+
+{% block text_body %}
+Usted esta recibiendo este mensaje, porqué el usuario administrador del sitio web {{ site_name }} creo una cuenta de usuario asociado a su correo electrónico.
+
+Las credenciales de acceso son:
+
+Username: {{ user.get_username }}
+Contraseña: {{ password }}
+
+Por su serguridad le recomendamos que cambie su contraseña.
+
+{% endblock text_body %}
+
+{% block html_body %}
+<p>Usted esta recibiendo este mensaje, porqué el usuario administrador del sitio web <a href="{{ protocol }}://{{ domain }}/{{ url }}">{{ protocol }}://{{ domain }}/{{ url }}</a>{{ site_name }} creo una cuenta de usuario asociado a su correo electrónico.</p>
+
+<p>Las credenciales de acceso son:</a>
+<p>Username: {{ user.get_username }}
+</p>
+<p>Contraseña: {{ password }}</p>
+<p>Por su serguridad le recomendamos que cambie su contraseña.</p>
+{% endblock html_body %}
