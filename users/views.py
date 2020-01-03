@@ -58,6 +58,7 @@ from multi_form_view import MultiModelFormView
 
 from .models import *
 from .forms import *
+from .email import AccountCreateEmail
 
 from utils.views import (
     LoginRequeridoPerAuth, IpClient,
@@ -575,12 +576,15 @@ class RegisterView(LoginRequeridoPerAuth, MultiModelFormView):
             action_flag=ADDITION)
         messages.success(self.request, "Usuario %s creado con exito\
                                        " % (str(usuario)))
+        to = [nuevo_usuario.email]
+        context = {'user': nuevo_usuario, 'password': forms['user'].cleaned_data['password1']}
+        AccountCreateEmail(self.request, context).send(to)
         return super(RegisterView, self).forms_valid(forms)
 
     def forms_invalid(self, forms, **kwargs):
         return super(RegisterView, self).forms_invalid(forms)
 
-        
+
 class ModalsPerfil(LoginRequeridoPerAuth, MultiModelFormView):
     """!
     Construye el modals para la actualizacion del usuario
@@ -869,5 +873,5 @@ class RegisterAccountView(FormView):
         @return errors on form
         """
         messages.error(self.request, form.errors)
-    
+
         return super().form_invalid(form)
