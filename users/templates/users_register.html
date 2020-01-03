@@ -39,6 +39,10 @@
                     {{ forms.user.username }}
                     <span class="glyphicon glyphicon-user form-control-feedback"></span>
                   </div>
+                  <a class="btn glyphicon glyphicon-refresh" data-toggle="tooltip" data-placement="top" 
+                  title="Generar contraseña!" onclick="ramdomString(8)"></a>
+                  <a class="btn glyphicon glyphicon-eye-open" data-toggle="tooltip" data-placement="top" title="Ver contraseña!" id="show"> <input type='checkbox' id ="check" style="display: none;"/></a>
+                  
                   <div class="form-group has-feedback">
                     {{ forms.user.password1 }}
                     <span class="glyphicon glyphicon-lock form-control-feedback"></span>

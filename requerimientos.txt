@@ -24,6 +24,7 @@ django-cors-headers==2.5.2
 django-datatables-view==1.13.1
 django-extensions==1.7.2
 django-filter==2.1.0
+django-templated-mail==1.1.1
 django-weasyprint==0.5.4
 djangorestframework==3.9.2
 future==0.17.1
