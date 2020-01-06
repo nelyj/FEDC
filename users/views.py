@@ -594,7 +594,8 @@ class ModalsPerfil(LoginRequeridoPerAuth, MultiModelFormView):
     @date 09-01-2017
     @version 1.0.0
     """
-    model = UserProfile
+    model = User
+    model_profile = UserProfile
     form_classes = {
       'user': FormularioUpdate,
       'user_perfil': FormularioAdminRegPerfil,
@@ -613,26 +614,27 @@ class ModalsPerfil(LoginRequeridoPerAuth, MultiModelFormView):
         """
         context = super(ModalsPerfil, self).get_context_data(**kwargs)
         self.record_id = self.kwargs.get('pk', None)
-        try:
-            record = self.model.objects.select_related().get(fk_user=self.record_id)
-        except UserProfile.DoesNotExist:
-            record = None
-        context['upUser'] = record
+        #try:
+        #    record = self.model_profile.objects.select_related().get(fk_user=self.record_id)
+        #except UserProfile.DoesNotExist:
+        #    record = None
+        context['upUser'] = self.record_id
         return context
 
     def get_objects(self, **kwargs):
         """
-        Carga el formulario en la vista,para actualizar el perfil del  usuario
-        @return: El contexto con los objectos para la vista
+        Carga el formulario en la vista, para actualizar el perfil del  usuario
+        @return: El contexto con los formularios cargados para la vista
         """
         self.record_id = self.kwargs.get('pk', None)
         try:
-            record = self.model.objects.select_related().get(fk_user=self.record_id)
+            record = self.model_profile.objects.select_related().get(fk_user=self.record_id)
         except UserProfile.DoesNotExist:
             record = None
+            record_user = self.model.objects.get(pk=self.record_id)
         return {
           'user_perfil': record,
-          'user': record.fk_user if record else None}
+          'user': record.fk_user if record else record_user}
 
     def get_success_url(self):
         return reverse('users:lista_users')
