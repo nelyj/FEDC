@@ -9,10 +9,11 @@ Modulo donde se construyen los ajax´s llamados desde los templates
 @version 1.0.0
 """
 from django.conf import settings
-from django_datatables_view.base_datatable_view import BaseDatatableView
 from django.contrib.auth.models import (
     User
     )
+from django.db.models import Q
+from django_datatables_view.base_datatable_view import BaseDatatableView
 from utils.views import (
     LoginRequeridoPerAuth
 )
@@ -31,7 +32,7 @@ class ListUsersAjaxView(LoginRequeridoPerAuth, BaseDatatableView):
     model = User
     # define the columns that will be returned
     columns = ['pk', 'first_name', 'last_name', 'username', 'email',
-                          'date_joined', 'last_joined', 'is_active', 'groups']
+                          'date_joined', 'last_login', 'is_active', 'groups']
     # define column names that will be used in sorting
     # order is important and should be same as order of columns
     # displayed by datatables. For non sortable columns use empty
@@ -58,6 +59,21 @@ class ListUsersAjaxView(LoginRequeridoPerAuth, BaseDatatableView):
         # You should not filter data returned here by any filter values entered by user. This is because
         # we need some base queryset to count total number of records.
         return self.model.objects.all()
+
+    def filter_queryset(self, qs):
+        # use parameters passed in GET request to filter queryset
+
+        search = self.request.GET.get(u'search[value]', None)
+        if search:
+            qs_params = None
+            if search in "Activo" or search in "activo":
+                search = True
+            elif search in "Inactivo" or search in "inactivo":
+                search = False
+            q = Q(pk__istartswith=search)|Q(first_name__icontains=search)|Q(last_name__icontains=search)|Q(email__icontains=search)|Q(date_joined__icontains=search)|Q(last_login__icontains=search)|Q(is_active__icontains=search)|Q(groups__name__icontains=search)
+            qs_params = qs_params | q if qs_params else q
+            qs = qs.filter(qs_params)
+        return qs
 
     def prepare_results(self, qs):
         """!
