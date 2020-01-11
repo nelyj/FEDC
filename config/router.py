@@ -7,9 +7,9 @@ Router del api de Rest Framework
 @version 1.0
 """
 from rest_framework import routers
-from facturas.viewset import *
-from nota_credito.viewset import NotaCreditoViewSet
+from dte.viewset import *
+#from nota_credito.viewset import NotaCreditoViewSet
 
 router = routers.DefaultRouter()
-router.register(r'facturas/(?P<rut>[-\w\s]+)/(?P<slug>[-\w]+)', FacturaViewSet, basename='facturas')
-router.register(r'nota-credito', NotaCreditoViewSet, basename='nota-credito')
+router.register(r'facturas/(?P<rut>[-\w\s]+)/(?P<slug>[-\w]+)', DteViewSet, basename='facturas')
+#router.register(r'nota-credito', NotaCreditoViewSet, basename='nota-credito')
