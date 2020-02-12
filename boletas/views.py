@@ -66,7 +66,7 @@ class ListaBoletasViews(LoginRequiredMixin, TemplateView):
 
         compania = self.kwargs.get('pk')
 
-        usuario = Conector.objects.filter(empresa=compania).first()
+        usuario = Conector.objects.filter(t_documento='39', empresa=compania).first()
 
         if not usuario:
 
