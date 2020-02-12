@@ -21,7 +21,7 @@ class ConectorViews(LoginRequiredMixin, FormView):
     """
     form_class = FormConector
     template_name = 'registrar_conector.html'
-    success_url =reverse_lazy('conectores:registrar_conector')
+    success_url = reverse_lazy('conectores:registrar_conector')
     model = Conector
     hasher = PBKDF2PasswordHasher
     decode_encode = DecodeEncodeChain()
@@ -48,7 +48,7 @@ class ConectorViews(LoginRequiredMixin, FormView):
         """
         try:
             transaction = Conector.objects.update_or_create(
-                pk=1,
+                empresa=form['empresa'].value(),
                 defaults={
                 'usuario': form['usuario'].value(),
                 'url_erp': form['url_erp'].value(),
@@ -57,6 +57,7 @@ class ConectorViews(LoginRequiredMixin, FormView):
                 'password': self.decode_encode.encrypt(str(form['password'].value())),
                 'time_cron': form['time_cron'].value(),
                 'certificado': form['certificado'].value(),
+                't_documento': form['t_documento'].value(),
                 'empresa': Compania.objects.get(pk=form['empresa'].value())
                 })
             msg = "Se configuro el Conector con éxito"
@@ -75,7 +76,7 @@ class ConectorViews(LoginRequiredMixin, FormView):
         @return errors on form
         """
         messages.error(self.request, form.errors)
-    
+
         return super().form_invalid(form)
 
     def get_form_kwargs(self):
