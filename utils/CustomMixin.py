@@ -15,7 +15,7 @@ class SeleccionarEmpresaView(LoginRequiredMixin,TemplateView):
 
         context = super().get_context_data(*args, **kwargs)
         context['empresas'] = Compania.objects.all()
-        if Compania.objects.filter(owner=self.request.user).exists():
+        if context['empresas']:
             context['tiene_empresa'] = True
         else:
             messages.info(self.request, "Registre una empresa para continuar")
