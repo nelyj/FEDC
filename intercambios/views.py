@@ -36,7 +36,7 @@ class SeleccionarEmpresaIntercambioView(LoginRequiredMixin, TemplateView):
   def get_context_data(self, *args, **kwargs): 
 
     context = super().get_context_data(*args, **kwargs)
-    context['empresas'] = Compania.objects.filter(owner=self.request.user)
+    context['empresas'] = Compania.objects.all()
     if Compania.objects.filter(owner=self.request.user).exists():
         context['tiene_empresa'] = True
     else:
