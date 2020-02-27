@@ -51,13 +51,13 @@ class StartLibro(SeleccionarEmpresaView):
         if not empresa:
             return HttpResponseRedirect('/')
         empresa_obj = Compania.objects.get(pk=empresa)
-        if empresa_obj and self.request.user == empresa_obj.owner and self.kwargs['tipo'] == 'crear':
+        if empresa_obj or self.request.user == empresa_obj.owner and self.kwargs['tipo'] == 'crear':
             return HttpResponseRedirect(reverse_lazy('libro:crear_libro', kwargs={'pk':empresa}))
-        elif empresa_obj and self.request.user == empresa_obj.owner and self.kwargs['tipo'] == 'listar':
+        elif empresa_obj or self.request.user == empresa_obj.owner and self.kwargs['tipo'] == 'listar':
             return HttpResponseRedirect(str(reverse_lazy('libro:listar_libro', kwargs={'pk':empresa})+"?tipo_libro=1"))
-        elif empresa_obj and self.request.user == empresa_obj.owner and self.kwargs['tipo'] == 'crear-compra':
+        elif empresa_obj or self.request.user == empresa_obj.owner and self.kwargs['tipo'] == 'crear-compra':
             return HttpResponseRedirect(reverse_lazy('libro:crear_libro_compra', kwargs={'pk':empresa}))
-        elif empresa_obj and self.request.user == empresa_obj.owner and self.kwargs['tipo'] == 'listar-compra':
+        elif empresa_obj or self.request.user == empresa_obj.owner and self.kwargs['tipo'] == 'listar-compra':
             return HttpResponseRedirect(str(reverse_lazy('libro:listar_libro', kwargs={'pk':empresa})+"?tipo_libro=0"))
         else:
             return HttpResponseRedirect('/')

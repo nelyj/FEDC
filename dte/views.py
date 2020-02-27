@@ -63,7 +63,7 @@ class StartDte(SeleccionarEmpresaView):
             return redirect(str(reverse_lazy('dte:lista_dte', kwargs={'pk':empresa}))+"?enviadas=1")
         elif self.request.GET.get(u'no_enviadas_erp', None) == '1':
             return HttpResponseRedirect(reverse_lazy('dte:lista_dte_erp', kwargs={'pk':empresa}))
-        elif empresa_obj and self.request.user == empresa_obj.owner:
+        elif empresa_obj or self.request.user == empresa_obj.owner:
             return HttpResponseRedirect(reverse_lazy('dte:lista_dte', kwargs={'pk':empresa}))
         else:
             return HttpResponseRedirect('/')
