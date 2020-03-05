@@ -1,9 +1,12 @@
 from django import forms
 from django.forms import ModelForm
 from conectores.constantes import COMUNAS
+
 from utils.constantes import (
     FORMA_DE_PAGO, TIPO_DOCUMENTO, 
     VALOR_DESCUENTO, CODIGO_REFERENCIA)
+from utils.utils import Sort
+
 from .models import *
 
 class FormCreateDte(ModelForm):
@@ -41,7 +44,7 @@ class FormCreateDte(ModelForm):
         self.fields['productos'].required = False
         self.fields['ciudad_receptora'].widget.attrs.update({'class': 'form-control'})
         self.fields['comuna'].widget = forms.Select(attrs={'class':'form-control'})
-        self.fields['comuna'].choices = COMUNAS
+        self.fields['comuna'].choices = Sort(COMUNAS, 0)
         self.fields['region'].widget.attrs.update({'class': 'form-control'})
         self.fields['region'].label = "Dirección"
         self.fields['forma_pago'].widget = forms.Select(attrs={'class':'form-control'})

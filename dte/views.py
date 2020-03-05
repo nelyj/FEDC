@@ -41,8 +41,9 @@ from utils.views import (
 )
 from utils.SIISdk import SII_SDK
 
-from .models import DTE
 from .forms import FormCreateDte
+from .models import DTE
+from .utils import GenerateAutoNumFact
 
 
 class StartDte(SeleccionarEmpresaView):
@@ -110,11 +111,16 @@ class DteCreateView(LoginRequiredMixin, CreateView):
         """
         context = super().get_context_data(*args, **kwargs)
         context['compania'] = self.kwargs.get('pk') if self.kwargs.get('pk', None) else self.pk
+        compania = self.pk if self.pk else self.kwargs.get('pk')
         context['impuesto'] =  Compania.objects.get(pk=self.pk).tasa_de_iva if self.pk else Compania.objects.get(pk=self.kwargs.get('pk')).tasa_de_iva
-        if(self.request.method == 'POST'):
+        if self.request.method == 'POST':
             dict_post = dict(self.request.POST.lists())
-            productos = self.transform_product(dict_post['codigo'],dict_post['nombre'],dict_post['cantidad'],dict_post['precio'],dict_post['descuento'],dict_post['exento'])
+            productos = self.transform_product(dict_post['codigo'], dict_post['nombre'], dict_post['cantidad'],dict_post['precio'], dict_post['descuento'], dict_post['exento'])
             context['productos'] = productos
+
+        new_num_dte = GenerateAutoNumFact(self.request, compania, 33, response_http=False)
+        
+        context['form'].fields['numero_factura'].initial = new_num_dte
         return context
 
     def get_form_kwargs(self):
@@ -123,6 +129,7 @@ class DteCreateView(LoginRequiredMixin, CreateView):
         """
         kwargs = super().get_form_kwargs()
         kwargs.update({'compania': self.kwargs.get('pk')})
+
         return kwargs
 
     def get_success_url(self):
@@ -364,7 +371,7 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
         }
         productos = json.loads(prod)
         productos = productos
-        print(productos)
+
         productos = self.reverse_product(
                     productos,
                     Compania.objects.get(pk=self.kwargs.get('comp')),
@@ -827,7 +834,7 @@ class VerEstado(LoginRequiredMixin, TemplateView):
         factura = self.model.objects.get(numero_factura=num_factura, compania=compania)
         context['factura'] = factura
         
-        estado = self.get_invoice_status(factura,factura.compania,)
+        estado = self.get_invoice_status(factura, factura.compania)
 
         if(not estado['estado']):
             messages.error(self.request, estado['msg'])
@@ -850,9 +857,9 @@ class VerEstado(LoginRequiredMixin, TemplateView):
             try:
                 sign = sii_sdk.signXml(seed, compania, compania.pass_certificado)
                 token = sii_sdk.getAuthToken(sign)
-                if(token):
+                if token:
                     print(token)
-                    estado = sii_sdk.checkDTEstatus(compania.rut,factura.track_id,token)
+                    estado = sii_sdk.checkDTEstatus(compania.rut, factura.track_id, token)
                     return {'estado':True,'status':estado['estado'],'glosa':estado['glosa']} 
                 else:
                     return {'estado':False,'msg':'No se pudo obtener el token del sii'}
@@ -1186,7 +1193,6 @@ class SendDteErpToSii(LoginRequiredMixin, View):
 
         empresa = kwargs.get('pk')
         urls = request.GET.getlist('pk', [])
-
         try:
             usuario = Conector.objects.filter(empresa=empresa).first()
         except Exception as e:
@@ -1201,6 +1207,9 @@ class SendDteErpToSii(LoginRequiredMixin, View):
             print(e)
             messages.warning(self.request, "No se pudo establecer conexion con el ERP Next, se genera el siguiente error: "+str(e))
         dte_list = []
+        folio_notexist = False
+        folio_vencido = False
+        folio_notmore = False
         for url in urls:
             try:
                 aux = erp.list(session, url)
@@ -1303,19 +1312,21 @@ class SendDteErpToSii(LoginRequiredMixin, View):
                                              vencido=False,
                                              tipo_de_documento=tipo_dte).order_by('fecha_de_autorizacion').first()
                 if not folio:
-                    continue
                     raise Folio.DoesNotExist
             except Folio.DoesNotExist:
+                folio_notexist = True
                 continue
                 #return JsonResponse({'status':False, 'msg':"No posee folios para asignacion de timbre"})
             try:
                 folio.verificar_vencimiento()
             except ElCAFSenEncuentraVencido:
+                folio_vencido = True
                 continue
                 #return JsonResponse({'status':False, 'msg':"El CAF se encuentra vencido"})
             try:
                 dte.recibir_folio(folio)
             except (ElCafNoTieneMasTimbres, ValueError):
+                folio_notmore = True
                 continue
                 #return JsonResponse({'status':False, 'msg':"Ya ha consumido todos sus timbres"})
 
@@ -1350,7 +1361,20 @@ class SendDteErpToSii(LoginRequiredMixin, View):
             dte.save()
             dte_list.append(dte.pk)
         # end for
+
         session.close()
+        # Validar Folios:
+
+        if folio_notexist:
+            DTE.objects.filter(pk__in=dte_list).delete()
+            return JsonResponse({'status':False, 'msg':"No posee folios para asignacion de timbre"})
+        elif folio_vencido:
+            DTE.objects.filter(pk__in=dte_list).delete()
+            return JsonResponse({'status':False, 'msg':"El CAF se encuentra vencido"})
+        elif folio_notmore:
+            DTE.objects.filter(pk__in=dte_list).delete()
+            return JsonResponse({'status':False, 'msg':"Ya ha consumido todos sus timbres"})
+        
         if len(dte_list) > 1 or dte.tipo_dte == 39:
             dte_boletas = DTE.objects.filter(compania_id=compania.pk, pk__in=dte_list).exclude(status='ENVIADA')
 

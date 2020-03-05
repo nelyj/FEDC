@@ -73,9 +73,11 @@ function generalTotal(table_id){
 		}
 	})
 	var total = (neto + (neto * (impuesto/100) )) + exento
-	$('#out_neto').val(neto)
-	$('#out_total').val(total)
-	$('#out_exento').val(exento)
+	var out_impuesto = neto * (impuesto/100)
+	$('#out_impuesto').val(Number((out_impuesto).toFixed(0)))
+	$('#out_neto').val(Number((neto).toFixed(0)))
+	$('#out_total').val(Number((total).toFixed(0)))
+	$('#out_exento').val(Number((exento).toFixed(0)))
 }
 
 /**
@@ -85,6 +87,15 @@ function generalTotal(table_id){
 */
 function show_dte_fields(select_value){
 	var val = $(select_value).val()
+
+	url = GENERATE_NUM_DTE;
+	$.ajax({
+		type: 'GET',
+		url: GENERATE_NUM_DTE.replace(0, val),
+		success: function(response) {
+			$('#id_numero_factura').val(response.num_dte)
+		}
+	})
 	if(val == 56 || val == 61){
 		$('#dte_hidden').show()
 		disable_dte_table_buttons(true)
