@@ -89,7 +89,7 @@ class SII_SDK():
         signature = etree.parse(settings.BASE_DIR+'/facturas/templates/snippets/signature_sii.xml').getroot()
         signature = etree.tostring(signature)
         authentication = render_to_string('snippets/authentication.xml', {'seed':seed,'signature':signature.decode()})
-        return self.generalSign(compania,authentication, pass_certificado)
+        return self.generalSign(compania, authentication, pass_certificado)
 
     def generalSign(self,compania,xml_string, pass_certificado):
         """
@@ -199,6 +199,7 @@ class SII_SDK():
         response = body.find('{http://'+self.sii_url+'.sii.cl/DTEWS/QueryEstUp.jws}getEstUpResponse').find('{http://'+self.sii_url+'.sii.cl/DTEWS/QueryEstUp.jws}getEstUpReturn').text
         xml_response = ET.fromstring(response)
         estado = xml_response.find('{http://www.sii.cl/XMLSchema}RESP_HDR').find('ESTADO').text
+        
         glosa = xml_response.find('{http://www.sii.cl/XMLSchema}RESP_HDR').find('GLOSA').text
         return {'estado':estado,'glosa':glosa}
 

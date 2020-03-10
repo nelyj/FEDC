@@ -98,3 +98,11 @@ def validate_string_number(value):
                     '%(value)s el valor es requerido',
                     params={'value': value},
                 )
+
+# Python code to sort the tuples using float element 
+# Function to sort using sorted() 
+def Sort(tup, position): 
+    # reverse = True (Sorts in Descending order) 
+    # key is set to sort using float elements 
+    # lambda has been used 
+    return(sorted(tup, key = lambda x: x[position], reverse = False))

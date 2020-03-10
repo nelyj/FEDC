@@ -29,6 +29,7 @@ class DteViewSet(viewsets.ViewSet):
     @date 07-01-2020 (dd-mm-YY)
     @version 1.0
     """
+    save_dte = SaveDteErp()
 
     def create(self, request, rut, slug):
         value = True
@@ -41,7 +42,7 @@ class DteViewSet(viewsets.ViewSet):
         valor = re.sub('[^a-zA-Z0-9 \n\.]', '', dte['numero_factura'])
         valor = valor.replace(' ', '')
         dte_obj.numero_factura = valor
-        tipo_dte = SaveDteErp.type_dte(dte.get('tipo_de_documento', None))
+        tipo_dte = self.save_dte.type_dte(dte.get('tipo_de_documento', None))
         dte_obj.tipo_dte = tipo_dte
         try:
             dte_obj.status = dte['status_sii']

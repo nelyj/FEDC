@@ -27,6 +27,7 @@ from utils.constantes import (TIPO_DOCUMENTO, FORMA_DE_PAGO,
 from utils.SIISdk import SII_SDK
 from utils.utils import validate_string_number
 
+
 class DTE(CreationModificationDateMixin):
     """!
     Modelo DTE
@@ -62,6 +63,7 @@ class DTE(CreationModificationDateMixin):
         ordering = ('numero_factura',)
         verbose_name = 'DTE'
         verbose_name_plural = 'DTE'
+        unique_together = (("compania", "numero_factura"),)
     
     def __str__(self):
         return self.numero_factura

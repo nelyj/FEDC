@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import *
+from .utils import GenerateAutoNumFact
 
 app_name = 'dte'
 urlpatterns = [
@@ -31,4 +32,7 @@ urlpatterns = [
          SendDteErpToSii.as_view(), name='send_dte_erp'),
     path('detalle-dte/<int:pk>/<str:slug>/',
          DeatailDTE.as_view(), name='detail_dte'),
+    path('genarate_num_dte/<int:compania>/<str:tipo>/',
+        GenerateAutoNumFact, name='generate_dte'
+        )
 ]

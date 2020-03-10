@@ -121,7 +121,7 @@
             </div>
             <div class="col-md-offset-8">
                 <label>Impuesto</label>
-                <input class="form-control" type="text" disabled="true" value="{{impuesto}}">
+                {{impuesto}} % <input class="form-control" type="text" disabled="true" id="out_impuesto">
             </div>
             <div class="col-md-offset-8">
                 <label>Total</label>
@@ -134,6 +134,7 @@
     </form>
 <script type="text/javascript">
     const LOAD_DTE = "{% url 'dte:get_dte_data' 0 %}" ;
+    const GENERATE_NUM_DTE = "{% url 'dte:generate_dte' compania 0%}";
     var impuesto = {{impuesto}};
     var today = new Date();
     
