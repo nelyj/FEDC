@@ -130,7 +130,7 @@ class DteViewSet(viewsets.ViewSet):
         except Exception as e:
             dte_obj.total = ""
         try:
-            compania = Compania.objects.get(razon_social=rut)
+            compania = Compania.objects.get(rut=rut)
         except Exception as e:
             print(e)
             value = False
