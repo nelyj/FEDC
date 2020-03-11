@@ -434,7 +434,7 @@ class UpdateDTEView(LoginRequiredMixin, UpdateView):
                 new_prod['descuento'] = 0
             new_prod['exento'] = producto.get('exento')
             if(new_prod['descuento']):
-                f_total = producto.get('qty', 0) * producto.get('base_net_rate', 0)
+                f_total = int(producto.get('qty', 0)) * int(producto.get('base_net_rate', 0))
                 new_prod['amount'] = f_total - (f_total*(new_prod['descuento']/100))
             else:
                 new_prod['amount'] = producto.get('qty', 0) * producto.get('base_net_rate', 0)

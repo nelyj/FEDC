@@ -148,11 +148,16 @@ class DteViewSet(viewsets.ViewSet):
             value = False
             return Response({"response":value,"message":"El CAF se encuentra vencido"})
         try:
+            dte_obj.recibir_folio(folio)
+        except (ElCafNoTieneMasTimbres, ValueError):
+            value = False
+            return Response({"response":value,"message":"Ya ha consumido todos sus timbres"})
+        try:
             response_dd = DTE._firmar_dd(dte, folio, dte_obj)
-            documento_firmado = DTE.firmar_documento(response_dd,dte,folio, compania, dte_obj, compania.pass_certificado)
+            documento_firmado = DTE.firmar_documento(response_dd, dte, folio, compania, dte_obj, compania.pass_certificado)
             documento_final_firmado = DTE.firmar_etiqueta_set_dte(compania, folio, documento_firmado,dte_obj)
-            caratula_firmada = DTE.generar_documento_final(compania,documento_final_firmado,compania.pass_certificado)
-            fact_obj.dte_xml = caratula_firmada
+            caratula_firmada = DTE.generar_documento_final(compania,documento_final_firmado,compania.pass_certificado, dte_obj)
+            dte_obj.dte_xml = caratula_firmada
         except Exception as e:
             print(e)
             value = False
@@ -166,7 +171,15 @@ class DteViewSet(viewsets.ViewSet):
             f.write(caratula_firmada)
             f.close()
         except Exception as e:
+            print(e)
             value = False
             return Response({"response":value,"message":"Ocurrió un error al crear el xml"})
-        fact_obj.save()
+        try:
+            dte_obj.forma_pago = 1
+            dte_obj.compania = compania
+            dte_obj.save()
+        except Exception as e:
+            print(e)
+            value = False
+            return Response({"response":value, "message":"Error al guardar el documento: {0}".format(e)})
         return Response({"response":value,"message":"Se creo el DTE con éxito"})
