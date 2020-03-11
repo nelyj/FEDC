@@ -139,7 +139,7 @@ class DTE(CreationModificationDateMixin):
 
         # Ajustados los montos de productos para el xml
         for producto in datos['productos']:
-            if(producto['discount']):
+            if producto.get('discount', None) or producto.get('discount_amount', None):
                 producto['discount'] = round(abs(producto['discount']))
                 discount_amount = producto['base_net_rate'] * (producto['discount']/100)
                 producto['discount_amount'] = round(abs(discount_amount))
@@ -157,10 +157,11 @@ class DTE(CreationModificationDateMixin):
         datos['numero_factura'] = datos['numero_factura'].replace('º','')
         datos['neto']=str(round(abs(float(datos['neto']))))
         datos['total']=str(round(abs(float(datos['total']))))
-        if(datos['exento']):
+        if datos.get('exento'):
             datos['monto_exento'] = str(round(abs(float(datos['exento']))))
 
-        datos['iva']=str(round(abs(int(datos['iva']))))
+        if datos.get('iva'):
+            datos['iva'] = str(round(abs(int(datos['iva']))))
 
         ref = ''
         if(instance.tipo_dte==56 or instance.tipo_dte==61):
