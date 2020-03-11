@@ -149,7 +149,7 @@ class DteViewSet(viewsets.ViewSet):
             return Response({"response":value,"message":"El CAF se encuentra vencido"})
         try:
             response_dd = DTE._firmar_dd(dte, folio, dte_obj)
-            documento_firmado = DTE.firmar_documento(response_dd,factura,folio, compania, fact_obj, compania.pass_certificado)
+            documento_firmado = DTE.firmar_documento(response_dd,dte,folio, compania, fact_obj, compania.pass_certificado)
             documento_final_firmado = DTE.firmar_etiqueta_set_dte(compania, folio, documento_firmado,fact_obj)
             caratula_firmada = DTE.generar_documento_final(compania,documento_final_firmado,compania.pass_certificado)
             fact_obj.dte_xml = caratula_firmada
