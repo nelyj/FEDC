@@ -94,7 +94,12 @@ class DTE(CreationModificationDateMixin):
             data['rut'] = data['rut'].replace('.','')
         data['neto']=str(round(float(data['neto'])))
         data['total']=str(round(abs(float(data['total']))))
-
+        if data.get('senores') is None:
+            data['senores'] = instance.senores
+        
+        if isinstance(instance.fecha, str):
+            instance.fecha = datetime.datetime.strptime(instance.fecha, "%Y-%m-%d")
+        
         sin_aplanar = render_to_string('snippets/dd_tag.xml', {'data':data,'folio':folio, 'instance':instance, 'timestamp':timestamp})
         digest_string = sin_aplanar.replace('\n','').replace('\t','').replace('\r','')
         RSAprivatekey = RSA.importKey(folio.pem_private)
@@ -162,7 +167,8 @@ class DTE(CreationModificationDateMixin):
 
         if datos.get('iva'):
             datos['iva'] = str(round(abs(int(datos['iva']))))
-
+        else:
+            datos['iva'] = str(round(float(datos['neto']) * (compania.tasa_de_iva/100)))
         ref = ''
         if(instance.tipo_dte==56 or instance.tipo_dte==61):
             documento_tag = 'snippets/documento_tag_ncd.xml'
