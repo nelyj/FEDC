@@ -24,6 +24,8 @@ from mixins.models import CreationModificationDateMixin
 from utils.constantes import (TIPO_DOCUMENTO, FORMA_DE_PAGO, 
     VALOR_DESCUENTO, CODIGO_REFERENCIA
 )
+
+from utils.models import Parametro
 from utils.SIISdk import SII_SDK
 from utils.utils import validate_string_number
 
@@ -187,8 +189,11 @@ class DTE(CreationModificationDateMixin):
                 'ref':ref
             })
 
-
-        sii_sdk = SII_SDK(settings.SII_PRODUCTION)
+        try:
+            sii_produccion = Parametro.objects.get(activo=True).sii_produccion
+        except:
+            sii_produccion = settings.SII_PRODUCTION
+        sii_sdk = SII_SDK(sii_produccion)
         set_dte_sin_aplanar = sii_sdk.generalSign(compania,documento_sin_aplanar,pass_certificado)
 
         return set_dte_sin_aplanar
@@ -246,8 +251,12 @@ class DTE(CreationModificationDateMixin):
         else:
             documento_final = render_to_string('snippets/dte.xml', {'set_DTE':etiqueta_SetDte})
 
+        try:
+            sii_produccion = Parametro.objects.get(activo=True).sii_produccion
+        except:
+            sii_produccion = settings.SII_PRODUCTION
         # Se firmó el archivo xml
-        sii_sdk = SII_SDK(settings.SII_PRODUCTION)
+        sii_sdk = SII_SDK(sii_produccion)
         set_dte_sin_aplanar = sii_sdk.multipleSign(compania,documento_final,pass_certificado,1)
 
         return '<?xml version="1.0" encoding="ISO-8859-1"?>\n'+set_dte_sin_aplanar
