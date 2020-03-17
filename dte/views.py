@@ -36,6 +36,7 @@ from utils.constantes import (
     documentos_dict, FORMA_DE_PAGO
 )
 from utils.CustomMixin import SeleccionarEmpresaView
+from utils.models import Parametro
 from utils.views import (
     sendToSii, DecodeEncodeChain
 )
@@ -713,8 +714,9 @@ class AjaxGenericListDTETable(LoginRequiredMixin, BaseDatatableView):
                                                                                           kwargs={'pk':item.pk, 'comp':self.kwargs['pk']}))
                 botones_acciones = boton_enviar_sii + boton_editar +boton_eliminar
             else:
-                boton_estado = '<a href="{0}"\
-                                class="btn btn-success">Ver Estado</a> '.format(reverse_lazy('dte:ver_estado', kwargs={'pk':self.kwargs['pk'], 'slug':item.numero_factura}))
+                #boton_estado = '<a href="{0}"\
+                #                class="btn btn-success">Ver Estado</a> '.format(reverse_lazy('dte:ver_estado', kwargs={'pk':self.kwargs['pk'], 'slug':item.numero_factura}))
+                boton_estado = ''
                 boton_imprimir_doc = '<a  id="edit_foo" href="{0}"\
                                      target="_blank" class="btn btn-info">Imprimir</a> '.format(reverse_lazy('dte:imprimir_dte', kwargs={'pk':self.kwargs['pk'], 'slug':item.numero_factura}))
                 boton_imprimir_con = '<a  id="edit_foo" href="{0}?impre=cont"\
@@ -852,6 +854,10 @@ class VerEstado(LoginRequiredMixin, TemplateView):
         @return dict con la respuesta
         """
         try:
+            try:
+                sii_produccion = Parametro.objects.get(activo=True).sii_produccion
+            except:
+                sii_produccion = settings.SII_PRODUCTION
             sii_sdk = SII_SDK(settings.SII_PRODUCTION)
             seed = sii_sdk.getSeed()
             try:

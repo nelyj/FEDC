@@ -28,11 +28,14 @@ from django.contrib.auth.mixins import (
 from django.shortcuts import (
     redirect
 )
+from django.urls import reverse_lazy
+from django.views.generic.edit import FormView
 
 from braces.views import GroupRequiredMixin
 
 from users.models import TwoFactToken
 
+from .forms import FormularioParametro
 from .models import *
 from .messages import MENSAJES_LOGIN
 
@@ -192,7 +195,11 @@ def sendToSii(compania,invoice, pass_certificado):
     """
     from .SIISdk import SII_SDK
     try:
-        sii_sdk = SII_SDK(settings.SII_PRODUCTION)
+        try:
+            sii_produccion = Parametro.objects.get(activo=True).sii_produccion
+        except:
+            sii_produccion = settings.SII_PRODUCTION
+        sii_sdk = SII_SDK(sii_produccion)
         seed = sii_sdk.getSeed()
         try:
             sign = sii_sdk.signXml(seed, compania, pass_certificado)
@@ -249,3 +256,45 @@ class DecodeEncodeChain():
         if data[-padding:] != bytes([padding]) * padding:  # Python 2.x: chr(padding) * padding
             raise ValueError("Invalid padding...")
         return data[:-padding]  # remove the padding
+
+
+class RegistrarParametroView(LoginRequeridoPerAuth, FormView):
+    """!
+    """
+    template_name = "config_parametros.html"
+    model = Parametro
+    form_class = FormularioParametro
+    success_url = reverse_lazy('utils:registrar_parametro')
+    group_required = [u"Super Admin"]
+
+    def form_valid(self, form, **kwargs):
+        """
+        """
+        try:
+            update_active = self.model.objects.get(activo=True)
+            update_active.activo = False
+            update_active.save()
+        except:
+            pass
+
+        created_parameter =  form.save(commit=False)
+        created_parameter.fk_user = self.request.user
+        obj, created = self.model.objects.update_or_create(
+            fk_user = created_parameter.fk_user,
+            defaults={
+                'envio_automatico': created_parameter.envio_automatico,
+                'activo': True
+                }
+            )
+        if created:
+            msg = "Los parametros generales se crearon con éxito"
+            messages.success(self.request, msg)
+        else:
+            msg = "Los parametros generales se actualizaron"
+            messages.info(self.request, msg)
+
+        return super().form_valid(form)
+
+    def form_invalid(self, form, **kwargs):
+        return super().form_invalid(form)
+

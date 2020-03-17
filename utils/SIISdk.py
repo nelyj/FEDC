@@ -197,6 +197,7 @@ class SII_SDK():
         response = requests.post('https://'+self.sii_url+'.sii.cl/DTEWS/QueryEstUp.jws?WSDL',data=soap,headers=headers)
         body = self._get_soap_body(response.content)
         response = body.find('{http://'+self.sii_url+'.sii.cl/DTEWS/QueryEstUp.jws}getEstUpResponse').find('{http://'+self.sii_url+'.sii.cl/DTEWS/QueryEstUp.jws}getEstUpReturn').text
+        print(response)
         xml_response = ET.fromstring(response)
         estado = xml_response.find('{http://www.sii.cl/XMLSchema}RESP_HDR').find('ESTADO').text
         glosa = xml_response.find('{http://www.sii.cl/XMLSchema}RESP_HDR').find('GLOSA').text

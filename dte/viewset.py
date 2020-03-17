@@ -17,8 +17,15 @@ from conectores.models import *
 from folios.models import Folio
 from folios.exceptions import ElCafNoTieneMasTimbres, ElCAFSenEncuentraVencido
 
+from utils.views import (
+    sendToSii, DecodeEncodeChain
+)
+from utils.models import Parametro
+
 from .models import DTE
-from .views import SaveDteErp
+from .views import (
+    SaveDteErp, SendToSiiView
+)
 
 
 class DteViewSet(viewsets.ViewSet):
@@ -159,7 +166,6 @@ class DteViewSet(viewsets.ViewSet):
             caratula_firmada = DTE.generar_documento_final(compania, documento_final_firmado, compania.pass_certificado, dte_obj)
             dte_obj.dte_xml = caratula_firmada
         except Exception as e:
-            print(e)
             value = False
             return Response({"response":value,"message":"Ocurrió un error al generar el xml"})
         etiqueta = slug.replace('º','')
@@ -177,9 +183,26 @@ class DteViewSet(viewsets.ViewSet):
         try:
             dte_obj.forma_pago = 1
             dte_obj.compania = compania
-            dte_obj.save()
+
+            send_sii = sendToSii(dte_obj.compania,dte_obj.dte_xml,dte_obj.compania.pass_certificado)
+            try:
+                envio_automatico = Parametro.objects.get(activo=True).envio_automatico
+            except:
+                envio_automatico = False
+            if envio_automatico:
+                if not send_sii['estado']:
+                    value = False
+                    return Response({'response': value, 'status':send_sii['estado'], 'message':send_sii['msg']})
+                else:
+                    dte_obj.track_id = send_sii['track_id']
+                    dte_obj.save()
+                    msg = 'y se envio con éxito al SII'
+            else:
+                dte_obj.save()
+                msg = 'con éxito'
         except Exception as e:
             print(e)
             value = False
             return Response({"response":value, "message":"Error al guardar el documento: {0}".format(e)})
-        return Response({"response":value,"message":"Se creo el DTE con éxito"})
+
+        return Response({"response":value,"message":"Se creo el DTE " + msg})
